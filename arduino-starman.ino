@@ -25,19 +25,22 @@
  ****************************************************/
 
 #include "Adafruit_TLC5947.h"
+#include "Playtune.h"
 
-// How many boards do you have chained?
-#define NUM_TLC5974 1
+#define BUTTON_PIN  2
 
-#define data   4
-#define clock   5
-#define latch   6
+#define DATA_PIN    4
+#define CLOCK_PIN   5
+#define LATCH_PIN   6
 
-Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
+#define AUDIO_1_PIN  7
+#define AUDIO_2_PIN  8
+#define AUDIO_3_PIN  9
+
+Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 
 #define TOTAL_LEDS 24
 #define FADE_LEDS 18
-#define BUTTON 2
 
 uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
@@ -47,8 +50,8 @@ int8_t delta[FADE_LEDS];   // current brightness delta
 void setup() {
   Serial.begin(9600);
 
-  pinMode(BUTTON, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON), button, RISING);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
     active[i] = i;
