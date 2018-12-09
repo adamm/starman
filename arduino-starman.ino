@@ -1,28 +1,27 @@
 /***************************************************
-  Arduino Starman Christmas Ornament
+
+    Arduino Starman Christmas Ornament
+    Copyright (C) 2018  Adam McDaniel
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+  ------
 
   * 24 randomly fading LEDs
   * TODO: add music button
   * TODO: flash lights in sequence with music
 
-  Adam McDaniel
-
-  ----
-
-  Uses an Adafruit 24-channel PWM/LED driver
-
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/1429
-
-  These drivers uses SPI to communicate, 3 pins are required to
-  interface: Data, Clock and Latch. The boards are chainable
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  BSD license, all text above must be included in any redistribution
  ****************************************************/
 
 #include "Adafruit_TLC5947.h"
