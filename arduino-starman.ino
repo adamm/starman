@@ -38,14 +38,18 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, clock, data, latch);
 
 #define TOTAL_LEDS 24
 #define FADE_LEDS 18
+#define BUTTON 2
 
 uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
- int8_t delta[FADE_LEDS];   // current brightness delta
+int8_t delta[FADE_LEDS];   // current brightness delta
 
 
 void setup() {
   Serial.begin(9600);
+
+  pinMode(BUTTON, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON), button, RISING);
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
     active[i] = i;
@@ -60,30 +64,30 @@ void setup() {
 
 uint8_t current = 0;
 uint16_t count = 0;
-uint16_t cycle = 200;
+uint16_t cycle = 100;
+
+void button() {
+  Serial.println("button!");
+  current = 1;
+}
 
 void loop() {
   //rotate(list, TOTAL_LEDS);
 
   if (current == 0) {
     fade();
-    cycle = 1000;
   }
   else if (current == 1) {
     marquee();
-    cycle = 50;
+    if (count++ > cycle) {
+      count = 0;
+      current = 0;
+    }
+
   }
   else if (current == 2) {
     twinkle();
     cycle = 100;
-  }
-
-  count++;
-  if (count > cycle) {
-    count = 0;
-    current++;
-    if (current >= 2)
-      current = 0;
   }
 
   //random_fade_in_out();
@@ -140,7 +144,7 @@ void marquee() {
     if (list[i])
       tlc.setPWM(i, 4095);
     else
-      tlc.setPWM(i, 0);
+      tlc.setPWM(i, 512);
   }
 
   list[TOTAL_LEDS] = list[0];
