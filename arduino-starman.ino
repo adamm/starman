@@ -1,5 +1,15 @@
 /***************************************************
-  This is an example for our Adafruit 24-channel PWM/LED driver
+  Arduino Starman Christmas Ornament
+
+  * 24 randomly fading LEDs
+  * TODO: add music button
+  * TODO: flash lights in sequence with music
+
+  Adam McDaniel
+
+  ----
+
+  Uses an Adafruit 24-channel PWM/LED driver
 
   Pick one up today in the adafruit shop!
   ------> http://www.adafruit.com/products/1429
