@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "arduino-starman.ino",
+    "port": "/dev/cu.Bluetooth-Incoming-Port",
+    "programmer": "ArduinoISP"
+}
