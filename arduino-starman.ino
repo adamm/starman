@@ -26,6 +26,7 @@
 
 #include "Adafruit_TLC5947.h"
 #include "Playtune.h"
+#include "Music.h"
 
 #define BUTTON_PIN  2
 
