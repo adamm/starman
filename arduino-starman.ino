@@ -47,12 +47,19 @@ uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
 int8_t delta[FADE_LEDS];   // current brightness delta
 
+Playtune pt;
 
 void setup() {
   Serial.begin(9600);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
+
+  pt.tune_initchan(3);
+  pt.tune_initchan(4);
+  pt.tune_initchan(5);
+
+  pt.tune_callback(&callback);
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
     active[i] = i;
@@ -72,6 +79,11 @@ uint16_t cycle = 100;
 void button() {
   Serial.println("button!");
   current = 1;
+}
+
+void callback() {
+  Serial.println("note tune callback!");
+  // Callback function called once per note.  Increment LED pattern on each note.
 }
 
 void loop() {

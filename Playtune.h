@@ -29,6 +29,7 @@
 class Playtune
 {
 public:
+ void tune_callback (void (*callback)(void));
  void tune_initchan (byte pin);			// assign a timer to an output pin
  void tune_playscore (const byte *score);	// start playing a polyphonic score
  volatile static boolean tune_playing;	// is the score still playing?

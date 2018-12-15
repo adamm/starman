@@ -374,6 +374,8 @@ const unsigned int PROGMEM tune_frequencies2_PGM[128] =
   22351, 23680, 25088
 };
 
+void (*callback_func)(void);
+
 void tune_playnote (byte chan, byte note);
 void tune_stopnote (byte chan);
 void tune_stepscore (void);
@@ -382,6 +384,10 @@ void tune_stepscore (void);
 void teslacoil_rising_edge(byte timernum);
 byte teslacoil_checknote(byte note);
 #endif
+
+void Playtune::tune_callback(void (*callback)(void)) {
+  callback_func = callback;
+}
 
 //------------------------------------------------------
 // Initialize a music channel on a specific output pin
@@ -743,6 +749,7 @@ void tune_stepscore (void) {
       Playtune::tune_playing = false;
       break;
     }
+    callback_func();
   }
 }
 
