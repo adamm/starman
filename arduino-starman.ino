@@ -52,6 +52,7 @@ const unsigned char* music[] = { block, powerup, starman, fanfare, death };
 
 Playtune pt;
 
+
 void setup() {
   Serial.begin(9600);
 
@@ -73,6 +74,7 @@ void setup() {
   Serial.println("LEDs ready");
 }
 
+
 void button() {
   Serial.println("button!");
   if (stage == 0) {
@@ -85,6 +87,7 @@ void button() {
   }
 }
 
+
 void callback() {
   Serial.println("note tune callback!");
   // Callback function called once per note.  Increment LED pattern on each note.
@@ -95,9 +98,8 @@ void callback() {
   tlc.write();
 }
 
-void loop() {
-  //rotate(list, TOTAL_LEDS);
 
+void loop() {
   if (stage == 0) {
     fade();
     tlc.write();
@@ -116,8 +118,8 @@ void loop() {
 
 }
 
-void fade() {
 
+void fade() {
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
     int16_t brightness;
 
@@ -176,43 +178,8 @@ void marquee() {
 }
 
 
-void random_fade_in_out() {
-  static uint8_t list[TOTAL_LEDS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-  static uint8_t active = 1;
-  static int8_t direction = 1;
-  static uint8_t cycleAt = 2;
-  static uint8_t count = 0;
-
-  for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
-    tlc.setPWM(i, (list[i] <= active ? 4095 : 0));
-  }
-
-  if (count++ == cycleAt) {
-    active += direction;
-    if (active == TOTAL_LEDS || active == 0) {
-      direction *= -1;
-    }
-    count = 0;
-  }
-
-  shuffle(list, TOTAL_LEDS);
-}
-
-
-void twinkle() {
-  static uint8_t list[TOTAL_LEDS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-  
-  for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
-    tlc.setPWM(i, (4095 / TOTAL_LEDS * list[i]));
-  }
-  shuffle(list, TOTAL_LEDS);
-  delay(100);
-}
-
-
 void shuffle(uint8_t *array, size_t n)
 {
-
   if (n > 1)
   {
     size_t i;
