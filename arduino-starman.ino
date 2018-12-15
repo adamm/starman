@@ -46,6 +46,9 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
 int8_t delta[FADE_LEDS];   // current brightness delta
+uint8_t stage = 0;         // music stage (0 = no music active)
+
+const unsigned char* music[] = { block, powerup, starman, fanfare, death }; 
 
 Playtune pt;
 
@@ -54,12 +57,10 @@ void setup() {
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
-
-  pt.tune_initchan(3);
-  pt.tune_initchan(4);
-  pt.tune_initchan(5);
+  Serial.println("Button ready");
 
   pt.tune_callback(&callback);
+  Serial.println("Music ready");
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
     active[i] = i;
@@ -68,46 +69,51 @@ void setup() {
   }
   shuffle(active, FADE_LEDS);
 
-  Serial.println("TLC5974 test");
   tlc.begin();
+  Serial.println("LEDs ready");
 }
-
-uint8_t current = 0;
-uint16_t count = 0;
-uint16_t cycle = 100;
 
 void button() {
   Serial.println("button!");
-  current = 1;
+  if (stage == 0) {
+    pt.tune_initchan(3);
+    pt.tune_initchan(4);
+    pt.tune_initchan(5);
+
+    stage = 1;
+    pt.tune_playscore(music[stage]);
+  }
 }
 
 void callback() {
   Serial.println("note tune callback!");
   // Callback function called once per note.  Increment LED pattern on each note.
+
+  if (stage >= 1)
+    marquee();
+
+  tlc.write();
 }
 
 void loop() {
   //rotate(list, TOTAL_LEDS);
 
-  if (current == 0) {
+  if (stage == 0) {
     fade();
+    tlc.write();
   }
-  else if (current == 1) {
-    marquee();
-    if (count++ > cycle) {
-      count = 0;
-      current = 0;
+  else {
+    pt.tune_playscore(music[stage]);
+    while (pt.tune_playing) ; /* wait here until playing stops */
+    pt.tune_delay(100); /* wait a moment */
+    stage++;
+    if (stage == 5) {
+      stage = 0;
+      pt.tune_stopchans();
     }
-
-  }
-  else if (current == 2) {
-    twinkle();
-    cycle = 100;
+    // tlc.write() called during callback()
   }
 
-  //random_fade_in_out();
-
-  tlc.write();
 }
 
 void fade() {
