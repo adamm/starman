@@ -47,7 +47,44 @@ int16_t bright[FADE_LEDS];  // current brightness value
 int8_t delta[FADE_LEDS];    // current brightness delta
 uint8_t stage = -1;         // music stage (0 = no music active)
 
-const unsigned char* music[] = { NULL, block, powerup, starman, fanfare, death }; 
+uint8_t alternate[]  = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+uint8_t shortdot[]   = {0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1};
+uint8_t longdot[]    = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1};
+uint8_t shortdash[]  = {0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1};
+uint8_t widedash[]   = {0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1};
+uint8_t longdash[]   = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1};
+uint8_t allpoints[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+uint8_t halfpoints[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+void marquee(uint8_t *pattern);
+void flash(uint8_t *pattern);
+
+struct demo {
+  const unsigned char *music;
+  void (*sequence)(uint8_t*);
+  uint8_t *pattern;
+};
+
+// TODO: Randomize start overworld, underwater, overworld, castle
+// TODO: Randomize end flagpole, fanfare, death, gameover, ending
+demo stardemo[] = {
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+
+  { .music = overworld, .sequence = &marquee, .pattern = widedash },
+  // { .music = underwater, .sequence = &marquee, .pattern = widedash },
+  // { .music = underworld, .sequence = &marquee, .pattern = longdot },
+  // { .music = castle, .sequence = &marquee, .pattern = longdot },
+
+  { .music = block, .sequence = &marquee, .pattern = longdot },
+  { .music = powerup, .sequence = &flash, .pattern = allpoints },
+  { .music = starman, .sequence = &marquee, .pattern = widedash },
+
+  { .music = flagpole, .sequence = &marquee, .pattern = longdash },
+  // { .music = fanfare, .sequence = &marquee, .pattern = shortdash },
+  // { .music = death, .sequence = &marquee, .pattern = longdash },
+  // { .music = gameover, .sequence = &marquee, .pattern = widedash},
+  // { .music = ending, .sequence = &marquee, .pattern = widedash },
+};
 
 void (*reset)(void) = 0;    // Declare a reset function at address 0
 
@@ -92,12 +129,12 @@ void button() {
 
 void callback() {
   // Callback function called once per note.  Increment LED pattern on each note.
+  Serial.println(stage);
+  void (*sequence)(uint8_t*) = stardemo[stage].sequence;
+  void *pattern  = stardemo[stage].pattern;
 
-  // TODO: create unique LED patterns for stages 2-5
-  if (stage >= 1) {
-    marquee();
-    tlc.write();
-  }
+  sequence(pattern);
+  tlc.write();
 }
 
 
@@ -109,11 +146,11 @@ void loop() {
   else if (stage >= 1) {
     Serial.print("playing stage");
     Serial.println(stage);
-    pt.tune_playscore(music[stage]);
+    pt.tune_playscore(stardemo[stage].music);
     while (pt.tune_playing); /* wait here until playing stops */
     pt.tune_delay(100); /* wait a moment */
     stage++;
-    if (stage == elements(music)) {
+    if (stage == elements(stardemo)) {
       stage = 0;
       reset();
     }
@@ -160,23 +197,34 @@ void fade() {
   pt.tune_delay(20);
 }
 
-
-void marquee() {
+void marquee(uint8_t *pattern) {
   static uint8_t count = 1;
-  static uint8_t list[24] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
 
   for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
-    if (list[i])
+    if (pattern[i])
       tlc.setPWM(i, 4095);
     else
       tlc.setPWM(i, 512);
   }
 
-  list[TOTAL_LEDS] = list[0];
+  pattern[TOTAL_LEDS] = pattern[0];
   for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
-    list[i] = list[i + 1];
+    pattern[i] = pattern[i + 1];
   }
-//  pt.tune_delay(5);
+}
+
+
+void flash(uint8_t *pattern) {
+  for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
+    if (pattern[i])
+      tlc.setPWM(i, 4095);
+    else
+      tlc.setPWM(i, 256);
+  }
+
+  for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
+    pattern[i] = !pattern[i];
+  }
 }
 
 
