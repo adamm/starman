@@ -19,8 +19,7 @@
   ------
 
   * 24 randomly fading LEDs
-  * TODO: add music button
-  * TODO: flash lights in sequence with music
+  * 24 synchronized LEDs with music playback
 
  ****************************************************/
 
@@ -29,14 +28,12 @@
 #include "Music.h"
 
 #define BUTTON_PIN  2
-
-#define DATA_PIN    4
-#define CLOCK_PIN   5
-#define LATCH_PIN   6
-
-#define AUDIO_1_PIN  7
-#define AUDIO_2_PIN  8
-#define AUDIO_3_PIN  9
+#define AUDIO_1_PIN 3
+#define AUDIO_2_PIN 4
+#define AUDIO_3_PIN 5
+#define DATA_PIN    6
+#define CLOCK_PIN   7
+#define LATCH_PIN   8
 
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 
@@ -45,21 +42,24 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 
 uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
-int8_t delta[FADE_LEDS];   // current brightness delta
-uint8_t stage = 0;         // music stage (0 = no music active)
+int8_t delta[FADE_LEDS];    // current brightness delta
+uint8_t stage = -1;         // music stage (0 = no music active)
 
-const unsigned char* music[] = { block, powerup, starman, fanfare, death }; 
+const unsigned char* music[] = { NULL, block, powerup, starman, fanfare, death }; 
 
 Playtune pt;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
   Serial.println("Button ready");
 
+  pt.tune_initchan(AUDIO_1_PIN);
+  pt.tune_initchan(AUDIO_2_PIN);
+  pt.tune_initchan(AUDIO_3_PIN);
   pt.tune_callback(&callback);
   Serial.println("Music ready");
 
@@ -72,30 +72,28 @@ void setup() {
 
   tlc.begin();
   Serial.println("LEDs ready");
+  stage = 0;
 }
 
 
 void button() {
-  Serial.println("button!");
+  Serial.print("Got Button! Stage: ");
+  Serial.println(stage);
   if (stage == 0) {
-    pt.tune_initchan(3);
-    pt.tune_initchan(4);
-    pt.tune_initchan(5);
-
+    // Button only reacts at stage=0 .. no music playing & random fading active
     stage = 1;
-    pt.tune_playscore(music[stage]);
   }
 }
 
 
 void callback() {
-  Serial.println("note tune callback!");
   // Callback function called once per note.  Increment LED pattern on each note.
 
-  if (stage >= 1)
+  // TODO: create unique LED patterns for stages 2-5
+  if (stage >= 1) {
     marquee();
-
-  tlc.write();
+    tlc.write();
+  }
 }
 
 
@@ -104,18 +102,17 @@ void loop() {
     fade();
     tlc.write();
   }
-  else {
+  else if (stage >= 1) {
+    Serial.print("playing stage");
+    Serial.println(stage);
     pt.tune_playscore(music[stage]);
-    while (pt.tune_playing) ; /* wait here until playing stops */
+    while (pt.tune_playing); /* wait here until playing stops */
     pt.tune_delay(100); /* wait a moment */
     stage++;
-    if (stage == 5) {
+    if (stage == 6) {
       stage = 0;
-      pt.tune_stopchans();
     }
-    // tlc.write() called during callback()
   }
-
 }
 
 
@@ -155,7 +152,7 @@ void fade() {
       }
     }
   }
-  delay(20);
+  pt.tune_delay(20);
 }
 
 
@@ -174,7 +171,7 @@ void marquee() {
   for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
     list[i] = list[i + 1];
   }
-  delay(50);
+//  pt.tune_delay(5);
 }
 
 

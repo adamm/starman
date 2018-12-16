@@ -4,8 +4,10 @@ Youtube Demo: https://www.youtube.com/watch?v=mx5et6Ui8Hc
 
 ## TODO
 
-- [ ] Add music button
-- [ ] Flash lights in sequence with music
+- [X] Add music button
+- [X] Flash lights in sequence with music
+- [ ] Create different light sequences based on music playing
+- [ ] Randomize the music pattern
 
 ## Build Dependencies
 

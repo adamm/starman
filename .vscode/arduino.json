@@ -1,7 +1,7 @@
 {
     "board": "arduino:avr:nano",
     "sketch": "arduino-starman.ino",
-    "port": "/dev/cu.Bluetooth-Incoming-Port",
-    "programmer": "ArduinoISP",
+    "port": "/dev/cu.usbserial-AD01V63V",
+    "programmer": "AVR ISP",
     "configuration": "cpu=atmega328old"
 }

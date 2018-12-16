@@ -374,7 +374,7 @@ const unsigned int PROGMEM tune_frequencies2_PGM[128] =
   22351, 23680, 25088
 };
 
-void (*callback_func)(void);
+void (*callback_func)(void) = NULL;
 
 void tune_playnote (byte chan, byte note);
 void tune_stopnote (byte chan);
@@ -738,6 +738,8 @@ void tune_stepscore (void) {
       note = pgm_read_byte(score_cursor++); // argument evaluation order is undefined in C!
       if (volume_present) ++score_cursor; // ignore volume if present
       tune_playnote (chan, note);
+      if (callback_func != NULL && Playtune::tune_playing)
+        callback_func();
     }
     else if (opcode == CMD_INSTRUMENT) { /* change a channel's instrument */
       score_cursor++; // ignore it
@@ -749,7 +751,6 @@ void tune_stepscore (void) {
       Playtune::tune_playing = false;
       break;
     }
-    callback_func();
   }
 }
 
