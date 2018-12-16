@@ -2,6 +2,8 @@
 
 Youtube Demo: https://www.youtube.com/watch?v=mx5et6Ui8Hc
 
+![Starman tree video](starman-tree.gif)
+
 ## TODO
 
 - [X] Add music button
