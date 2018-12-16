@@ -35,6 +35,8 @@
 #define CLOCK_PIN   7
 #define LATCH_PIN   8
 
+#define elements(x) (sizeof(x) / sizeof((x)[0]))
+
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 
 #define TOTAL_LEDS 24
@@ -46,6 +48,8 @@ int8_t delta[FADE_LEDS];    // current brightness delta
 uint8_t stage = -1;         // music stage (0 = no music active)
 
 const unsigned char* music[] = { NULL, block, powerup, starman, fanfare, death }; 
+
+void (*reset)(void) = 0;    // Declare a reset function at address 0
 
 Playtune pt;
 
@@ -109,8 +113,9 @@ void loop() {
     while (pt.tune_playing); /* wait here until playing stops */
     pt.tune_delay(100); /* wait a moment */
     stage++;
-    if (stage == 6) {
+    if (stage == elements(music)) {
       stage = 0;
+      reset();
     }
   }
 }
