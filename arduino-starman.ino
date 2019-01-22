@@ -66,25 +66,39 @@ struct demo {
   uint8_t *pattern;
 };
 
-// TODO: Randomize start overworld, underwater, overworld, castle
-// TODO: Randomize end flagpole, fanfare, death, gameover, ending
-demo stardemo[] = {
-  { .music = NULL, .sequence = NULL, .pattern = NULL },
+demo levelstart[] = {
+  { .music = overworld, .sequence = &marquee, .pattern = widedash},
+  { .music = underworld, .sequence = &marquee, .pattern = longdot },
+  { .music = underwater, .sequence = &marquee, .pattern = halfpoints },
+  { .music = castle, .sequence = &marquee, .pattern = longdot },
+}; // randomly pick one
 
-  { .music = overworld, .sequence = &marquee, .pattern = widedash },
-  // { .music = underwater, .sequence = &marquee, .pattern = widedash },
-  // { .music = underworld, .sequence = &marquee, .pattern = longdot },
-  // { .music = castle, .sequence = &marquee, .pattern = longdot },
-
+demo invincibility[] = {
   { .music = block, .sequence = &marquee, .pattern = longdot },
   { .music = powerup, .sequence = &flash, .pattern = allpoints },
   { .music = starman, .sequence = &marquee, .pattern = widedash },
+}; // randomly pick all or none
 
+demo levelfinish[] = {
   { .music = flagpole, .sequence = &marquee, .pattern = longdash },
-  // { .music = fanfare, .sequence = &marquee, .pattern = shortdash },
-  // { .music = death, .sequence = &marquee, .pattern = longdash },
-  // { .music = gameover, .sequence = &marquee, .pattern = widedash},
-  // { .music = ending, .sequence = &marquee, .pattern = widedash },
+  { .music = fanfare, .sequence = &marquee, .pattern = shortdash },
+  { .music = ending, .sequence = &marquee, .pattern = widedash },
+}; // randomly pick 1 if not cascle, or 2 plus maybe 3 if cascle, or levelfailed
+
+demo levelfailed[] = {
+  { .music = death, .sequence = &marquee, .pattern = longdash },
+  { .music = gameover, .sequence = &marquee, .pattern = widedash },
+}; // randomly pick 1, 2, or 3 instead of levelfinish
+
+demo stardemo[] = {
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
+  { .music = NULL, .sequence = NULL, .pattern = NULL },
 };
 
 void (*reset)(void) = 0;    // Declare a reset function at address 0
@@ -101,6 +115,61 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
   Serial.println("Button ready");
+
+  randomSeed(analogRead(0));
+
+  uint8_t pos = 1;
+  long level = random(elements(levelstart));
+  long invin = random(2);
+  long success = random(2);
+  long ending = random(2);
+
+  Serial.print("Play Level: ");
+  Serial.println(level);
+
+  Serial.print("Random Invincibility? ");
+  Serial.println(invin);
+
+  Serial.print("Random Success? ");
+  Serial.println(success);
+
+  Serial.print("Random Ending? ");
+  Serial.println(ending);
+  
+  stardemo[pos++] = levelstart[int(level)];
+
+  if (invin) {
+    Serial.println("Play Invincibility");
+    for (uint8_t i = 0; i < elements(invincibility); i++) {
+      stardemo[pos++] = invincibility[i];
+    }
+  }
+
+  if (success) {
+    // lived
+    Serial.println("Mario Lived!");
+    if (level < 3) {
+      stardemo[pos++] = levelfinish[0];
+      Serial.println("Play Flagpole");
+    }
+    else {
+      Serial.println("Play Fanfare");
+      stardemo[pos++] = levelfinish[1];
+      if (ending) {
+        Serial.println("Play Ending");
+        stardemo[pos++] = levelfinish[2];
+      }
+    }
+  }
+  else {
+    // died
+    Serial.println("Mario Died!");
+    stardemo[pos++] = levelfailed[0];
+    if (ending) {
+      Serial.println("Play GameOver");
+      stardemo[pos++] = levelfailed[1];
+    }
+  }
 
   pt.tune_initchan(AUDIO_1_PIN);
   pt.tune_initchan(AUDIO_2_PIN);
@@ -154,7 +223,8 @@ void loop() {
     while (pt.tune_playing); /* wait here until playing stops */
     pt.tune_delay(100); /* wait a moment */
     stage++;
-    if (stage == elements(stardemo)) {
+    if (stage == elements(stardemo) ||
+        stardemo[stage].music == NULL ) {
       stage = 0;
       reset();
     }
