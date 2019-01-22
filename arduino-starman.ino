@@ -28,12 +28,13 @@
 #include "Music.h"
 
 #define BUTTON_PIN  2
-#define AUDIO_1_PIN 3
-#define AUDIO_2_PIN 4
-#define AUDIO_3_PIN 5
-#define DATA_PIN    6
-#define CLOCK_PIN   7
-#define LATCH_PIN   8
+#define AUDIO_1_PIN 5
+#define AUDIO_2_PIN 6
+#define AUDIO_3_PIN 7
+#define DATA_PIN    9
+#define CLOCK_PIN   10
+#define DISABLE_PIN 11
+#define LATCH_PIN   12
 
 #define elements(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -45,7 +46,7 @@ Adafruit_TLC5947 tlc = Adafruit_TLC5947(1, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 uint8_t active[FADE_LEDS];  // active leds
 int16_t bright[FADE_LEDS];  // current brightness value
 int8_t delta[FADE_LEDS];    // current brightness delta
-uint8_t stage = -1;         // music stage (0 = no music active)
+volatile uint8_t stage = -1;         // music stage (0 = no music active)
 
 uint8_t alternate[]  = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
 uint8_t shortdot[]   = {0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1};
@@ -94,6 +95,9 @@ Playtune pt;
 void setup() {
   Serial.begin(115200);
 
+  pinMode(DISABLE_PIN, OUTPUT);
+  digitalWrite(DISABLE_PIN, true);
+
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
   Serial.println("Button ready");
@@ -112,6 +116,7 @@ void setup() {
   shuffle(active, FADE_LEDS);
 
   tlc.begin();
+  digitalWrite(DISABLE_PIN, false);
   Serial.println("LEDs ready");
   stage = 0;
 }
@@ -129,7 +134,6 @@ void button() {
 
 void callback() {
   // Callback function called once per note.  Increment LED pattern on each note.
-  Serial.println(stage);
   void (*sequence)(uint8_t*) = stardemo[stage].sequence;
   void *pattern  = stardemo[stage].pattern;
 
