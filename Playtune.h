@@ -26,16 +26,14 @@
 
 #include <Arduino.h>
 
-class Playtune
-{
-public:
  void tune_callback (void (*callback)(void));
  void tune_initchan (byte pin);			// assign a timer to an output pin
  void tune_playscore (const byte *score);	// start playing a polyphonic score
- volatile static boolean tune_playing;	// is the score still playing?
+ extern volatile boolean tune_playing;	// is the score still playing?
  void tune_stopscore (void);			// stop playing the score
  void tune_delay (unsigned msec);		// delay in milliseconds
  void tune_stopchans (void);			// stop all timers
-};
+ void tune_speed(unsigned percent);       // adjust playing speed:
+ //                                          100 = normal, 50 = slow by 1/2, 200 = doubletime, etc.
 
 #endif

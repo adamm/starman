@@ -1,7 +1,7 @@
 /*********************************************************************************************
 
      Playtune: An Arduino polyphonic music generator
-
+     ESP32 version
 
                          About Playtune, generally
 
@@ -9,7 +9,7 @@
    each intepret a bytestream of commands that represent a polyphonic musical
    score, and play it using different techniques.
 
-   (1) This original Playtune, first released in 2011, uses a separate hardware timer
+   (1) The original Playtune, first released in 2011, uses a separate hardware timer
    to generate a square wave for each note played simultaneously. The timers run at twice
    the frequency of the note being played, and the interrupt routine flips the output bit.
    It can play only as many simultaneous notes as there are timers available. The sound
@@ -30,36 +30,45 @@
    the Teensy to generate an analog wave that is the sum of stored samples of sounds. The
    samples are scaled to the right frequency and volume, and any number of instrument
    samples can be used and mapped to MIDI patches. The sound quality is much better,
-   although not in league with real synthesizers.
+   although not in league with real synthesizers. It currently only supports Teensy.
    https://github.com/LenShustek/playtune_samp
 
-   For all these versions, once a score starts playing, the processing happens in
+   (4) The fourth version is an audio object for the PJRC Audio Library.
+   https://www.pjrc.com/teensy/td_libs_Audio.html
+   It allows up to 16 simultaneous sound generators that are internally mixed, at
+   the appropriate volume, to produce one monophonic audio stream.
+   Sounds are created from sampled one-cycle waveforms for any number of instruments,
+   each with its own attack-hold-decay-sustain-release envelope. Percussion sounds
+   (from MIDI channel 10) are generated from longer sampled waveforms of a complete
+   instrument strike. Each generator's volume is independently adjusted according to
+   the MIDI velocity of the note being played before all channels are mixed.
+   www.github.com/LenShustek/Playtune_synth
+
+   (5) This fifth version is for the Teensy 3.1/3.2, and uses the four Periodic Interval
+   Timers in the Cortex M4 processor to support up to 4 simultaneous notes.
+   It uses less CPU time than the polling version, but is limited to 4 notes at a time.
+   (This was written to experiment with multi-channel multi-Tesla Coil music playing,
+   where I use Flexible Timer Module FTM0 for generating precise one-shot pulses.
+   But I ultimately switched to the polling version to play more simultaneous notes.)
+   www.github.com/LenShustek/Playtune_Teensy
+
+   For all versions, once a score starts playing, the processing happens in
    the interrupt routine.  Any other "real" program can be running at the same time
-   as long as it doesn't use the timer or the output pins that Playtune is using.
+   as long as it doesn't use the timers or the output pins that Playtune is using.
 
-   **** Details about this version: arduino-playtune
+   Each timer (tone generator) can be associated with any digital output pin,
+   not just the pins that are internally connected to the timer. The exception is
+   when the Teensy version is compiled for playing music on Tesla coils, in which
+   case the outputs must be on digital pins 20, 21, 22, and 23.
 
-  This uses the Arduino counters for generating tones, so the number of simultaneous
-  note that can be played varies from 3 to 6 depending on which processor you have.
-  See more information later. No volume modulation, percussion, or instrument simulation
-  is done.
-
-  Each timer (tone generator) can be associated with any digital output pin, not just the
-  pins that are internally connected to the timer.
-
-  Playtune generates a lot of interrupts because the toggling of the output bits is done
-  in software, not by the timer hardware.  But measurements I made on a NANO show that
-  Playtune uses less than 10% of the available processor cycles even when playing all
-  three channels at pretty high frequencies.
-
-  The easiest way to hear the music is to connect each of the output pins to a resistor
-  (500 ohms, say).  Connect other ends of the resistors together and then to one
-  terminal of an 8-ohm speaker.  The other terminal of the speaker is connected to
-  ground.  No other hardware is needed!  But using an amplifier is nicer.
+   The easiest way to hear the music is to connect each of the output pins to a resistor
+   (500 ohms, say).  Connect other ends of the resistors together and then to one
+   terminal of an 8-ohm speaker.  The other terminal of the speaker is connected to
+   ground.  No other hardware is needed!  But using an amplifier is nicer.
 
   ****  The public Playtune interface  ****
 
-  There are five public functions and one public variable.
+  There are fivb public functions and one public variable.
 
   void tune_initchan(byte pin)
 
@@ -85,15 +94,20 @@
 
   void tune_delay(unsigned int msec)
 
-    Delay for "msec" milliseconds.  This is provided because the usual Arduino
-    "delay" function will stop working if you use all of your processor's
-    timers for generating tones.
+    Delay for "msec" milliseconds.  This is provided for compatibility with other versions
+    of Playtune that break the "delay' function if you use all of your processor's
+    timers for generating tones. (This one doesn't, and delay() works fine.)
 
   void tune_stopchans()
 
     This disconnects all the timers from their pins and stops the interrupts.
     Do this when you don't want to play any more tunes.
 
+  void tune_speed(unsigned int percent)
+
+    New for the Teensy version, this changes playback speed to the specified percent
+    of normal. The minimum is percent=20 (1/5 slow speed) and the maximum is
+    percent=500 (5x fast speed).
 
    *****  The score bytestream  *****
 
@@ -120,8 +134,9 @@
      8t     Stop playing the note on tone generator t.
 
      Ct ii  Change tone generator t to play instrument ii from now on.  Miditones will
-            generate this with the -i option. This version of Playtune ignores
-            instrument information if it is present.
+            generate this with the -i option. This version of Playtune gives that to
+            the Tesla coil routine, if so compiled, so it can decide which coil(s)
+            to play the note on.
 
      F0     End of score: stop playing.
 
@@ -137,7 +152,23 @@
    would cause a wait of 0x07d0 = 2000 decimal millisconds or 2 seconds.  Any tones
    that were playing before the wait command will continue to play.
 
-   The score is stored in Flash memory ("PROGMEM") along with the program, because
+   Playtune bytestream files generated by later versions of the Miditones progam using
+   the -d option begin with a small header that describe what optional data is present
+   in the file. This makes the file more self-describing, and this version of Playtune
+   uses that if it is present.
+
+    'Pt'   2 ascii characters that signal the presence of the header
+     nn    The length (in one byte) of the entire header, 6..255
+     ff1   A byte of flag bits, three of which are currently defined:
+               80 velocity information is present
+               40 instrument change information is present
+               20 translated percussion notes are present
+     ff2    Another byte of flags, currently undefined
+     tt     The number (in one byte) of tone generators actually used in this music.
+            We use that the scale the volume when combining simulatneous notes.
+
+   Any subsequent header bytes covered by the count, if present, are currently undefined
+   and are ignored.The score is stored in Flash memory ("PROGMEM") along with the program, because
    there's a lot more of that than data memory.
 
 
@@ -148,36 +179,6 @@
    and I've written a program called "Miditones" to do that.  See the separate
    documentation for that program, which is also open source at
    https://github.com/lenshustek/miditones
-
-   ****  More gory details  ****
-
-   The number of hardware timers, and therefore the number of tones that can be
-   played simultaneously, depends on the processor that is on your board, of
-   which there is an ever-increasing number. Here are some. I've listed the
-   processor, some  boards the use it, and the 8- 10- and 16-bit timers they have,
-   in the order that Playtune will use them.
-
-     ATMega8 (old Arduinos): 2 tones
-        T1(16b), T2(8b) [Why not T0(8b) ??)
-     ATmega168/328 (Nano, Uno, Mini, Fio): 3 tones
-        T1(16b), T2(8b), T0(8b)
-     ATmega1280/2560 (Mega2560, MegaADK): 6 tones
-        T1(16b), T2(8b), T3(16b), T4(16b), T5(16b), T0(8b)
-     ATmega32u (Micro, Leonardo): 4 tones
-        T1(16b), T0(8b), T3(16b), T4(10b)
-
-   Timer 0 is assigned last (except on the ATmega32u), because using
-   it will disable the Arduino millis(), delay(), and the PWM functions.
-   Timer 1 is used first and is used to time the score, so it is always
-   kept running even if it isn't playing a note.
-
-   The lowest MIDI note that can be played using the 8-bit timers
-   depends on your processor's clock frequency.
-      8 Mhz clock: note 12 (about 16.5 Hz, which is below the piano keyboard)
-     16 Mhz clock: note 24 (about 32.5 Hz, C in octave 1)
-
-   The highest MIDI note (127, about 12,544 Hz) can always be played, but can't
-   always be heard.
 
    ****  Nostalgia from me  ****
 
@@ -195,7 +196,7 @@
 
   ------------------------------------------------------------------------------------
    The MIT License (MIT)
-   Copyright (c) 2011, 2016, Len Shustek
+  Copyright (c) 2011, 2016, 2021 Len Shustek
 
   Permission is hereby granted, free of charge, to any person obtaining a copy of
   this software and associated documentation files (the "Software"), to deal in
@@ -248,6 +249,13 @@
       - Various reformatting to make it easier to read.
       - Allow use of the fourth timer on the ATmega32U4 (Micro, Leonardo)
       - Change to the more permissive MIT license.
+   20 March 2021, L. Shustek,
+      - Rewrite for Teensy 3.2 using the four K20 interval timers, in support of
+        playing music on multiple Tesla coils reepresenting different instruments.
+      - Make Playtune not a C++ object, which is causing constructor/destructor
+        delay and interlocks. (Can you tell I hate C++?)
+      - Add tune_speed() to adjust playing speed without changing tones.
+      - Reformat in a more compact linguistic style.
 
   -----------------------------------------------------------------------------------------*/
 
@@ -255,11 +263,11 @@
 #include "Playtune.h"
 
 #ifndef DBUG
-#define DBUG 0          // debugging?
+#define DBUG 1          // debugging?
 #endif
-#define ASSUME_VOLUME 0 // assume volume information is present in bytestream files without headers?
-#define TESLA_COIL 0    // special Tesla Coil version?
-
+#define ASSUME_VOLUME 0    // assume volume information is present in bytestream files without headers?
+#define TESLA_COIL 0       // special Tesla Coil version?
+#define AVAILABLE_TIMERS 4 // what the Cortex M4 on the Teensy 3.2 MK20DX256VLH7 processor has
 
 struct file_hdr_t {  // the optional bytestream file header
   char id1;     // 'P'
@@ -275,358 +283,126 @@ struct file_hdr_t {  // the optional bytestream file header
 
 // timer ports and masks
 
-#if defined(__AVR_ATmega8__)
-#define TCCR2A TCCR2
-#define TCCR2B TCCR2
-#define COM2A1 COM21
-#define COM2A0 COM20
-#define OCR2A OCR2
-#define TIMSK2 TIMSK
-#define OCIE2A OCIE2
-#define TIMER2_COMPA_vect TIMER2_COMP_vect
-#define TIMSK1 TIMSK
-#endif
+hw_timer_t* timer0 = NULL;
+hw_timer_t* timer1 = NULL;
+hw_timer_t* timer2 = NULL;
+hw_timer_t* timer3 = NULL;
+hw_timer_t* timers[4] = {timer0, timer1, timer2, timer3 };
+void ISRtimer0(void);
+void ISRtimer1(void);
+void ISRtimer2(void);
+void ISRtimer3(void);
+void (*ISRs[4])(void) = {&ISRtimer0, &ISRtimer1, &ISRtimer2, &ISRtimer3 };
+// the first interval timer is also used to time score waits, whether or not that timer is playing a note
 
-#if !defined(__AVR_ATmega8__)
-volatile byte *timer0_pin_port;
-volatile byte timer0_pin_mask;
-#endif
-volatile byte *timer1_pin_port;
-volatile byte timer1_pin_mask;
-#if !defined(__AVR_ATmega32U4__)
-volatile byte *timer2_pin_port;
-volatile byte timer2_pin_mask;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-volatile byte *timer3_pin_port;
-volatile byte timer3_pin_mask;
-volatile byte *timer4_pin_port;
-volatile byte timer4_pin_mask;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-volatile byte *timer5_pin_port;
-volatile byte timer5_pin_mask;
-#endif
-
-// Define the order to allocate timers.
-
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-#define AVAILABLE_TIMERS 6
-const byte PROGMEM tune_pin_to_timer_PGM[] = {
-  1, 2, 3, 4, 5, 0
-};
-#elif defined(__AVR_ATmega8__)
-#define AVAILABLE_TIMERS 2
-const byte PROGMEM tune_pin_to_timer_PGM[] = {
-  1, 2
-};
-#elif defined(__AVR_ATmega32U4__)
-#define AVAILABLE_TIMERS 4
-const byte PROGMEM tune_pin_to_timer_PGM[] = {
-  1, 0, 3, 4
-};
-#else
-#define AVAILABLE_TIMERS 3
-const byte PROGMEM tune_pin_to_timer_PGM[] = {
-  1, 2, 0
-};
-#endif
-
-//  Other local varables
+//  local varables
 
 byte _tune_pins[AVAILABLE_TIMERS];
+byte _tune_volume[AVAILABLE_TIMERS] = {0 }; // last volume for each timer
 byte _tune_num_chans = 0;
+unsigned _tune_speed = 100;
 
-/* one of the timers is also used to time
-  - score waits (whether or not that timer is playing a note)
-  - tune_delay() delay requests
-  We currently use timer1, since that is the common one available on different microcontrollers.
-*/
-volatile unsigned wait_timer_frequency2;       /* its current frequency */
-volatile unsigned wait_timer_old_frequency2;   /* its previous frequency */
+volatile unsigned wait_timer_frequency8;       /* its current frequency x 8 */
 volatile boolean wait_timer_playing = false;   /* is it currently playing a note? */
-volatile boolean doing_delay = false;          /* are we using it for a tune_delay()? */
 volatile unsigned long wait_toggle_count;      /* countdown score waits */
-volatile unsigned long delay_toggle_count;     /* countdown tune_ delay() delays */
 
 volatile const byte *score_start = 0;
 volatile const byte *score_cursor = 0;
-volatile boolean Playtune::tune_playing = false;
+volatile boolean tune_playing = false;
 boolean volume_present = ASSUME_VOLUME;
 
-// Table of midi note frequencies * 2
-//   They are times 2 for greater accuracy, yet still fit in a word.
-//   Generated from Excel by =ROUND(2*440/32*(2^((x-9)/12)),0) for 0<x<128
-// The lowest notes might not work, depending on the Arduino clock frequency
-
-const unsigned int PROGMEM tune_frequencies2_PGM[128] =
-{
-  16, 17, 18, 19, 21, 22, 23, 24, 26, 28, 29, 31, 33, 35, 37, 39, 41,
-  44, 46, 49, 52, 55, 58, 62, 65, 69, 73, 78, 82, 87, 92, 98, 104, 110,
-  117, 123, 131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233,
-  247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494,
-  523, 554, 587, 622, 659, 698, 740, 784, 831, 880, 932, 988, 1047,
-  1109, 1175, 1245, 1319, 1397, 1480, 1568, 1661, 1760, 1865, 1976,
-  2093, 2217, 2349, 2489, 2637, 2794, 2960, 3136, 3322, 3520, 3729,
-  3951, 4186, 4435, 4699, 4978, 5274, 5588, 5920, 6272, 6645, 7040,
-  7459, 7902, 8372, 8870, 9397, 9956, 10548, 11175, 11840, 12544,
-  13290, 14080, 14917, 15804, 16744, 17740, 18795, 19912, 21096,
-  22351, 23680, 25088
-};
-
 void (*callback_func)(void) = NULL;
+// Table of midi note frequencies times 8
+//   They are times 8 for greater accuracy.
+//   Generated from Excel by =ROUND(8*440/32*(2^((x-9)/12)),0) for 0<x<128
+
+const uint32_t PROGMEM tune_frequencies8_PGM[128] = {
+   65, 69, 73, 78, 82, 87, 92, 98, 104, 110, 117, 123, 131, 139,
+   147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294,
+   311, 330, 349, 370, 392, 415, 440, 466, 494, 523, 554, 587, 622,
+   659, 698, 740, 784, 831, 880, 932, 988, 1047, 1109, 1175, 1245,
+   1319, 1397, 1480, 1568, 1661, 1760, 1865, 1976, 2093, 2217, 2349,
+   2489, 2637, 2794, 2960, 3136, 3322, 3520, 3729, 3951, 4186, 4435,
+   4699, 4978, 5274, 5588, 5920, 6272, 6645, 7040, 7459, 7902, 8372,
+   8870, 9397, 9956, 10548, 11175, 11840, 12544, 13290, 14080,
+   14917, 15804, 16744, 17740, 18795, 19912, 21096, 22351, 23680,
+   25088, 26580, 28160, 29834, 31609, 33488, 35479, 37589, 39824,
+   42192, 44701, 47359, 50175, 53159, 56320, 59669, 63217, 66976,
+   70959, 75178, 79649, 84385, 89402, 94719, 100351 };
 
 void tune_playnote (byte chan, byte note);
 void tune_stopnote (byte chan);
 void tune_stepscore (void);
 
 #if TESLA_COIL
-void teslacoil_rising_edge(byte timernum);
-byte teslacoil_checknote(byte note);
+void teslacoil_rising_edge(byte channel);
+byte teslacoil_checknote(byte channel, byte note);
+void teslacoil_change_instrument(byte channel, byte instrument);
+void teslacoil_change_volume(byte channel, byte volume);
 #endif
 
-void Playtune::tune_callback(void (*callback)(void)) {
+void tune_callback(void (*callback)(void)) {
   callback_func = callback;
 }
 
 //------------------------------------------------------
 // Initialize a music channel on a specific output pin
 //------------------------------------------------------
-
-void Playtune::tune_initchan(byte pin) {
-  byte timer_num;
-
+// this is defined in pins_teensy.c:
+extern const uint8_t PROGMEM digital_pin_table_PGM[];
+void tune_initchan(byte pin) {
   if (_tune_num_chans < AVAILABLE_TIMERS) {
-    timer_num = pgm_read_byte(tune_pin_to_timer_PGM + _tune_num_chans);
-    _tune_pins[_tune_num_chans] = pin;
-    _tune_num_chans++;
+    byte chan = _tune_num_chans;
+    _tune_pins[chan] = pin;
     pinMode(pin, OUTPUT);
 #if DBUG
     Serial.print("init pin "); Serial.print(pin);
-    Serial.print(" on timer "); Serial.println(timer_num);
+    Serial.print(" on channel "); Serial.println(chan);
 #endif
-    switch (timer_num) { // All timers are put in CTC mode
-
-#if !defined(__AVR_ATmega8__)
-      case 0:  // 8 bit timer
-        TCCR0A = 0;
-        TCCR0B = 0;
-        bitWrite(TCCR0A, WGM01, 1);
-        bitWrite(TCCR0B, CS00, 1);
-        timer0_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer0_pin_mask = digitalPinToBitMask(pin);
-        break;
-#endif
-      case 1:  // 16 bit timer
-        TCCR1A = 0;
-        TCCR1B = 0;
-        bitWrite(TCCR1B, WGM12, 1);
-        bitWrite(TCCR1B, CS10, 1);
-        timer1_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer1_pin_mask = digitalPinToBitMask(pin);
-        tune_playnote (0, 60);  /* start and stop channel 0 (timer 1) on middle C so wait/delay works */
-        tune_stopnote (0);
-        break;
-#if !defined(__AVR_ATmega32U4__)
-      case 2:  // 8 bit timer
-        TCCR2A = 0;
-        TCCR2B = 0;
-        bitWrite(TCCR2A, WGM21, 1);
-        bitWrite(TCCR2B, CS20, 1);
-        timer2_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer2_pin_mask = digitalPinToBitMask(pin);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-      case 3:  // 16 bit timer
-        TCCR3A = 0;
-        TCCR3B = 0;
-        bitWrite(TCCR3B, WGM32, 1); // CTC mode
-        bitWrite(TCCR3B, CS30, 1);  // clk/1 (no prescaling)
-        timer3_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer3_pin_mask = digitalPinToBitMask(pin);
-        break;
-#endif
-#if defined(__AVR_ATmega32U4__)
-      case 4: // 10 bit timer, treated as 8 bit
-        TCCR4A = 0;
-        TCCR4B = 0;
-        bitWrite(TCCR4B, CS40, 1); // clk/1 (no prescaling)
-        timer4_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer4_pin_mask = digitalPinToBitMask(pin);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-      case 4:  // 16 bit timer
-        TCCR4A = 0;
-        TCCR4B = 0;
-        bitWrite(TCCR4B, WGM42, 1);
-        bitWrite(TCCR4B, CS40, 1);
-        timer4_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer4_pin_mask = digitalPinToBitMask(pin);
-        break;
-      case 5:  // 16 bit timer
-        TCCR5A = 0;
-        TCCR5B = 0;
-        bitWrite(TCCR5B, WGM52, 1);
-        bitWrite(TCCR5B, CS50, 1);
-        timer5_pin_port = portOutputRegister(digitalPinToPort(pin));
-        timer5_pin_mask = digitalPinToBitMask(pin);
-        break;
-#endif
-    }
+    timers[chan] = timerBegin(chan, 80, true);
+    timerAttachInterrupt(timers[chan], ISRs[chan], true);
+    timerStop(timers[chan]);
+    _tune_num_chans++;
   }
 }
 
 //-----------------------------------------------
 // Start playing a note on a particular channel
 //-----------------------------------------------
+unsigned long stackpointer(void) {
+  register unsigned long int stackptr asm("sp");
+  return (unsigned long) stackptr;
+}
 
 void tune_playnote (byte chan, byte note) {
-  byte timer_num;
-  byte prescalarbits = 0b001;
-  unsigned int frequency2; /* frequency times 2 */
-  unsigned long ocr;
-
 #if DBUG
   Serial.print ("Play at ");
   Serial.print(score_cursor - score_start, HEX);
   Serial.print(", ch");
   Serial.print(chan); Serial.print(' ');
-  Serial.println(note, HEX);
+  Serial.print(note, HEX);
 #endif
   if (chan < _tune_num_chans) {
-    timer_num = pgm_read_byte(tune_pin_to_timer_PGM + chan);
-#if TESLA_COIL
-    note = teslacoil_checknote(note);  // let teslacoil modify the note
-#endif
+    #if TESLA_COIL
+    note = teslacoil_checknote(chan, note);  // let teslacoil modify the note
+    #endif
     if (note > 127) note = 127;
-    frequency2 = pgm_read_word (tune_frequencies2_PGM + note);
-    // The stuff below really needs a rewrite to avoid so many divisions and to
-    // make it easier to add new processors with different timer configurations!
-    if (timer_num == 0 || timer_num == 2
-#if defined(__AVR_ATmega32U4__)
-        || timer_num == 4 // treat the 10-bit counter as an 8-bit counter
+    unsigned int frequency8 = pgm_read_dword (tune_frequencies8_PGM + note);
+    if (chan == 0) {
+      wait_timer_frequency8 = frequency8;
+      wait_timer_playing = true; }
+    // for Tesla coils, interrupt at the true note frequency, not twice that
+    unsigned int interval = (TESLA_COIL ? 8000000UL : 4000000UL) / frequency8;
+    timerAlarmWrite(timers[chan], interval, true); // usec period
+    timerAlarmEnable(timers[chan]);
+    timerRestart(timers[chan]);
+#if DBUG
+    Serial.print(" usec "); Serial.print(interval);
 #endif
-       ) { //***** 8 bit timer ******
-      if (note < ( F_CPU <= 8000000UL ? 12 : 24))
-        return;   //  too low to be playable
-      // scan through prescalars to find the best fit
-      ocr = F_CPU / frequency2 - 1;
-      prescalarbits = 0b001;  // ck/1: same for all timers
-      if (ocr > 255) {
-        ocr = F_CPU / frequency2 / 8 - 1;
-        prescalarbits = timer_num == 4 ? 0b0100 : 0b010;  // ck/8
-        if (timer_num == 2 && ocr > 255) {
-          ocr = F_CPU / frequency2 / 32 - 1;
-          prescalarbits = 0b011; // ck/32
-        }
-        if (ocr > 255) {
-          ocr = F_CPU / frequency2 / 64 - 1;
-          prescalarbits = timer_num == 0 ? 0b011 : (timer_num == 4 ? 0b0111 : 0b100);  // ck/64
-          if (timer_num == 2 && ocr > 255) {
-            ocr = F_CPU / frequency2 / 128 - 1;
-            prescalarbits = 0b101; // ck/128
-          }
-          if (ocr > 255) {
-            ocr = F_CPU / frequency2 / 256 - 1;
-            prescalarbits = timer_num == 0 ? 0b100 : (timer_num == 4 ? 0b1001 : 0b110); // clk/256
-            if (ocr > 255) {
-              // can't do any better than /1024
-              ocr = F_CPU / frequency2 / 1024 - 1;
-              prescalarbits = timer_num == 0 ? 0b101 : (timer_num == 4 ? 0b1011 : 0b111); // clk/1024
-            }
-          }
-        }
-      }
-#if !defined(__AVR_ATmega8__)
-      if (timer_num == 0) TCCR0B = (TCCR0B & 0b11111000) | prescalarbits;
-#if defined(__AVR_ATmega32U4__)
-      else if (timer_num == 4) {
-        TCCR4B = (TCCR4B & 0b11110000) | prescalarbits;
-      }
-#endif
-      else { // must be timer_num == 2
-#endif
-#if !defined(__AVR_ATmega32U4__)
-        TCCR2B = (TCCR2B & 0b11111000) | prescalarbits;
-#endif
-      }
-    }
-    else  //******  16-bit timer  *********
-    { // two choices for the 16 bit timers: ck/1 or ck/64
-      ocr = F_CPU / frequency2 - 1;
-      prescalarbits = 0b001;
-      if (ocr > 0xffff) {
-        ocr = F_CPU / frequency2 / 64 - 1;
-        prescalarbits = 0b011;
-      }
-      if (timer_num == 1) TCCR1B = (TCCR1B & 0b11111000) | prescalarbits;
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-      else if (timer_num == 3) TCCR3B = (TCCR3B & 0b11111000) | prescalarbits;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-      else if (timer_num == 4) TCCR4B = (TCCR4B & 0b11111000) | prescalarbits;
-      else if (timer_num == 5) TCCR5B = (TCCR5B & 0b11111000) | prescalarbits;
-#endif
-    }
-
-    // Set the OCR for the timer, zero the counter, then turn on the interrupts
-    switch (timer_num) {
-#if !defined(__AVR_ATmega8__)
-      case 0:
-        OCR0A = ocr;
-        TCNT0 = 0;
-        bitWrite(TIMSK0, OCIE0A, 1);
-        break;
-#endif
-      case 1:
-        OCR1A = ocr;
-        TCNT1 = 0;
-        wait_timer_frequency2 = frequency2;  // for "tune_delay" function
-        wait_timer_playing = true;
-        bitWrite(TIMSK1, OCIE1A, 1);
-        break;
-#if !defined(__AVR_ATmega32U4__)
-      case 2:
-        OCR2A = ocr;
-        TCNT2 = 0;
-        bitWrite(TIMSK2, OCIE2A, 1);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||(__AVR_ATmega32U4__)
-      case 3:
-        OCR3A = ocr;
-        TCNT3 = 0;
-        bitWrite(TIMSK3, OCIE3A, 1);
-        break;
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-      case 4:
-        OCR4A = ocr;
-        TCNT4 = 0;
-        bitWrite(TIMSK4, OCIE4A, 1);
-        break;
-#endif
-#if defined(__AVR_ATmega32U4__)
-      case 4:// TOP value compare for this 10-bit register is in C!
-        OCR4C = ocr / 2 + 1; //timer4 doesn't have CTC mode, but I don't understand the f/2
-        // others have reported problems too, and apparently the chip as has bugs.
-        // http://forum.arduino.cc/index.php?topic=261869.0
-        // http://electronics.stackexchange.com/questions/245661/atmega32u4-generate-clock-using-timer4
-        TCNT4 = 0;
-        bitWrite(TIMSK4, OCIE4A, 1);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-      case 5:
-        OCR5A = ocr;
-        TCNT5 = 0;
-        bitWrite(TIMSK5, OCIE5A, 1);
-        break;
-#endif
-#endif
-    }
   }
+#if DBUG
+  Serial.println();
+#endif
 }
 
 //-----------------------------------------------
@@ -634,57 +410,44 @@ void tune_playnote (byte chan, byte note) {
 //-----------------------------------------------
 
 void tune_stopnote (byte chan) {
-  byte timer_num;
-
 #if DBUG
   Serial.print ("Stop note ");
   Serial.println(chan, DEC);
 #endif
-
-  timer_num = pgm_read_byte(tune_pin_to_timer_PGM + chan);
-  switch (timer_num) {
-#if !defined(__AVR_ATmega8__)
-    case 0:
-      TIMSK0 &= ~(1 << OCIE0A);                 // disable the interrupt
-      *timer0_pin_port &= ~(timer0_pin_mask);   // keep pin low after stop
-      break;
+  if (chan < _tune_num_chans) {
+#if !TESLA_COIL
+    byte pin = _tune_pins[chan];
+    digitalWrite(pin, 0);
 #endif
-    case 1:
-      // We leave the timer1 interrupt running for timing delays and score waits
+    if (chan == 0)
       wait_timer_playing = false;
-      *timer1_pin_port &= ~(timer1_pin_mask);   // keep pin low after stop
-      break;
-#if !defined(__AVR_ATmega32U4__)
-    case 2:
-      TIMSK2 &= ~(1 << OCIE1A);                 // disable the interrupt
-      *timer2_pin_port &= ~(timer2_pin_mask);   // keep pin low after stop
-      break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-    case 3:
-      TIMSK3 &= ~(1 << OCIE3A);                 // disable the interrupt
-      *timer3_pin_port &= ~(timer3_pin_mask);   // keep pin low after stop
-      break;
-    case 4:
-      TIMSK4 &= ~(1 << OCIE4A);                 // disable the interrupt
-      *timer4_pin_port &= ~(timer4_pin_mask);   // keep pin low after stop
-      break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-    case 5:
-      TIMSK5 &= ~(1 << OCIE5A);                 // disable the interrupt
-      *timer5_pin_port &= ~(timer5_pin_mask);   // keep pin low after stop
-      break;
-#endif
+    else { // if not the channel we use to time waits,
+      timerStop(timers[chan]);
+      timerAlarmDisable(timers[chan]);
+    }
   }
+}
+
+//-----------------------------------------------
+// Stop playing a score
+//-----------------------------------------------
+
+void tune_stopscore (void) {
+  timerStop(timers[0]);
+  timerAlarmDisable(timers[0]);
+  for (int i = 0; i < _tune_num_chans; ++i)
+    tune_stopnote(i);
+  tune_playing = false;
 }
 
 //-----------------------------------------------
 // Start playing a score
 //-----------------------------------------------
 
-void Playtune::tune_playscore (const byte *score) {
+void tune_playscore (const byte *score) {
   if (tune_playing) tune_stopscore();
+  tune_playnote (0, 60);  /* start and stop channel 0 on middle C so wait works */
+  tune_stopnote (0);
   score_start = score;
   volume_present = ASSUME_VOLUME;
 
@@ -698,34 +461,45 @@ void Playtune::tune_playscore (const byte *score) {
     score_start += file_header.hdr_length; // skip the whole header
   }
   score_cursor = score_start;
+  tune_playing = true;
   tune_stepscore();  /* execute initial commands */
-  Playtune::tune_playing = true;  /* release the interrupt routine */
+}
+
+void tune_speed (unsigned speed) {
+  if (speed > 500) speed = 500; // pin between 1/5 and 5x speed
+  if (speed < 20) speed = 20;
+  _tune_speed = speed;
 }
 
 void tune_stepscore (void) {
   byte cmd, opcode, chan, note;
   unsigned duration;
   /* Do score commands until a "wait" is found, or the score is stopped.
-    This is called initially from tune_playcore, but then is called
-    from the interrupt routine when waits expire.
-  */
-#define CMD_PLAYNOTE	0x90	/* play a note: low nibble is generator #, note is next byte */
-#define CMD_STOPNOTE	0x80	/* stop a note: low nibble is generator # */
+     This is called initially from tune_playscore, but then is called
+     from the interrupt routine when waits expire.
+   */
+#define CMD_PLAYNOTE  0x90  /* play a note: low nibble is generator #, note is next byte */
+#define CMD_STOPNOTE  0x80  /* stop a note: low nibble is generator # */
 #define CMD_INSTRUMENT  0xc0 /* change instrument; low nibble is generator #, instrument is next byte */
-#define CMD_RESTART	0xe0	/* restart the score from the beginning */
-#define CMD_STOP	0xf0	/* stop playing */
+#define CMD_RESTART 0xe0  /* restart the score from the beginning */
+#define CMD_STOP  0xf0  /* stop playing */
   /* if CMD < 0x80, then the other 7 bits and the next byte are a 15-bit big-endian number of msec to wait */
-
   while (1) {
     cmd = pgm_read_byte(score_cursor++);
     if (cmd < 0x80) { /* wait count in msec. */
       duration = ((unsigned)cmd << 8) | (pgm_read_byte(score_cursor++));
-      wait_toggle_count = ((unsigned long) wait_timer_frequency2 * duration + 500) / 1000;
+      if (_tune_speed != 100)
+        duration = (unsigned) (((unsigned long)duration * 100UL) / _tune_speed);
+#if TESLA_COIL // count for true frequency
+      wait_toggle_count = ((unsigned long) wait_timer_frequency8 * duration  + 8 * 500) / (8 * 1000);
+#else // count for double frequency
+      wait_toggle_count = ((unsigned long) wait_timer_frequency8 * duration  + 4 * 500) / (4 * 1000);
+#endif
       if (wait_toggle_count == 0) wait_toggle_count = 1;
 #if DBUG
       Serial.print("wait "); Serial.print(duration);
       Serial.print("ms, cnt ");
-      Serial.print(wait_toggle_count); Serial.print(" freq "); Serial.println(wait_timer_frequency2);
+      Serial.print(wait_toggle_count); Serial.print(" freq8 "); Serial.println(wait_timer_frequency8);
 #endif
       break;
     }
@@ -736,176 +510,103 @@ void tune_stepscore (void) {
     }
     else if (opcode == CMD_PLAYNOTE) { /* play note */
       note = pgm_read_byte(score_cursor++); // argument evaluation order is undefined in C!
-      if (volume_present) ++score_cursor; // ignore volume if present
+      if (volume_present) {
+#if TESLA_COIL
+        byte volume = pgm_read_byte(score_cursor);
+#if DBUG
+        Serial.print("chan "); Serial.print(chan); Serial.print(" volume "); Serial.println(volume);
+#endif
+        if (chan < _tune_num_chans && _tune_volume[chan] != volume) { // if volume is changing
+          _tune_volume[chan] = volume;
+          teslacoil_change_volume(chan, volume); }
+#endif
+        ++score_cursor; // ignore volume if present
+      }
       tune_playnote (chan, note);
-      if (callback_func != NULL && Playtune::tune_playing)
+      if (callback_func != NULL && tune_playing)
         callback_func();
     }
     else if (opcode == CMD_INSTRUMENT) { /* change a channel's instrument */
-      score_cursor++; // ignore it
+#if TESLA_COIL
+      byte instrument = pgm_read_byte(score_cursor);
+#if DBUG
+      Serial.print("chan "); Serial.print(chan); Serial.print(" instrument "); Serial.println(instrument);
+#endif
+      if (chan < _tune_num_chans) teslacoil_change_instrument(chan, instrument);
+#endif
+      ++score_cursor; // skip over it
     }
     else if (opcode == CMD_RESTART) { /* restart score */
-      score_cursor = score_start;
-    }
+      score_cursor = score_start; }
     else if (opcode == CMD_STOP) { /* stop score */
-      Playtune::tune_playing = false;
+      tune_stopscore();
       break;
     }
   }
 }
 
 //-----------------------------------------------
-// Stop playing a score
-//-----------------------------------------------
-
-void Playtune::tune_stopscore (void) {
-  int i;
-  for (i = 0; i < _tune_num_chans; ++i)
-    tune_stopnote(i);
-  Playtune::tune_playing = false;
-}
-
-//-----------------------------------------------
 // Delay a specified number of milliseconds
 //-----------------------------------------------
 
-void Playtune::tune_delay (unsigned duration) {
-
-  // We provide this because using timer 0 breaks the Arduino delay() function.
-  // Compute the toggle count based on whatever frequency the timer used for
-  // score waits is running at.  If the frequency of that timer changes, the
-  // toggle count will be adjusted by the interrupt routine.
-
-  boolean notdone;
-  noInterrupts();
-  delay_toggle_count = ((unsigned long) wait_timer_frequency2 * duration + 500) / 1000;
-  doing_delay = true;
-  interrupts();
-  do { // wait until the interrupt routines decrements the toggle count to zero
-    noInterrupts();
-    notdone = delay_toggle_count != 0;  /* interrupt-safe test */
-    interrupts();
-  }
-  while (notdone);
-  doing_delay = false;
+void tune_delay (unsigned duration) {
+  // This is for compatibility with other Playtune versions
+  delay(duration);
 }
 
 //-----------------------------------------------
 // Stop all channels
 //-----------------------------------------------
 
-void Playtune::tune_stopchans(void) {
-  byte chan;
-  byte timer_num;
-
-  for (chan = 0; chan < _tune_num_chans; ++chan) {
-    timer_num = pgm_read_byte(tune_pin_to_timer_PGM + chan);
-    switch (timer_num) {
-
-#if !defined(__AVR_ATmega8__)
-      case 0:
-        TIMSK0 &= ~(1 << OCIE0A);  // disable all timer interrupts
-        break;
-#endif
-      case 1:
-        TIMSK1 &= ~(1 << OCIE1A);
-        break;
-#if !defined(__AVR_ATmega32U4__)
-      case 2:
-        TIMSK2 &= ~(1 << OCIE2A);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-      case 3:
-        TIMSK3 &= ~(1 << OCIE3A);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-      case 4:
-        TIMSK4 &= ~(1 << OCIE4A);
-        break;
-#endif
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-      case 5:
-        TIMSK5 &= ~(1 << OCIE5A);
-        break;
-#endif
-    }
-    digitalWrite(_tune_pins[chan], 0);
-  }
-  _tune_num_chans = 0;
+void tune_stopchans(void) {
+  tune_stopscore();
 }
 
 //-----------------------------------------------
-//  Timer Interrupt Service Routines
+//  Interval Timer Interrupt Service Routines
 //-----------------------------------------------
 
-#if !defined(__AVR_ATmega8__) && !TESLA_COIL
-ISR(TIMER0_COMPA_vect) {  // **** TIMER 0
-  *timer0_pin_port ^= timer0_pin_mask; // toggle the pin
-}
-#endif
-
-ISR(TIMER1_COMPA_vect) {  // **** TIMER 1
+void ISRtimer0(void) {
   // We keep this running always and use it to time score waits, whether or not it is playing a note.
   if (wait_timer_playing) { // toggle the pin if we're sounding a note
-    *timer1_pin_port ^= timer1_pin_mask;
 #if TESLA_COIL
-    if (*timer1_pin_port & timer1_pin_mask) teslacoil_rising_edge (2);  // do a tesla coil pulse
+    teslacoil_rising_edge(0); // do a Tesla coil pulse
+#else
+    byte pin = _tune_pins[0];
+    digitalWrite(pin, !digitalRead(pin)); // toggle the pin
 #endif
   }
-  if (Playtune::tune_playing && wait_toggle_count && --wait_toggle_count == 0) {
+  if (tune_playing && wait_toggle_count && --wait_toggle_count == 0) {
     // end of a score wait, so execute more score commands
-    wait_timer_old_frequency2 = wait_timer_frequency2;  // save this timer's frequency
     tune_stepscore ();  // execute commands
-    // If this timer's frequency has changed and we're using it for a tune_delay(),
-    // recompute the number of toggles to wait for
-    if (doing_delay && wait_timer_old_frequency2 != wait_timer_frequency2) {
-      if (delay_toggle_count >= 0x20000UL && wait_timer_frequency2 >= 0x4000U) {
-        // Need scaling to avoid 32-bit overflow...
-        delay_toggle_count = ( (delay_toggle_count + 4 >> 3) * (wait_timer_frequency2 + 2 >> 2) / wait_timer_old_frequency2 ) << 5;
-      }
-      else {
-        delay_toggle_count = delay_toggle_count * wait_timer_frequency2 / wait_timer_old_frequency2;
-      }
-    }
   }
-  if (doing_delay && delay_toggle_count) --delay_toggle_count;	// countdown for tune_delay()
 }
 
-#if !defined(__AVR_ATmega32U4__)
-#if !TESLA_COIL
-ISR(TIMER2_COMPA_vect) {  // **** TIMER 2
-  *timer2_pin_port ^= timer2_pin_mask;  // toggle the pin
-}
-#endif
-#endif
-
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-ISR(TIMER3_COMPA_vect) {  // **** TIMER 3
-  *timer3_pin_port ^= timer3_pin_mask;  // toggle the pin
+void ISRtimer1(void) {
 #if TESLA_COIL
-  if (*timer3_pin_port & timer3_pin_mask) teslacoil_rising_edge (3);  // do a tesla coil pulse
+  teslacoil_rising_edge(1); // do a Tesla coil pulse
+#else
+  byte pin = _tune_pins[1];
+  digitalWrite(pin, !digitalRead(pin)); // toggle the pin
 #endif
 }
-#endif
 
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)||defined(__AVR_ATmega32U4__)
-ISR(TIMER4_COMPA_vect) {  // **** TIMER 4
-  *timer4_pin_port ^= timer4_pin_mask;  // toggle the pin
+void ISRtimer2(void) {
 #if TESLA_COIL
-  if (*timer4_pin_port & timer4_pin_mask) teslacoil_rising_edge (4);  // do a tesla coil pulse
+  teslacoil_rising_edge(2); // do a Tesla coil pulse
+#else
+  byte pin = _tune_pins[2];
+  digitalWrite(pin, !digitalRead(pin)); // toggle the pin
 #endif
 }
-#endif
 
-#if defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__)
-ISR(TIMER5_COMPA_vect) {  // **** TIMER 5
-  *timer5_pin_port ^= timer5_pin_mask;  // toggle the pin
+void ISRtimer3(void) {
 #if TESLA_COIL
-  if (*timer5_pin_port & timer5_pin_mask) teslacoil_rising_edge (5);  // do a tesla coil pulse
+  teslacoil_rising_edge(3); // do a Tesla coil pulse
+#else
+  byte pin = _tune_pins[3];
+  digitalWrite(pin, !digitalRead(pin)); // toggle the pin
 #endif
 }
-#endif
 
-
+//*
