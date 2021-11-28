@@ -103,7 +103,6 @@ demo stardemo[] = {
 };
 
 void (*reset)(void) = 0;    // Declare a reset function at address 0
-void IRAM_ATTR button();
 
 
 void setup() {
@@ -114,8 +113,6 @@ void setup() {
   digitalWrite(DISABLE_PIN, true);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  attachInterrupt(BUTTON_PIN, button, FALLING);
-  Serial.println("Button ready");
 
   randomSeed(analogRead(0));
 
@@ -172,6 +169,11 @@ void setup() {
     }
   }
 
+  tune_initchan(AUDIO_1_PIN);
+  tune_initchan(AUDIO_2_PIN);
+  tune_initchan(AUDIO_3_PIN);
+  tune_initchan(AUDIO_4_PIN);
+  tune_callback(&callback);
   Serial.println("Music ready");
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
@@ -185,23 +187,6 @@ void setup() {
   digitalWrite(DISABLE_PIN, false);
   Serial.println("LEDs ready");
   stage = 0;
-}
-
-
-void IRAM_ATTR button() {
-  Serial.print("Got Button! Stage: ");
-  Serial.println(stage);
-  if (stage == 0) {
-    detachInterrupt(BUTTON_PIN);
-
-    // Button only reacts at stage=0 .. no music playing & random fading active
-    stage = 1;
-    tune_initchan(AUDIO_1_PIN);
-    tune_initchan(AUDIO_2_PIN);
-    tune_initchan(AUDIO_3_PIN);
-    tune_initchan(AUDIO_4_PIN);
-    tune_callback(&callback);
-  }
 }
 
 
@@ -219,6 +204,9 @@ void loop() {
   if (stage == 0) {
     fade();
     tlc.write();
+    bool buttonState = digitalRead(BUTTON_PIN);
+    if (buttonState == 0)
+      stage = 1;
   }
   else if (stage >= 1) {
     Serial.print("playing stage");
@@ -272,12 +260,10 @@ void fade() {
       }
     }
   }
-  tune_delay(20);
+  delay(20);
 }
 
 void marquee(uint8_t *pattern) {
-  static uint8_t count = 1;
-
   for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
     if (pattern[i])
       tlc.setPWM(i, 4095);
@@ -285,10 +271,11 @@ void marquee(uint8_t *pattern) {
       tlc.setPWM(i, 512);
   }
 
-  pattern[TOTAL_LEDS] = pattern[0];
-  for (uint8_t i = 0; i < TOTAL_LEDS; i++) {
+  uint8_t tmp = pattern[0];
+  for (uint8_t i = 0; i < TOTAL_LEDS-1; i++) {
     pattern[i] = pattern[i + 1];
   }
+  pattern[TOTAL_LEDS-1] = tmp;
 }
 
 
