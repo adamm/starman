@@ -27,14 +27,15 @@
 #include "Playtune.h"
 #include "Music.h"
 
-#define BUTTON_PIN  2
-#define AUDIO_1_PIN 5
-#define AUDIO_2_PIN 6
-#define AUDIO_3_PIN 7
-#define DATA_PIN    9
-#define CLOCK_PIN   10
-#define DISABLE_PIN 11
-#define LATCH_PIN   12
+#define BUTTON_PIN  15
+#define AUDIO_1_PIN 19
+#define AUDIO_2_PIN 21
+#define AUDIO_3_PIN 22
+#define AUDIO_4_PIN 23
+#define DATA_PIN    18
+#define CLOCK_PIN   5
+#define DISABLE_PIN 17
+#define LATCH_PIN   16
 
 #define elements(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -102,18 +103,18 @@ demo stardemo[] = {
 };
 
 void (*reset)(void) = 0;    // Declare a reset function at address 0
-
-Playtune pt;
+void IRAM_ATTR button();
 
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("startup");
 
   pinMode(DISABLE_PIN, OUTPUT);
   digitalWrite(DISABLE_PIN, true);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button, RISING);
+  attachInterrupt(BUTTON_PIN, button, FALLING);
   Serial.println("Button ready");
 
   randomSeed(analogRead(0));
@@ -171,10 +172,6 @@ void setup() {
     }
   }
 
-  pt.tune_initchan(AUDIO_1_PIN);
-  pt.tune_initchan(AUDIO_2_PIN);
-  pt.tune_initchan(AUDIO_3_PIN);
-  pt.tune_callback(&callback);
   Serial.println("Music ready");
 
   for (uint8_t i = 0; i < FADE_LEDS; i++) {
@@ -191,12 +188,19 @@ void setup() {
 }
 
 
-void button() {
+void IRAM_ATTR button() {
   Serial.print("Got Button! Stage: ");
   Serial.println(stage);
   if (stage == 0) {
+    detachInterrupt(BUTTON_PIN);
+
     // Button only reacts at stage=0 .. no music playing & random fading active
     stage = 1;
+    tune_initchan(AUDIO_1_PIN);
+    tune_initchan(AUDIO_2_PIN);
+    tune_initchan(AUDIO_3_PIN);
+    tune_initchan(AUDIO_4_PIN);
+    tune_callback(&callback);
   }
 }
 
@@ -204,7 +208,7 @@ void button() {
 void callback() {
   // Callback function called once per note.  Increment LED pattern on each note.
   void (*sequence)(uint8_t*) = stardemo[stage].sequence;
-  void *pattern  = stardemo[stage].pattern;
+  uint8_t *pattern  = stardemo[stage].pattern;
 
   sequence(pattern);
   tlc.write();
@@ -219,9 +223,9 @@ void loop() {
   else if (stage >= 1) {
     Serial.print("playing stage");
     Serial.println(stage);
-    pt.tune_playscore(stardemo[stage].music);
-    while (pt.tune_playing); /* wait here until playing stops */
-    pt.tune_delay(100); /* wait a moment */
+    tune_playscore(stardemo[stage].music);
+    while (tune_playing); /* wait here until playing stops */
+    tune_delay(100); /* wait a moment */
     stage++;
     if (stage == elements(stardemo) ||
         stardemo[stage].music == NULL ) {
@@ -268,7 +272,7 @@ void fade() {
       }
     }
   }
-  pt.tune_delay(20);
+  tune_delay(20);
 }
 
 void marquee(uint8_t *pattern) {
