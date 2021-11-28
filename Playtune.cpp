@@ -380,7 +380,7 @@ void tune_playnote (byte chan, byte note) {
   Serial.print(score_cursor - score_start, HEX);
   Serial.print(", ch");
   Serial.print(chan); Serial.print(' ');
-  Serial.print(note, HEX);
+  Serial.print(note);
 #endif
   if (chan < _tune_num_chans) {
     #if TESLA_COIL
@@ -390,13 +390,15 @@ void tune_playnote (byte chan, byte note) {
     unsigned int frequency8 = pgm_read_dword (tune_frequencies8_PGM + note);
     if (chan == 0) {
       wait_timer_frequency8 = frequency8;
-      wait_timer_playing = true; }
+      wait_timer_playing = true;
+    }
     // for Tesla coils, interrupt at the true note frequency, not twice that
     unsigned int interval = (TESLA_COIL ? 8000000UL : 4000000UL) / frequency8;
     timerAlarmWrite(timers[chan], interval, true); // usec period
     timerAlarmEnable(timers[chan]);
     timerRestart(timers[chan]);
 #if DBUG
+    Serial.print(" freq "); Serial.print(frequency8);
     Serial.print(" usec "); Serial.print(interval);
 #endif
   }
@@ -486,6 +488,7 @@ void tune_stepscore (void) {
   /* if CMD < 0x80, then the other 7 bits and the next byte are a 15-bit big-endian number of msec to wait */
   while (1) {
     cmd = pgm_read_byte(score_cursor++);
+    Serial.print("cmd: "); Serial.println(cmd, HEX);
     if (cmd < 0x80) { /* wait count in msec. */
       duration = ((unsigned)cmd << 8) | (pgm_read_byte(score_cursor++));
       if (_tune_speed != 100)
@@ -501,6 +504,8 @@ void tune_stepscore (void) {
       Serial.print("ms, cnt ");
       Serial.print(wait_toggle_count); Serial.print(" freq8 "); Serial.println(wait_timer_frequency8);
 #endif
+      if (callback_func != NULL && tune_playing)
+        callback_func();
       break;
     }
     opcode = cmd & 0xf0;
@@ -523,8 +528,6 @@ void tune_stepscore (void) {
         ++score_cursor; // ignore volume if present
       }
       tune_playnote (chan, note);
-      if (callback_func != NULL && tune_playing)
-        callback_func();
     }
     else if (opcode == CMD_INSTRUMENT) { /* change a channel's instrument */
 #if TESLA_COIL
