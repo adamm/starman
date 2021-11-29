@@ -27,15 +27,15 @@
 #include "Playtune.h"
 #include "Music.h"
 
-#define BUTTON_PIN  15
+#define BUTTON_PIN  4
 #define AUDIO_1_PIN 19
 #define AUDIO_2_PIN 21
 #define AUDIO_3_PIN 22
 #define AUDIO_4_PIN 23
-#define DATA_PIN    18
-#define CLOCK_PIN   5
-#define DISABLE_PIN 17
-#define LATCH_PIN   16
+#define DATA_PIN    16
+#define CLOCK_PIN   17
+#define DISABLE_PIN 5
+#define LATCH_PIN   18
 
 #define elements(x) (sizeof(x) / sizeof((x)[0]))
 
