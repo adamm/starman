@@ -116,23 +116,31 @@ demo stardemo[] = {
 
 
 void handleRoot() {
-  char temp[400];
+  char temp[1024];
   int sec = millis() / 1000;
   int min = sec / 60;
   int hr = min / 60;
 
-  snprintf(temp, 400,
+  snprintf(temp, 1024,
 
            "<html>\
   <head>\
-    <meta http-equiv='refresh' content='5'/>\
     <title>Starman Christmas Ornament</title>\
     <style>\
       body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
     </style>\
+    <script>\
+      function play_music() {\
+        const Http = new XMLHttpRequest();\
+        const url = '/play';\
+        Http.open('GET', url);\
+        Http.send();\
+      }\
+    </script>\
   </head>\
   <body>\
     <h1>Starman! &#127776;</h1>\
+    <button onclick='play_music()'>Play Music</button>\
     <p>Tune playing: %d</p>\
     <p>Tune stage: %d</p>\
     <p>Uptime: %02d:%02d:%02d</p>\
@@ -141,6 +149,15 @@ void handleRoot() {
            tune_playing, stage, hr, min % 60, sec % 60
           );
   server.send(200, "text/html", temp);
+}
+
+void handlePlayButton() {
+  if (stage == 0) {
+    randomLevel();
+    stage = 1;
+  }
+
+  server.send(200, "text/html", "OK");
 }
 
 
@@ -189,6 +206,7 @@ void setup() {
   }
 
   server.on("/", handleRoot);
+  server.on("/play", handlePlayButton);
   server.onNotFound(handleNotFound);
   server.begin();
 
