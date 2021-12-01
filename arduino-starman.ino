@@ -23,9 +23,21 @@
 
  ****************************************************/
 
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <WebServer.h>
+#include <ESPmDNS.h>
+
 #include "Adafruit_TLC5947.h"
 #include "Playtune.h"
 #include "Music.h"
+#include "secret.h"
+
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWD;
+
+
+WebServer server(80);
 
 #define BUTTON_PIN  4
 #define AUDIO_1_PIN 19
@@ -102,17 +114,83 @@ demo stardemo[] = {
   { .music = NULL, .sequence = NULL, .pattern = NULL },
 };
 
-void (*reset)(void) = 0;    // Declare a reset function at address 0
+
+void handleRoot() {
+  char temp[400];
+  int sec = millis() / 1000;
+  int min = sec / 60;
+  int hr = min / 60;
+
+  snprintf(temp, 400,
+
+           "<html>\
+  <head>\
+    <meta http-equiv='refresh' content='5'/>\
+    <title>Starman Christmas Ornament</title>\
+    <style>\
+      body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
+    </style>\
+  </head>\
+  <body>\
+    <h1>Starman! &#127776;</h1>\
+    <p>Tune playing: %d</p>\
+    <p>Tune stage: %d</p>\
+    <p>Uptime: %02d:%02d:%02d</p>\
+  </body>\
+</html>",
+           tune_playing, stage, hr, min % 60, sec % 60
+          );
+  server.send(200, "text/html", temp);
+}
+
+
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+
+  server.send(404, "text/plain", message);
+}
 
 
 void setup() {
   Serial.begin(115200);
   Serial.println("startup");
 
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(DISABLE_PIN, OUTPUT);
   digitalWrite(DISABLE_PIN, true);
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  if (MDNS.begin("starman")) {
+    Serial.println("MDNS responder started");
+  }
+
+  server.on("/", handleRoot);
+  server.onNotFound(handleNotFound);
+  server.begin();
 
   randomSeed(analogRead(0));
 
@@ -207,6 +285,9 @@ void callback() {
 
 
 void loop() {
+  server.handleClient();
+  delay(2);//allow the cpu to switch to other tasks
+  
   if (stage == 0) {
     fade();
     tlc.write();
@@ -220,7 +301,11 @@ void loop() {
     Serial.print("playing stage");
     Serial.println(stage);
     tune_playscore(stardemo[stage].music);
-    while (tune_playing); /* wait here until playing stops */
+    while (tune_playing) {
+      // As we block the main thread here, we still want the web server to handle requests.
+      server.handleClient(); 
+      delay(2);
+    }
     tune_delay(100); /* wait a moment */
     stage++;
     if (stage == elements(stardemo) ||
