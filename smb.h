@@ -444,6 +444,17 @@ const unsigned char PROGMEM castle [] = {
 0x92,76,70, 0,75, 0x80, 0,4, 0x90,70,64, 0x82, 0,78, 0x80, 0,4, 0x81, 0xf0};
 // This score contains 1993 bytes, and 3 tone generators are used.
 
+// Playtune bytestream for file "warning.mid" created by MIDITONES V1.17 on Wed Dec  1 14:30:15 2021
+// command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 warning 
+const unsigned char PROGMEM score [] = {
+'P','t', 6, 0x00, 0x00,  3, // (Playtune file header)
+0x90,52, 0x91,64, 0x92,59, 0,100, 0x90,68, 0x91,74, 0x92,71, 0,100, 0x81, 0x82, 0,100, 0x90,68, 0x91,74, 0x92,71, 
+0,100, 0x90,68, 0x91,74, 0,100, 0x80, 0x81, 0x82, 0,100, 0x90,53, 0x91,65, 0x92,60, 0,100, 0x90,69, 0x91,75, 0x92,72, 
+0,100, 0x81, 0x82, 0,100, 0x90,69, 0x91,75, 0x92,72, 0,100, 0x90,69, 0x91,75, 0,100, 0x80, 0x81, 0x82, 0,100, 0x90,54, 
+0x91,66, 0x92,61, 0,100, 0x90,70, 0x91,76, 0x92,73, 0,100, 0x81, 0x82, 0,100, 0x90,70, 0x91,76, 0x92,73, 0,100, 
+0x90,70, 0x91,76, 0,100, 0x80, 0x81, 0x82, 0,100, 0x90,71, 0x91,77, 0x92,55, 0,100, 0x81, 0x82, 0,100, 0x90,71, 0x91,77, 
+0x92,55, 2,88, 0x80, 0x81, 0,200, 0x82, 0xf0};
+// This score contains 149 bytes, and 3 tone generators are used.
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Item-Block-Sound.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:33 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Item-Block-Sound 

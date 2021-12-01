@@ -30,7 +30,7 @@
 
 #include "Adafruit_TLC5947.h"
 #include "Playtune.h"
-#include "Music.h"
+#include "smb.h"
 #include "secret.h"
 
 const char *ssid = WIFI_SSID;
