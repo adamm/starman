@@ -263,7 +263,7 @@
 #include "Playtune.h"
 
 #ifndef DBUG
-#define DBUG 1          // debugging?
+#define DBUG 0          // debugging?
 #endif
 #define ASSUME_VOLUME 0    // assume volume information is present in bytestream files without headers?
 #define TESLA_COIL 0       // special Tesla Coil version?
@@ -488,7 +488,9 @@ void tune_stepscore (void) {
   /* if CMD < 0x80, then the other 7 bits and the next byte are a 15-bit big-endian number of msec to wait */
   while (1) {
     cmd = pgm_read_byte(score_cursor++);
+#if DBUG
     Serial.print("cmd: "); Serial.println(cmd, HEX);
+#endif
     if (cmd < 0x80) { /* wait count in msec. */
       duration = ((unsigned)cmd << 8) | (pgm_read_byte(score_cursor++));
       if (_tune_speed != 100)
