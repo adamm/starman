@@ -116,6 +116,28 @@ void setup() {
 
   randomSeed(analogRead(0));
 
+  tune_initchan(AUDIO_1_PIN);
+  tune_initchan(AUDIO_2_PIN);
+  tune_initchan(AUDIO_3_PIN);
+  tune_initchan(AUDIO_4_PIN);
+  tune_callback(&callback);
+  Serial.println("Music ready");
+
+  for (uint8_t i = 0; i < FADE_LEDS; i++) {
+    active[i] = i;
+    bright[i] = (rand() % 4096);
+    delta[i] = (rand() & 400) - 200;
+  }
+  shuffle(active, FADE_LEDS);
+
+  tlc.begin();
+  digitalWrite(DISABLE_PIN, false);
+  Serial.println("LEDs ready");
+  stage = 0;
+}
+
+
+void randomLevel() {
   uint8_t pos = 1;
   long level = random(elements(levelstart));
   long invin = random(2);
@@ -133,6 +155,8 @@ void setup() {
 
   Serial.print("Random Ending? ");
   Serial.println(ending);
+
+  memset(stardemo, 0, sizeof(stardemo));
   
   stardemo[pos++] = levelstart[int(level)];
 
@@ -168,26 +192,8 @@ void setup() {
       stardemo[pos++] = levelfailed[1];
     }
   }
-
-  tune_initchan(AUDIO_1_PIN);
-  tune_initchan(AUDIO_2_PIN);
-  tune_initchan(AUDIO_3_PIN);
-  tune_initchan(AUDIO_4_PIN);
-  tune_callback(&callback);
-  Serial.println("Music ready");
-
-  for (uint8_t i = 0; i < FADE_LEDS; i++) {
-    active[i] = i;
-    bright[i] = (rand() % 4096);
-    delta[i] = (rand() & 400) - 200;
-  }
-  shuffle(active, FADE_LEDS);
-
-  tlc.begin();
-  digitalWrite(DISABLE_PIN, false);
-  Serial.println("LEDs ready");
-  stage = 0;
 }
+
 
 
 void callback() {
@@ -205,8 +211,10 @@ void loop() {
     fade();
     tlc.write();
     bool buttonState = digitalRead(BUTTON_PIN);
-    if (buttonState == 0)
+    if (buttonState == 0) {
+      randomLevel();
       stage = 1;
+    }
   }
   else if (stage >= 1) {
     Serial.print("playing stage");
@@ -218,7 +226,6 @@ void loop() {
     if (stage == elements(stardemo) ||
         stardemo[stage].music == NULL ) {
       stage = 0;
-      reset();
     }
   }
 }
