@@ -27,6 +27,7 @@
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
+#include <ArduinoOTA.h>
 
 #include "Adafruit_TLC5947.h"
 #include "Playtune.h"
@@ -201,6 +202,22 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start updating..");
+  }).onEnd([]() {
+    Serial.println("\n\nDone!");
+  }).onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  }).onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+
   if (MDNS.begin("starman")) {
     Serial.println("MDNS responder started");
   }
@@ -304,6 +321,7 @@ void callback() {
 
 void loop() {
   server.handleClient();
+  ArduinoOTA.handle();
   delay(2);//allow the cpu to switch to other tasks
   
   if (stage == 0) {
@@ -322,6 +340,7 @@ void loop() {
     while (tune_playing) {
       // As we block the main thread here, we still want the web server to handle requests.
       server.handleClient(); 
+      ArduinoOTA.handle();
       delay(2);
     }
     tune_delay(100); /* wait a moment */
