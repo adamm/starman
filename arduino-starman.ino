@@ -81,27 +81,27 @@ struct demo {
 };
 
 demo levelstart[] = {
-  { .music = overworld, .sequence = &marquee, .pattern = widedash},
-  { .music = underworld, .sequence = &marquee, .pattern = longdot },
-  { .music = underwater, .sequence = &marquee, .pattern = halfpoints },
-  { .music = castle, .sequence = &marquee, .pattern = longdot },
+  { .music = smb_overworld, .sequence = &marquee, .pattern = widedash},
+  { .music = smb_underworld, .sequence = &marquee, .pattern = longdot },
+  { .music = smb_underwater, .sequence = &marquee, .pattern = halfpoints },
+  { .music = smb_castle, .sequence = &marquee, .pattern = longdot },
 }; // randomly pick one
 
 demo invincibility[] = {
-  { .music = block, .sequence = &marquee, .pattern = longdot },
-  { .music = powerup, .sequence = &flash, .pattern = allpoints },
-  { .music = starman, .sequence = &marquee, .pattern = widedash },
+  { .music = smb_block, .sequence = &marquee, .pattern = longdot },
+  { .music = smb_powerup, .sequence = &flash, .pattern = allpoints },
+  { .music = smb_starman, .sequence = &marquee, .pattern = widedash },
 }; // randomly pick all or none
 
 demo levelfinish[] = {
-  { .music = flagpole, .sequence = &marquee, .pattern = longdash },
-  { .music = fanfare, .sequence = &marquee, .pattern = shortdash },
-  { .music = ending, .sequence = &marquee, .pattern = widedash },
-}; // randomly pick 1 if not cascle, or 2 plus maybe 3 if cascle, or levelfailed
+  { .music = smb_course_clear, .sequence = &marquee, .pattern = longdash },
+  { .music = smb_fanfare, .sequence = &marquee, .pattern = shortdash },
+  { .music = smb_ending, .sequence = &marquee, .pattern = widedash },
+}; // randomly pick 1 if not castle, or 2 plus maybe 3 if castle, or death
 
 demo levelfailed[] = {
-  { .music = death, .sequence = &marquee, .pattern = longdash },
-  { .music = gameover, .sequence = &marquee, .pattern = widedash },
+  { .music = smb_death, .sequence = &marquee, .pattern = longdash },
+  { .music = smb_gameover, .sequence = &marquee, .pattern = widedash },
 }; // randomly pick 1, 2, or 3 instead of levelfinish
 
 demo stardemo[] = {
