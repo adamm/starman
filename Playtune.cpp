@@ -311,7 +311,6 @@ volatile const byte *score_cursor = 0;
 volatile boolean tune_playing = false;
 boolean volume_present = ASSUME_VOLUME;
 
-void (*callback_func)(void) = NULL;
 // Table of midi note frequencies times 8
 //   They are times 8 for greater accuracy.
 //   Generated from Excel by =ROUND(8*440/32*(2^((x-9)/12)),0) for 0<x<128
@@ -341,7 +340,9 @@ void teslacoil_change_instrument(byte channel, byte instrument);
 void teslacoil_change_volume(byte channel, byte volume);
 #endif
 
-void tune_callback(void (*callback)(void)) {
+void (*callback_func)(uint32_t) = NULL;
+
+void tune_callback(void (*callback)(uint32_t)) {
   callback_func = callback;
 }
 
@@ -507,7 +508,7 @@ void tune_stepscore (void) {
       Serial.print(wait_toggle_count); Serial.print(" freq8 "); Serial.println(wait_timer_frequency8);
 #endif
       if (callback_func != NULL && tune_playing)
-        callback_func();
+        callback_func((uint32_t)(score_cursor - score_start));
       break;
     }
     opcode = cmd & 0xf0;

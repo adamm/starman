@@ -102,9 +102,10 @@ struct demo {
 
 int8_t lives = STARTING_LIVES;
 int8_t level = STARTING_LEVEL;
+uint32_t marioDiesAtPos = -1;
 
 demo levels[] = {
-  { .music = smb_overworld, .sequence = &marquee, .pattern = widedash},
+  { .music = smb_overworld, .sequence = &marquee, .pattern = widedash },
   { .music = smb_underworld, .sequence = &marquee, .pattern = longdot },
   { .music = smb_underwater, .sequence = &marquee, .pattern = halfpoints },
   { .music = smb_castle, .sequence = &marquee, .pattern = longdot },
@@ -259,8 +260,6 @@ void setup() {
   server.onNotFound(handleNotFound);
   server.begin();
 
-  randomSeed(analogRead(0));
-
   tune_initchan(AUDIO_1_PIN);
   tune_initchan(AUDIO_2_PIN);
   tune_initchan(AUDIO_3_PIN);
@@ -285,13 +284,16 @@ void setup() {
 void playLevel() {
   uint8_t pos = 1;
   boolean gotStar = 0, got1up = 0, finishedLevel = 0, finishedGame = 0;
+
+  randomSeed(millis());
+
   long chanceStar = random(100);
   long chance1up  = random(100);
   long chanceFinishedLevel = random(100);
   long chanceFinishedGame  = random(100);
 
-  Serial.print("Play level: ");
-  Serial.println(level);
+  Serial.printf("Lives Remaining: %d\n", lives);
+  Serial.printf("Play level: %d\n", level);
 
   Serial.printf("Random star (%d or lower)? %d\n", MAX_STAR_PERCENT, chanceStar);
   if (chanceStar <= MAX_STAR_PERCENT)
@@ -304,6 +306,19 @@ void playLevel() {
   Serial.printf("Random finished level (%d or lower)? %d\n", MAX_FINISHED_LEVEL_PERCENT, chanceFinishedLevel);
   if (chanceFinishedLevel <= MAX_FINISHED_LEVEL_PERCENT)
     finishedLevel = 1;
+
+  if (!finishedLevel) {
+    uint32_t musicBytes = 0;
+    byte data = 0;
+    while (data != 0xf0) {
+      data = pgm_read_byte(levels[level].music + musicBytes++);
+    }
+    marioDiesAtPos = random(musicBytes);
+    Serial.printf("Mario will die at music position %d of %d\n", marioDiesAtPos, musicBytes);
+  }
+  else {
+    marioDiesAtPos = -1;
+  }
 
   if (level == 3) {
     Serial.printf("Random finished game (%d or lower)? %d\n", MAX_FINISHED_GAME_PERCENT, chanceFinishedGame);
@@ -364,10 +379,17 @@ void playLevel() {
 
 
 
-void callback() {
+void callback(uint32_t pos) {
   // Callback function called once per note.  Increment LED pattern on each note.
   void (*sequence)(uint8_t*) = stardemo[stage].sequence;
   uint8_t *pattern  = stardemo[stage].pattern;
+
+  Serial.printf("Playing music at byte: %d\n", pos);
+
+  if (pos > marioDiesAtPos) {
+    tune_stopscore();
+    marioDiesAtPos = -1;
+  }
 
   sequence(pattern);
   tlc.write();
