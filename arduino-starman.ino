@@ -40,6 +40,7 @@ const char *password = WIFI_PASSWD;
 
 WebServer server(80);
 
+#define STATUS_LED  2
 #define BUTTON_PIN  4
 #define AUDIO_1_PIN 19
 #define AUDIO_2_PIN 21
@@ -199,8 +200,10 @@ void setup() {
   Serial.begin(115200);
   Serial.println("startup");
 
+  pinMode(STATUS_LED, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(DISABLE_PIN, OUTPUT);
+  digitalWrite(STATUS_LED, false);
   digitalWrite(DISABLE_PIN, true);
 
   WiFi.mode(WIFI_STA);
@@ -220,9 +223,11 @@ void setup() {
   ArduinoOTA.onStart([]() {
     Serial.println("Start updating..");
   }).onEnd([]() {
+    digitalWrite(STATUS_LED, false);
     Serial.println("\n\nDone!");
   }).onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
   }).onError([](ota_error_t error) {
     Serial.printf("Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
