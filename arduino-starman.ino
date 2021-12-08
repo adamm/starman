@@ -1,7 +1,7 @@
 /***************************************************
 
     Arduino Starman Christmas Ornament
-    Copyright (C) 2018  Adam McDaniel
+    Copyright (C) 2018-2021  Adam McDaniel
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
@@ -20,6 +20,18 @@
 
   * 24 randomly fading LEDs
   * 24 synchronized LEDs with music playback
+
+  * Press the button to start the game.
+  * Start the game with three lives at level 1 (overworld).  If you lose all lives, it's game over.
+  * There is a 50% chance you will complete each level.  If you do, you move onto next level.  If not, you die and need to retry.
+    * Death can occur randomly within the level.
+    * Press the button again to start the next level, or retry the same level.
+  * There is a 40% chance you'll get a star.
+    * Stars can occur randomly within the level.
+    * Stars do not negate death (ie, falling into a pit).
+  * There is a 25% chance you'll get a 1-up, resulting in an extra life.
+  * If you make it to level 4 (castle) and complete it, there is a 25% chance the princess will be there and the game is over.
+    * If the princess is in another castle, restart at level 1 with current number of lives.
 
  ****************************************************/
 
@@ -170,7 +182,7 @@ void handleRoot() {
 
 void handlePlayButton() {
   if (stage == 0) {
-    randomLevel();
+    playLevel();
     stage = 1;
   }
 
@@ -270,59 +282,82 @@ void setup() {
 }
 
 
-void randomLevel() {
+void playLevel() {
   uint8_t pos = 1;
-  long level = random(elements(levelstart));
-  long invin = random(2);
-  long success = random(2);
-  long ending = random(2);
+  boolean gotStar = 0, got1up = 0, finishedLevel = 0, finishedGame = 0;
+  long chanceStar = random(100);
+  long chance1up  = random(100);
+  long chanceFinishedLevel = random(100);
+  long chanceFinishedGame  = random(100);
 
-  Serial.print("Play Level: ");
+  Serial.print("Play level: ");
   Serial.println(level);
 
-  Serial.print("Random Invincibility? ");
-  Serial.println(invin);
+  Serial.printf("Random star (%d or lower)? %d\n", MAX_STAR_PERCENT, chanceStar);
+  if (chanceStar <= MAX_STAR_PERCENT)
+    gotStar = 1;
+  
+  Serial.printf("Random 1up (%d or lower)? %d\n", MAX_1UP_PERCENT, chance1up);
+  if (chance1up <= MAX_1UP_PERCENT)
+    got1up = 1;
 
-  Serial.print("Random Success? ");
-  Serial.println(success);
+  Serial.printf("Random finished level (%d or lower)? %d\n", MAX_FINISHED_LEVEL_PERCENT, chanceFinishedLevel);
+  if (chanceFinishedLevel <= MAX_FINISHED_LEVEL_PERCENT)
+    finishedLevel = 1;
 
-  Serial.print("Random Ending? ");
-  Serial.println(ending);
+  if (level == 3) {
+    Serial.printf("Random finished game (%d or lower)? %d\n", MAX_FINISHED_GAME_PERCENT, chanceFinishedGame);
+    if (chanceFinishedGame <= MAX_FINISHED_GAME_PERCENT)
+      finishedGame = 1;
+  }
 
   memset(stardemo, 0, sizeof(stardemo));
   
-  stardemo[pos++] = levelstart[int(level)];
+  stardemo[pos++] = levels[level];
 
-  if (invin) {
-    Serial.println("Play Invincibility");
+  if (gotStar) {
+    Serial.println("Play starman invincibility");
     for (uint8_t i = 0; i < elements(invincibility); i++) {
       stardemo[pos++] = invincibility[i];
     }
   }
 
-  if (success) {
+  if (got1up) { 
+    Serial.println("Play 1-Up");
+    for (uint8_t i = 0; i < elements(oneUp); i++) {
+      stardemo[pos++] = oneUp[i];
+    }
+    lives++;
+  }
+
+  if (finishedLevel) {
     // lived
     Serial.println("Mario Lived!");
     if (level < 3) {
       stardemo[pos++] = levelfinish[0];
       Serial.println("Play Flagpole");
+      level++;
     }
     else {
       Serial.println("Play Fanfare");
       stardemo[pos++] = levelfinish[1];
-      if (ending) {
+      if (finishedGame) {
         Serial.println("Play Ending");
         stardemo[pos++] = levelfinish[2];
+        lives = STARTING_LIVES;
       }
+      level = STARTING_LEVEL;
     }
   }
   else {
     // died
     Serial.println("Mario Died!");
     stardemo[pos++] = levelfailed[0];
-    if (ending) {
+    if (lives-- == 0) {
       Serial.println("Play GameOver");
       stardemo[pos++] = levelfailed[1];
+      lives = STARTING_LIVES;
+      level = STARTING_LEVEL;
     }
   }
 }
@@ -349,7 +384,7 @@ void loop() {
     tlc.write();
     bool buttonState = digitalRead(BUTTON_PIN);
     if (buttonState == 0) {
-      randomLevel();
+      playLevel();
       stage = 1;
     }
   }
