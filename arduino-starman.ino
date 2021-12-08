@@ -80,18 +80,33 @@ struct demo {
   uint8_t *pattern;
 };
 
-demo levelstart[] = {
+#define STARTING_LIVES    3
+#define STARTING_LEVEL    0
+#define MAX_STAR_PERCENT 40
+#define MAX_1UP_PERCENT  25
+#define MAX_FINISHED_LEVEL_PERCENT 50
+#define MAX_FINISHED_GAME_PERCENT  25
+
+int8_t lives = STARTING_LIVES;
+int8_t level = STARTING_LEVEL;
+
+demo levels[] = {
   { .music = smb_overworld, .sequence = &marquee, .pattern = widedash},
   { .music = smb_underworld, .sequence = &marquee, .pattern = longdot },
   { .music = smb_underwater, .sequence = &marquee, .pattern = halfpoints },
   { .music = smb_castle, .sequence = &marquee, .pattern = longdot },
-}; // randomly pick one
+};
 
 demo invincibility[] = {
   { .music = smb_block, .sequence = &marquee, .pattern = longdot },
   { .music = smb_powerup, .sequence = &flash, .pattern = allpoints },
   { .music = smb_starman, .sequence = &marquee, .pattern = widedash },
-}; // randomly pick all or none
+};
+
+demo oneUp[] = {
+  { .music = smb_block, .sequence = &marquee, .pattern = longdot },
+  { .music = smb_1up, .sequence = &flash, .pattern = allpoints },
+};
 
 demo levelfinish[] = {
   { .music = smb_course_clear, .sequence = &marquee, .pattern = longdash },
