@@ -171,12 +171,14 @@ void handleRoot() {
   <body>\
     <h1>Starman! &#127776;</h1>\
     <button onclick='play_music()'>Play Music</button>\
+    <p>Lives: %d</p>\
+    <p>Current Level: %d</p>\
     <p>Tune playing: %d</p>\
     <p>Tune stage: %d</p>\
     <p>Uptime: %02d:%02d:%02d</p>\
   </body>\
 </html>",
-           tune_playing, stage, hr, min % 60, sec % 60
+           lives, level + 1, tune_playing, stage, hr, min % 60, sec % 60
           );
   server.send(200, "text/html", temp);
 }
@@ -370,7 +372,7 @@ void playLevel() {
     // died
     Serial.println("Mario Died!");
     stardemo[pos++] = levelfailed[0];
-    if (lives-- == 0) {
+    if (--lives == 0) {
       Serial.println("Play GameOver");
       stardemo[pos++] = levelfailed[1];
       lives = STARTING_LIVES;
