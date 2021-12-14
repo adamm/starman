@@ -310,13 +310,13 @@ const unsigned char PROGMEM smb_powerup [] = {
 // This score contains 127 bytes, and 1 tone generator is used.
 
 
-// Playtune bytestream for file "1up.mid" created by MIDITONES V1.17 on Wed Dec  1 14:29:36 2021
+// Playtune bytestream for file "1up.mid" created by MIDITONES V1.17 on Thu Dec  9 16:40:33 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 1up
 const unsigned char PROGMEM smb_1up [] = {
-'P','t', 6, 0x00, 0x00,  1, // (Playtune file header)
-0x90,88, 0,68, 0x80, 0,68, 0x90,91, 0,68, 0x80, 0,68, 0x90,100, 0,68, 0x80, 0,68, 0x90,96, 0,68, 0x80,
-0,68, 0x90,98, 0,68, 0x80, 0,68, 0x90,103, 0x80, 0xf0};
-// This score contains 47 bytes, and 1 tone generator is used.
+'P','t', 6, 0x00, 0x00,  2, // (Playtune file header)
+0,2, 0x90,88, 0,145, 0x91,91, 0,8, 0x80, 0,129, 0x90,100, 0,8, 0x81, 0,130, 0x91,96, 0,8, 0x80, 0,129, 
+0x90,98, 0,8, 0x81, 0,127, 0x91,103, 0,8, 0x80, 0,137, 0x81, 0xf0};
+// This score contains 49 bytes, and 2 tone generators are used.
 
 
 // Playtune bytestream for file "Mario-Sheet-Music-Starman-Theme.mid" created by MIDITONES V1.17 on Mon Dec  3 21:03:57 2018
