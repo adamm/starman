@@ -53,15 +53,15 @@ const char *password = WIFI_PASSWD;
 WebServer server(80);
 
 #define STATUS_LED  2
-#define BUTTON_PIN  4
-#define AUDIO_1_PIN 19
-#define AUDIO_2_PIN 21
-#define AUDIO_3_PIN 22
-#define AUDIO_4_PIN 23
-#define DATA_PIN    16
-#define CLOCK_PIN   17
-#define DISABLE_PIN 5
-#define LATCH_PIN   18
+#define BUTTON_PIN  16
+#define AUDIO_1_PIN 17
+#define AUDIO_2_PIN 5
+#define AUDIO_3_PIN 18
+#define AUDIO_4_PIN 19
+#define DATA_PIN    27
+#define CLOCK_PIN   26
+#define DISABLE_PIN 25
+#define LATCH_PIN   33
 
 #define elements(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -224,9 +224,11 @@ void setup() {
   
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
     delay(500);
     Serial.print(".");
   }
+  digitalWrite(STATUS_LED, false);
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
