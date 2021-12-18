@@ -1,2 +1,4 @@
 secret.h
 output/
+.DS_Store
+kicad/*.zip
