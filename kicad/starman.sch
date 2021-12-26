@@ -1,7 +1,7 @@
 EESchema Schematic File Version 4
 EELAYER 30 0
 EELAYER END
-$Descr A4 11693 8268
+$Descr USLetter 11000 8500
 encoding utf-8
 Sheet 1 1
 Title ""
@@ -253,7 +253,7 @@ L Device:R_POT RV1
 U 1 1 61B8AD6A
 P 7750 1750
 F 0 "RV1" H 7680 1796 50  0000 R CNN
-F 1 "10k" H 7680 1705 50  0000 R CNN
+F 1 "1k" H 7680 1705 50  0000 R CNN
 F 2 "Potentiometer_THT:Potentiometer_Vishay_T73YP_Vertical" H 7750 1750 50  0001 C CNN
 F 3 "~" H 7750 1750 50  0001 C CNN
 	1    7750 1750
