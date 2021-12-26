@@ -52,16 +52,16 @@ const char *password = WIFI_PASSWD;
 
 WebServer server(80);
 
-#define STATUS_LED  2
-#define BUTTON_PIN  16
-#define AUDIO_1_PIN 17
+#define STATUS_LED  19
+#define BUTTON_PIN  4
+#define AUDIO_1_PIN 18
 #define AUDIO_2_PIN 5
-#define AUDIO_3_PIN 18
-#define AUDIO_4_PIN 19
-#define DATA_PIN    27
-#define CLOCK_PIN   26
-#define DISABLE_PIN 25
-#define LATCH_PIN   33
+#define AUDIO_3_PIN 17
+#define AUDIO_4_PIN 16
+#define DATA_PIN    26
+#define CLOCK_PIN   25
+#define DISABLE_PIN 33
+#define LATCH_PIN   32
 
 #define elements(x) (sizeof(x) / sizeof((x)[0]))
 
