@@ -1,3 +1,4 @@
 (sym_lib_table
   (lib (name Espressif)(type Legacy)(uri /Users/adamm/git/arduino-starman/kicad2/espressif/libraries/Espressif.lib)(options "")(descr ""))
+  (lib (name starman)(type Legacy)(uri ${KIPRJMOD}/starman.lib)(options "")(descr ""))
 )
