@@ -5,3 +5,4 @@ kicad*/*.zip
 kicad*/*bak
 kicad*/*.zip
 kicad*/*cache
+kicad*/*backups/
