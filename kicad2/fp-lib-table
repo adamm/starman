@@ -1,4 +1,0 @@
-(fp_lib_table
-  (lib (name Espressif)(type KiCad)(uri /Users/adamm/git/arduino-starman/kicad2/espressif/footprints/Espressif.pretty)(options "")(descr ""))
-  (lib (name starman)(type KiCad)(uri ${KIPRJMOD}/starman.pretty)(options "")(descr ""))
-)
