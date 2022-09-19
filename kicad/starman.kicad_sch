@@ -7642,7 +7642,7 @@
     (property "Footprint" "Package_TO_SOT_SMD:TO-252-2" (id 2) (at 321.31 178.435 0)
       (effects (font (size 1.27 1.27) italic) hide)
     )
-    (property "Datasheet" "http://www.st.com/content/ccc/resource/technical/document/datasheet/c4/0e/7e/2a/be/bc/4c/bd/CD00000546.pdf/files/CD00000546.pdf/jcr:content/translations/en.CD00000546.pdf" (id 3) (at 321.31 185.42 0)
+    (property "Datasheet" "https://fscdn.rohm.com/en/products/databook/datasheet/ic/power/linear_regulator/baxxbc0-e.pdf" (id 3) (at 321.31 185.42 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 4509e1d1-95cc-4d04-93b3-9a6452e2f5b5))
