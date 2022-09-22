@@ -1,3 +1,5 @@
+.vscode/settings.json
 secret.h
-output/
 .DS_Store
+build/
+sdkconfig
