@@ -2,6 +2,9 @@
 #include <freertos/task.h>
 #include <driver/ledc.h>
 #include <esp_log.h>
+#include <string.h>
+
+#include "config.h"
 
 #include "music.h"
 
@@ -47,80 +50,23 @@ static const uint32_t freqs[] = {
 
 #define MAX_CHANNELS 4
 
-void music_init(void) {
-    ledc_timer_config_t ledc_timer[] = {
-        {
-            .duty_resolution = LEDC_TIMER_13_BIT,
-            .freq_hz = 2000,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .timer_num = LEDC_TIMER_0,
-            .clk_cfg = LEDC_AUTO_CLK,
-        }, {
-            .duty_resolution = LEDC_TIMER_13_BIT,
-            .freq_hz = 2000,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .timer_num = LEDC_TIMER_1,
-            .clk_cfg = LEDC_AUTO_CLK,
-        }, {
-            .duty_resolution = LEDC_TIMER_13_BIT,
-            .freq_hz = 2000,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .timer_num = LEDC_TIMER_2,
-            .clk_cfg = LEDC_AUTO_CLK,
-        }, {
-            .duty_resolution = LEDC_TIMER_13_BIT,
-            .freq_hz = 2000,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .timer_num = LEDC_TIMER_3,
-            .clk_cfg = LEDC_AUTO_CLK,
-        },
-    };
+static ledc_timer_config_t* ledc_timer;
+static ledc_channel_config_t* ledc_channel;
 
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-        esp_err_t err = ledc_timer_config(&ledc_timer[i]);
-        ESP_LOGE(TAG, "ledc_timer_config[%d]: %d", i, err);
-    }
+unsigned _tune_speed = 100;
+volatile unsigned wait_timer_frequency8;       /* its current frequency x 8 */
+volatile bool wait_timer_playing = false;   /* is it currently playing a note? */
+volatile unsigned long wait_toggle_count;      /* countdown score waits */
+volatile const byte *score_start = 0;
+volatile const byte *score_cursor = 0;
+volatile bool music_playing = false;
+static bool volume_present = false;
+static void (*callback_func)(uint32_t) = NULL;
 
-    ledc_channel_config_t ledc_channel[] = {
-        {
-            .channel = LEDC_CHANNEL_0,
-            .duty = 0,
-            .gpio_num = 17,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .hpoint = 0,
-            .timer_sel = LEDC_TIMER_0,
-            .flags.output_invert = 0,
-        }, {
-            .channel = LEDC_CHANNEL_1,
-            .duty = 0,
-            .gpio_num = 18,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .hpoint = 0,
-            .timer_sel = LEDC_TIMER_1,
-            .flags.output_invert = 0,
-        }, {
-            .channel = LEDC_CHANNEL_2,
-            .duty = 0,
-            .gpio_num = 19,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .hpoint = 0,
-            .timer_sel = LEDC_TIMER_2,
-            .flags.output_invert = 0,
-        }, {
-            .channel = LEDC_CHANNEL_3,
-            .duty = 0,
-            .gpio_num = 20,
-            .speed_mode = LEDC_LOW_SPEED_MODE,
-            .hpoint = 0,
-            .timer_sel = LEDC_TIMER_3,
-            .flags.output_invert = 0,
-        }
-    };
+static void music_stepscore(void);
+static void music_stopscore(void);
 
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-        esp_err_t err = ledc_channel_config(&ledc_channel[i]);
-        ESP_LOGE(TAG, "ledc_channel_config[%d]: %d", i, err);
-    }
+static void music_test_chords(void) {
     
     int total = sizeof(freqs) / sizeof(uint32_t);
 
@@ -176,6 +122,176 @@ void music_init(void) {
         ledc_set_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel, 0);
         ledc_update_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel);
     }
+}
+
+
+void music_callback(void (*callback)(uint32_t)) {
+    callback_func = callback;
+}
+
+
+static void music_playnote(byte chan, byte note) {
+}
+
+
+static void music_stopnote(byte chan) {
+}
+
+
+void music_playscore(const byte* score) {
+    music_header_t file_header;
+
+    score_start = score;
+
+    // Read header
+    // look for the optional file header
+    memcpy(&file_header, score, sizeof(music_header_t)); // copy possible header from PROGMEM to RAM
+    if (file_header.id1 == 'P' && file_header.id2 == 't') { // validate it
+        volume_present = file_header.f1 & HDR_F1_VOLUME_PRESENT;
+        ESP_LOGD(TAG, "header: volume_present=%d", volume_present);
+        score_start += file_header.hdr_length; // skip the whole header
+    }
+    score_cursor = score_start;
+    music_playing = true;
+    music_stepscore();  /* execute initial commands */
+}
+
+
+static void music_stepscore(void) {
+    byte cmd, opcode, chan, note;
+    unsigned duration;
+
+    /* Do score commands until a "wait" is found, or the score is stopped.
+        This is called initially from tune_playscore, but then is called
+        from the interrupt routine when waits expire.
+    */
+    /* if CMD < 0x80, then the other 7 bits and the next byte are a 15-bit big-endian number of msec to wait */
+    while (1) {
+        cmd = *score_cursor++;
+        ESP_LOGD(TAG, "cmd: %x", cmd);
+        if (cmd < 0x80) { /* wait count in msec. */
+            duration = ((unsigned)cmd << 8) | (*score_cursor++);
+            if (_tune_speed != 100)
+                duration = (unsigned) (((unsigned long)duration * 100UL) / _tune_speed);
+            wait_toggle_count = ((unsigned long) wait_timer_frequency8 * duration  + 4 * 500) / (4 * 1000);
+            if (wait_toggle_count == 0)
+                wait_toggle_count = 1;
+
+            ESP_LOGD(TAG, "wait %d", duration);
+            ESP_LOGD(TAG, "ms, cnt %lu", wait_toggle_count);
+            ESP_LOGD(TAG, "freq %d", wait_timer_frequency8);
+
+            if (callback_func != NULL && music_playing)
+                callback_func((uint32_t)(score_cursor - score_start));
+            break;
+        }
+        
+        opcode = cmd & 0xf0;
+        chan = cmd & 0x0f;
+
+        if (opcode == CMD_STOPNOTE) { /* stop note */
+            music_stopnote(chan);
+        }
+        else if (opcode == CMD_PLAYNOTE) { /* play note */
+            note = *score_cursor++;
+            if (volume_present) {
+                // TODO: find a way to implement volume, until then...
+                score_cursor++; // ignore volume if present
+            }
+            music_playnote(chan, note);
+        }
+        else if (opcode == CMD_RESTART) { /* restart score */
+            score_cursor = score_start;
+        }
+        else if (opcode == CMD_STOP) { /* stop score */
+            music_stopscore();
+            break;
+        }
+    }
+}
+
+
+static void music_stopscore(void) {
+    music_playing = false;
+}
+
+
+void music_init(void) {
+    ledc_timer   = malloc(sizeof(ledc_timer_config_t) * MAX_CHANNELS);
+
+    ledc_timer[0].duty_resolution = LEDC_TIMER_13_BIT;
+    ledc_timer[0].freq_hz = 2000;
+    ledc_timer[0].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_timer[0].timer_num = LEDC_TIMER_0;
+    ledc_timer[0].clk_cfg = LEDC_AUTO_CLK;
+
+    ledc_timer[1].duty_resolution = LEDC_TIMER_13_BIT;
+    ledc_timer[1].freq_hz = 2000;
+    ledc_timer[1].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_timer[1].timer_num = LEDC_TIMER_1;
+    ledc_timer[1].clk_cfg = LEDC_AUTO_CLK;
+
+    ledc_timer[2].duty_resolution = LEDC_TIMER_13_BIT;
+    ledc_timer[2].freq_hz = 2000;
+    ledc_timer[2].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_timer[2].timer_num = LEDC_TIMER_2;
+    ledc_timer[2].clk_cfg = LEDC_AUTO_CLK;
+
+    ledc_timer[3].duty_resolution = LEDC_TIMER_13_BIT;
+    ledc_timer[3].freq_hz = 2000;
+    ledc_timer[3].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_timer[3].timer_num = LEDC_TIMER_3;
+    ledc_timer[3].clk_cfg = LEDC_AUTO_CLK;
+
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+        esp_err_t err = ledc_timer_config(&ledc_timer[i]);
+        ESP_LOGE(TAG, "ledc_timer_config[%d]: %d", i, err);
+    }
+
+    ledc_channel = malloc(sizeof(ledc_channel_config_t) * MAX_CHANNELS);
+
+    ledc_channel[0].channel = LEDC_CHANNEL_0;
+    ledc_channel[0].duty = 0;
+    ledc_channel[0].gpio_num = MUSIC_CHANNEL_1_PIN;
+    ledc_channel[0].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_channel[0].hpoint = 0;
+    ledc_channel[0].timer_sel = LEDC_TIMER_0;
+    ledc_channel[0].flags.output_invert = 0;
+
+    ledc_channel[1].channel = LEDC_CHANNEL_1;
+    ledc_channel[1].duty = 0;
+    ledc_channel[1].gpio_num = MUSIC_CHANNEL_2_PIN;
+    ledc_channel[1].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_channel[1].hpoint = 0;
+    ledc_channel[1].timer_sel = LEDC_TIMER_1;
+    ledc_channel[1].flags.output_invert = 0;
+
+    ledc_channel[2].channel = LEDC_CHANNEL_2;
+    ledc_channel[2].duty = 0;
+    ledc_channel[2].gpio_num = MUSIC_CHANNEL_3_PIN;
+    ledc_channel[2].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_channel[2].hpoint = 0;
+    ledc_channel[2].timer_sel = LEDC_TIMER_2;
+    ledc_channel[2].flags.output_invert = 0;
+
+    ledc_channel[3].channel = LEDC_CHANNEL_3;
+    ledc_channel[3].duty = 0;
+    ledc_channel[3].gpio_num = MUSIC_CHANNEL_4_PIN;
+    ledc_channel[3].speed_mode = LEDC_LOW_SPEED_MODE;
+    ledc_channel[3].hpoint = 0;
+    ledc_channel[3].timer_sel = LEDC_TIMER_3;
+    ledc_channel[3].flags.output_invert = 0;
+
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+        esp_err_t err = ledc_channel_config(&ledc_channel[i]);
+        ESP_LOGE(TAG, "ledc_channel_config[%d]: %d", i, err);
+    }
 
     ESP_LOGI(TAG, "Music initialized");
+}
+
+
+void music_stop(void) {
+    free(ledc_channel);
+    free(ledc_timer);
 }

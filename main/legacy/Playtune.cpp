@@ -266,7 +266,6 @@
 #define DBUG 0          // debugging?
 #endif
 #define ASSUME_VOLUME 0    // assume volume information is present in bytestream files without headers?
-#define TESLA_COIL 0       // special Tesla Coil version?
 #define AVAILABLE_TIMERS 4 // what the Cortex M4 on the Teensy 3.2 MK20DX256VLH7 processor has
 
 struct file_hdr_t {  // the optional bytestream file header
@@ -333,13 +332,6 @@ void tune_playnote (byte chan, byte note);
 void tune_stopnote (byte chan);
 void tune_stepscore (void);
 
-#if TESLA_COIL
-void teslacoil_rising_edge(byte channel);
-byte teslacoil_checknote(byte channel, byte note);
-void teslacoil_change_instrument(byte channel, byte instrument);
-void teslacoil_change_volume(byte channel, byte volume);
-#endif
-
 void (*callback_func)(uint32_t) = NULL;
 
 void tune_callback(void (*callback)(uint32_t)) {
@@ -384,9 +376,6 @@ void tune_playnote (byte chan, byte note) {
   Serial.print(note);
 #endif
   if (chan < _tune_num_chans) {
-    #if TESLA_COIL
-    note = teslacoil_checknote(chan, note);  // let teslacoil modify the note
-    #endif
     if (note > 127) note = 127;
     unsigned int frequency8 = pgm_read_dword (tune_frequencies8_PGM + note);
     if (chan == 0) {
@@ -394,7 +383,7 @@ void tune_playnote (byte chan, byte note) {
       wait_timer_playing = true;
     }
     // for Tesla coils, interrupt at the true note frequency, not twice that
-    unsigned int interval = (TESLA_COIL ? 8000000UL : 4000000UL) / frequency8;
+    unsigned int interval = 4000000UL / frequency8;
     timerAlarmWrite(timers[chan], interval, true); // usec period
     timerAlarmEnable(timers[chan]);
     timerRestart(timers[chan]);
@@ -418,10 +407,8 @@ void tune_stopnote (byte chan) {
   Serial.println(chan, DEC);
 #endif
   if (chan < _tune_num_chans) {
-#if !TESLA_COIL
     byte pin = _tune_pins[chan];
     digitalWrite(pin, 0);
-#endif
     if (chan == 0)
       wait_timer_playing = false;
     else { // if not the channel we use to time waits,
@@ -496,11 +483,7 @@ void tune_stepscore (void) {
       duration = ((unsigned)cmd << 8) | (pgm_read_byte(score_cursor++));
       if (_tune_speed != 100)
         duration = (unsigned) (((unsigned long)duration * 100UL) / _tune_speed);
-#if TESLA_COIL // count for true frequency
-      wait_toggle_count = ((unsigned long) wait_timer_frequency8 * duration  + 8 * 500) / (8 * 1000);
-#else // count for double frequency
       wait_toggle_count = ((unsigned long) wait_timer_frequency8 * duration  + 4 * 500) / (4 * 1000);
-#endif
       if (wait_toggle_count == 0) wait_toggle_count = 1;
 #if DBUG
       Serial.print("wait "); Serial.print(duration);
@@ -519,27 +502,11 @@ void tune_stepscore (void) {
     else if (opcode == CMD_PLAYNOTE) { /* play note */
       note = pgm_read_byte(score_cursor++); // argument evaluation order is undefined in C!
       if (volume_present) {
-#if TESLA_COIL
-        byte volume = pgm_read_byte(score_cursor);
-#if DBUG
-        Serial.print("chan "); Serial.print(chan); Serial.print(" volume "); Serial.println(volume);
-#endif
-        if (chan < _tune_num_chans && _tune_volume[chan] != volume) { // if volume is changing
-          _tune_volume[chan] = volume;
-          teslacoil_change_volume(chan, volume); }
-#endif
         ++score_cursor; // ignore volume if present
       }
       tune_playnote (chan, note);
     }
     else if (opcode == CMD_INSTRUMENT) { /* change a channel's instrument */
-#if TESLA_COIL
-      byte instrument = pgm_read_byte(score_cursor);
-#if DBUG
-      Serial.print("chan "); Serial.print(chan); Serial.print(" instrument "); Serial.println(instrument);
-#endif
-      if (chan < _tune_num_chans) teslacoil_change_instrument(chan, instrument);
-#endif
       ++score_cursor; // skip over it
     }
     else if (opcode == CMD_RESTART) { /* restart score */
@@ -575,12 +542,8 @@ void tune_stopchans(void) {
 void ISRtimer0(void) {
   // We keep this running always and use it to time score waits, whether or not it is playing a note.
   if (wait_timer_playing) { // toggle the pin if we're sounding a note
-#if TESLA_COIL
-    teslacoil_rising_edge(0); // do a Tesla coil pulse
-#else
     byte pin = _tune_pins[0];
     digitalWrite(pin, !digitalRead(pin)); // toggle the pin
-#endif
   }
   if (tune_playing && wait_toggle_count && --wait_toggle_count == 0) {
     // end of a score wait, so execute more score commands
@@ -589,30 +552,18 @@ void ISRtimer0(void) {
 }
 
 void ISRtimer1(void) {
-#if TESLA_COIL
-  teslacoil_rising_edge(1); // do a Tesla coil pulse
-#else
   byte pin = _tune_pins[1];
   digitalWrite(pin, !digitalRead(pin)); // toggle the pin
-#endif
 }
 
 void ISRtimer2(void) {
-#if TESLA_COIL
-  teslacoil_rising_edge(2); // do a Tesla coil pulse
-#else
   byte pin = _tune_pins[2];
   digitalWrite(pin, !digitalRead(pin)); // toggle the pin
-#endif
 }
 
 void ISRtimer3(void) {
-#if TESLA_COIL
-  teslacoil_rising_edge(3); // do a Tesla coil pulse
-#else
   byte pin = _tune_pins[3];
   digitalWrite(pin, !digitalRead(pin)); // toggle the pin
-#endif
 }
 
 //*

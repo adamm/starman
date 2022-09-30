@@ -1,8 +1,9 @@
-#include <Arduino.h>
+#ifndef SMB_H
+#define SMB_H
 
 // Playtune bytestream for file "Mario-Sheet-Music-Overworld-Main-Theme.mid" created by MIDITONES V1.17 on Sun Dec 16 12:02:41 2018
 // command line: ./miditones -v -i -pt -d Mario-Sheet-Music-Overworld-Main-Theme 
-const unsigned char PROGMEM smb_overworld [] = {
+const unsigned char smb_overworld [] = {
 'P','t', 6, 0xE0, 0x00,  3, // (Playtune file header)
 0,1, 0x90,66,61, 0x91,50,69, 0x92,76,71, 0,152, 0x90,50,64, 0x91,66,56, 0x92,76,66, 0,149, 0x80, 0x81, 
 0x82, 0,148, 0x90,50,64, 0x91,66,56, 0x92,76,70, 0,148, 0x80, 0x81, 0x82, 0,154, 0x90,50,64, 0x91,66,56, 0x92,72,70, 
@@ -91,7 +92,7 @@ const unsigned char PROGMEM smb_overworld [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Underwater-Theme.mid" created by MIDITONES V1.17 on Sun Dec 16 12:34:20 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Underwater-Theme 
-const unsigned char PROGMEM smb_underwater [] = {
+const unsigned char smb_underwater [] = {
 'P','t', 6, 0xE0, 0x00,  5, // (Playtune file header)
 0,2, 0x90,62,64, 0x91,62,64, 1,26, 0x92,64,64, 0x93,61,64, 0,10, 0x80, 0x81, 1,9, 0x90,66,64, 0x91,60,64, 
 0,10, 0x82, 0x83, 1,7, 0x92,67,64, 0x93,59,64, 0,9, 0x80, 0x81, 1,18, 0x90,69,64, 0x91,60,64, 0,10, 
@@ -146,7 +147,7 @@ const unsigned char PROGMEM smb_underwater [] = {
 
 // Playtune bytestream for file "Mario-Sheet-Music-Underworld-Theme.mid" created by MIDITONES V1.17 on Sat Nov 27 23:03:38 2021
 // command line: ./miditones -d -pi -s1 -t4 Mario-Sheet-Music-Underworld-Theme 
-const unsigned char PROGMEM smb_underworld [] = {
+const unsigned char smb_underworld [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,60, 0x91,48, 0x92,72, 0x93,60, 0x80, 0x81, 0,143, 0x90,57, 0x91,45, 0,5, 0x82, 0x83, 
 0,142, 0x92,69, 0x93,57, 0,5, 0x80, 0x81, 0,142, 0x90,58, 0x91,46, 0,5, 0x82, 0x83, 0,148, 0x92,70, 0x93,58, 
@@ -195,7 +196,7 @@ const unsigned char PROGMEM smb_underworld [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Castle-Theme.mid" created by MIDITONES V1.17 on Sun Dec 16 12:40:57 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Castle-Theme 
-const unsigned char PROGMEM smb_castle [] = {
+const unsigned char smb_castle [] = {
 'P','t', 6, 0xE0, 0x00,  3, // (Playtune file header)
 0,3, 0x90,70,61, 0x91,51,64, 0x92,74,75, 0,84, 0x80, 0,4, 0x90,67,64, 0x82, 0,75, 0x80, 0,5, 0x90,69,59, 
 0x92,73,73, 0,75, 0x80, 0,4, 0x90,67,64, 0x82, 0,75, 0x80, 0,5, 0x90,68,56, 0x92,72,70, 0,75, 0x80, 
@@ -276,7 +277,7 @@ const unsigned char PROGMEM smb_castle [] = {
 
 // Playtune bytestream for file "warning.mid" created by MIDITONES V1.17 on Wed Dec  1 14:30:15 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 warning 
-const unsigned char PROGMEM smb_warning [] = {
+const unsigned char smb_warning [] = {
 'P','t', 6, 0x00, 0x00,  3, // (Playtune file header)
 0x90,52, 0x91,64, 0x92,59, 0,100, 0x90,68, 0x91,74, 0x92,71, 0,100, 0x81, 0x82, 0,100, 0x90,68, 0x91,74, 0x92,71, 
 0,100, 0x90,68, 0x91,74, 0,100, 0x80, 0x81, 0x82, 0,100, 0x90,53, 0x91,65, 0x92,60, 0,100, 0x90,69, 0x91,75, 0x92,72, 
@@ -289,7 +290,7 @@ const unsigned char PROGMEM smb_warning [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Item-Block-Sound.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:33 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Item-Block-Sound 
-const unsigned char PROGMEM smb_block [] = {
+const unsigned char smb_block [] = {
 'P','t', 6, 0xE0, 0x00,  2, // (Playtune file header)
 0,1, 0x90,67,69, 0x91,55,69, 0,52, 0x80, 0x81, 0,75, 0x90,68,64, 0x91,56,64, 0,49, 0x80, 0x81, 0,75, 
 0x90,69,64, 0x91,57,64, 0,48, 0x80, 0x81, 0,75, 0x90,70,64, 0x91,58,64, 0,48, 0x80, 0x81, 0,75, 0x90,71,69, 
@@ -299,7 +300,7 @@ const unsigned char PROGMEM smb_block [] = {
 
 // Playtune bytestream for file "Mario-Sheet-Music-Power-Up-Sound.mid" created by MIDITONES V1.17 on Mon Dec  3 21:09:40 2018
 // command line: ./miditones -v -i -pt -d Mario-Sheet-Music-Power-Up-Sound
-const unsigned char PROGMEM smb_powerup [] = {
+const unsigned char smb_powerup [] = {
   'P', 't', 6, 0xE0, 0x00,  1, // (Playtune file header)
   0, 1, 0x90, 67, 69, 0, 59, 0x80, 0, 3, 0x90, 71, 64, 0, 55, 0x80, 0, 3, 0x90, 74, 64, 0, 55, 0x80, 0, 3,
   0x90, 79, 64, 0, 55, 0x80, 0, 3, 0x90, 83, 64, 0, 56, 0x80, 0, 3, 0x90, 68, 64, 0, 56, 0x80, 0, 3, 0x90, 72, 64,
@@ -312,7 +313,7 @@ const unsigned char PROGMEM smb_powerup [] = {
 
 // Playtune bytestream for file "1up.mid" created by MIDITONES V1.17 on Thu Dec  9 16:40:33 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 1up
-const unsigned char PROGMEM smb_1up [] = {
+const unsigned char smb_1up [] = {
 'P','t', 6, 0x00, 0x00,  2, // (Playtune file header)
 0,2, 0x90,88, 0,145, 0x91,91, 0,8, 0x80, 0,129, 0x90,100, 0,8, 0x81, 0,130, 0x91,96, 0,8, 0x80, 0,129, 
 0x90,98, 0,8, 0x81, 0,127, 0x91,103, 0,8, 0x80, 0,137, 0x81, 0xf0};
@@ -321,7 +322,7 @@ const unsigned char PROGMEM smb_1up [] = {
 
 // Playtune bytestream for file "Mario-Sheet-Music-Starman-Theme.mid" created by MIDITONES V1.17 on Mon Dec  3 21:03:57 2018
 // command line: ./miditones -v -i -pt -d Mario-Sheet-Music-Starman-Theme
-const unsigned char PROGMEM smb_starman [] = {
+const unsigned char smb_starman [] = {
   'P', 't', 6, 0xE0, 0x00,  3, // (Playtune file header)
   0, 1, 0x90, 65, 61, 0x91, 50, 69, 0x92, 72, 71, 0, 103, 0x80, 0x81, 0x82, 0, 100, 0x90, 65, 56, 0x91, 72, 66, 0, 99,
   0x80, 0x81, 0, 100, 0x90, 57, 64, 0x91, 65, 56, 0x92, 72, 66, 0, 97, 0x80, 0x81, 0x82, 0, 100, 0x90, 62, 64, 0, 91, 0x80,
@@ -365,7 +366,7 @@ const unsigned char PROGMEM smb_starman [] = {
 
 // Playtune bytestream for file "Mario-Sheet-Music-Rescue-Fanfare.mid" created by MIDITONES V1.17 on Mon Dec  3 21:10:21 2018
 // command line: ./miditones -v -i -pt -d Mario-Sheet-Music-Rescue-Fanfare
-const unsigned char PROGMEM smb_fanfare [] = {
+const unsigned char smb_fanfare [] = {
   'P', 't', 6, 0xE0, 0x00,  5, // (Playtune file header)
   0, 1, 0x90, 72, 57, 0x91, 48, 56, 0x92, 52, 66, 0, 137, 0x93, 67, 52, 0, 7, 0x80, 0, 123, 0x90, 64, 52, 0, 7,
   0x83, 0, 125, 0x93, 72, 52, 0, 7, 0x80, 0, 125, 0x90, 67, 52, 0, 7, 0x83, 0, 121, 0x93, 64, 52, 0, 7, 0x80, 0, 125,
@@ -389,7 +390,7 @@ const unsigned char PROGMEM smb_fanfare [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Death-Sound.mid" created by MIDITONES V1.17 on Mon Dec  3 21:12:37 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Death-Sound
-const unsigned char PROGMEM smb_death [] = {
+const unsigned char smb_death [] = {
   'P', 't', 6, 0xE0, 0x00,  3, // (Playtune file header)
   0, 1, 0x90, 72, 69, 0, 38, 0x80, 0, 2, 0x90, 73, 64, 0, 34, 0x80, 0, 2, 0x90, 74, 67, 0, 29, 0x80, 1, 235,
   0x90, 55, 69, 0x91, 67, 61, 0x92, 71, 75, 0, 153, 0x90, 74, 56, 0x91, 77, 70, 0x82, 0, 146, 0, 3, 0x80, 0x81, 0, 34,
@@ -404,7 +405,7 @@ const unsigned char PROGMEM smb_death [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Game-Over-Sound.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:44 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Game-Over-Sound 
-const unsigned char PROGMEM smb_gameover [] = {
+const unsigned char smb_gameover [] = {
 'P','t', 6, 0xE0, 0x00,  3, // (Playtune file header)
 0,1, 0x90,64,61, 0x91,55,69, 0x92,72,75, 0,152, 0x80, 0x81, 0x82, 1,41, 0x90,52,64, 0x91,60,56, 0x92,67,70, 
 0,148, 0x80, 0x81, 0x82, 1,47, 0x90,48,64, 0x91,55,56, 0x92,64,70, 1,40, 0x90,53,64, 0x91,69,69, 0x92,65,64, 
@@ -416,7 +417,7 @@ const unsigned char PROGMEM smb_gameover [] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Flagpole-Fanfare.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:55 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Flagpole-Fanfare 
-const unsigned char PROGMEM smb_course_clear[] = {
+const unsigned char smb_course_clear[] = {
 'P','t', 6, 0xE0, 0x00,  5, // (Playtune file header)
 0,1, 0x90,55,52, 0,36, 0x91,57,52, 0,34, 0x80, 0,3, 0x90,59,52, 0,34, 0x81, 0,3, 0x91,60,52, 
 0,34, 0x80, 0,3, 0x90,62,52, 0,34, 0x81, 0,3, 0x91,64,52, 0,34, 0x80, 0,3, 0x90,65,52, 0,34, 
@@ -442,7 +443,7 @@ const unsigned char PROGMEM smb_course_clear[] = {
 
 // Playtune bytestream for file "./Mario-Sheet-Music-Ending-Theme.mid" created by MIDITONES V1.17 on Sun Dec 16 12:27:25 2018
 // command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Ending-Theme 
-const unsigned char PROGMEM smb_ending [] = {
+const unsigned char smb_ending [] = {
 'P','t', 6, 0xE0, 0x00,  3, // (Playtune file header)
 1,148, 0x90,67,64, 0x91,47,64, 0,125, 0x80, 0,8, 0x90,66,64, 0,121, 0x80, 0,8, 0x90,67,64, 0,125, 
 0x80, 0,7, 0x90,55,56, 0x91,48,64, 0x92,64,70, 3,31, 0x90,50,69, 0x91,57,61, 0x92,65,75, 1,148, 0x90,51,64, 
@@ -463,3 +464,5 @@ const unsigned char PROGMEM smb_ending [] = {
 1,144, 0,4, 0x91,43,64, 0,45, 0,50, 0,50, 0,50, 0,51, 0,51, 0,51, 0,51, 0x90,64,56, 
 0x91,48,64, 0x92,72,70, 3,60, 0x80, 0x81, 0x82, 0xf0};
 // This score contains 471 bytes, and 3 tone generators are used.
+
+#endif

@@ -1,8 +1,9 @@
-#include <Arduino.h>
+#ifndef SMB2_H
+#define SMB2_H
 
 // Playtune bytestream for file "smb2_ending.mid" created by MIDITONES V1.17 on Wed Dec  1 14:48:32 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 smb2_ending 
-const unsigned char PROGMEM smb2_ending [] = {
+const unsigned char smb2_ending [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,67, 0x91,76, 0x92,48, 0,125, 0x82, 1,119, 0x92,48, 0,108, 0x82, 0,58, 0x92,48, 0,108, 0x82, 0,58, 0x92,48, 
 0,108, 0x82, 0,58, 0x92,48, 0,83, 0x82, 0,160, 0x80, 0x81, 0,6, 0x90,69, 0x91,77, 0x92,48, 0,83, 0x82, 0,160, 
@@ -183,3 +184,5 @@ const unsigned char PROGMEM smb2_ending [] = {
 0,83, 0x80, 0,166, 0x90,76, 0,83, 0x80, 0,166, 0x90,67, 0,83, 0x80, 0,166, 0x90,76, 0,83, 0x80, 0,166, 
 0x90,72, 0,83, 0x80, 0,166, 0x90,76, 0,83, 0x80, 0xf0};
 // This score contains 4687 bytes, and 4 tone generators are used.
+
+#endif

@@ -1,6 +1,9 @@
+#ifndef SM64_H
+#define SM64_h
+
 // Playtune bytestream for file "Super Mario 64 - Slider.mid" created by MIDITONES V1.17 on Thu Dec  9 17:01:25 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pt -s1 -t4 Super Mario 64 - Slider 
-const unsigned char PROGMEM sm64_slider [] = {
+const unsigned char sm64_slider [] = {
 'P','t', 6, 0x20, 0x00,  4, // (Playtune file header)
 0,3, 0x90,88, 0x91,87, 0,74, 0x92,81, 0x93,88, 0,9, 0x81, 0,253, 0x80, 0x82, 0x83, 0,9, 0x90,45, 1,75, 
 0x91,87, 0,6, 0x90,88, 0,71, 0x92,81, 0x93,88, 0,9, 0x81, 0,253, 0x80, 0x82, 0x83, 0,3, 0x90,45, 1,80, 
@@ -419,3 +422,5 @@ const unsigned char PROGMEM sm64_slider [] = {
 0,10, 0x90,67, 0x91,57, 0x93,61, 0,9, 0x82, 0,72, 0x92,64, 0,9, 0x80, 0,59, 0x82, 0,6, 0x81, 0x83, 0xf0};
 // This score contains 10954 bytes, and 4 tone generators are used.
 // 153 notes had to be skipped.
+
+#endif

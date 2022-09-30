@@ -1,5 +1,5 @@
-#include <Arduino.h>
-
+#ifndef SMW_H
+#define SMW_H
 
 // Playtune bytestream for file "overworld-2.mid" created by MIDITONES V1.17 on Wed Dec  1 13:55:52 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 overworld-2 
@@ -1143,3 +1143,5 @@ const unsigned char PROGMEM smw_gameover [] = {
 0x83, 0xf0};
 // This score contains 113 bytes, and 4 tone generators are used.
 // 4 notes had to be skipped.
+
+#endif

@@ -1,8 +1,9 @@
-#include <Arduino.h>
+#ifndef SMB3_H
+#define SMB3_H
 
 // Playtune bytestream for file "smb3-overworld.mid" created by MIDITONES V1.17 on Wed Dec  1 15:07:37 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 smb3-overworld 
-const unsigned char PROGMEM smb3_overworld [] = {
+const unsigned char smb3_overworld [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 6,154, 0x90,52, 0x91,55, 0x92,35, 0x93,52, 0,7, 0,56, 0x80, 0x81, 0x82, 0x83, 0,218, 0x90,55, 0x91,60, 0x92,38, 
 0x93,55, 0,7, 0,56, 0x80, 0x81, 0x82, 0x83, 0,77, 0x90,64, 0x91,67, 0x92,52, 0x93,64, 0,7, 0,56, 0x80, 0x81, 
@@ -143,7 +144,7 @@ const unsigned char PROGMEM smb3_overworld [] = {
 
 // Playtune bytestream for file "smb3-underwater.mid" created by MIDITONES V1.17 on Wed Dec  1 15:09:40 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 smb3-underwater 
-const unsigned char PROGMEM smb3_underwater [] = {
+const unsigned char smb3_underwater [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,67, 0x91,59, 1,26, 0x81, 0,2, 0x90,79, 0x91,71, 1,26, 0x81, 0,2, 0x90,77, 0x91,69, 1,26, 0x81, 0,2, 
 0x90,74, 0x91,65, 2,59, 0x90,67, 0x91,59, 1,26, 0x81, 0,2, 0x90,69, 0x91,60, 1,26, 0x81, 0,2, 0x90,70, 
@@ -252,7 +253,7 @@ const unsigned char PROGMEM smb3_underwater [] = {
 
 // Playtune bytestream for file "smb3-fortress.mid" created by MIDITONES V1.17 on Wed Dec  1 15:10:52 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 smb3-fortress 
-const unsigned char PROGMEM smb3_castle [] = {
+const unsigned char smb3_castle [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // Super Mario Bros 3 : Fortress / [GM] \ Sequenced by -Mark Jansen-
 0x90,46, 0x91,48, 0x92,53, 0,137, 0x80, 0x81, 0x82, 0,137, 0x90,57, 0x91,59, 0x92,64, 0,137, 0x80, 0x81, 0x82, 0,137, 
@@ -286,7 +287,7 @@ const unsigned char PROGMEM smb3_castle [] = {
 
 // Playtune bytestream for file "course-clear.mid" created by MIDITONES V1.17 on Wed Dec  1 15:03:18 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 course-clear 
-const unsigned char PROGMEM smb3_course_clear [] = {
+const unsigned char smb3_course_clear [] = {
 'P','t', 6, 0x00, 0x00,  3, // (Playtune file header)
 0x90,72, 0x91,69, 0x92,52, 0,202, 0x80, 0x81, 0x82, 0,4, 0x90,74, 0x91,71, 0,202, 0x80, 0x81, 0,4, 0x90,76, 0x91,72, 
 0,202, 0x80, 0x81, 0,4, 0x90,77, 0x91,74, 0x92,50, 0,202, 0x82, 0,142, 0x80, 0x81, 0,68, 0x90,79, 0x91,76, 0x92,50, 
@@ -298,7 +299,7 @@ const unsigned char PROGMEM smb3_course_clear [] = {
 
 // Playtune bytestream for file "king-restored.mid" created by MIDITONES V1.17 on Wed Dec  1 14:55:34 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 king-restored 
-const unsigned char PROGMEM smb3_fanfare [] = {
+const unsigned char smb3_fanfare [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // King Restored from Super Mario Brothers 3
 // For the Nintendo Entertainment System
@@ -321,7 +322,7 @@ const unsigned char PROGMEM smb3_fanfare [] = {
 
 // Playtune bytestream for file "victory-fanfare.mid" created by MIDITONES V1.17 on Wed Dec  1 15:00:03 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 victory-fanfare 
-const unsigned char PROGMEM smb3_fanfare2 [] = {
+const unsigned char smb3_fanfare2 [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // Airship Victory from Super Mario Brothers 3
 // For the Nintendo Entertainment System
@@ -338,7 +339,7 @@ const unsigned char PROGMEM smb3_fanfare2 [] = {
 
 // Playtune bytestream for file "game-over.mid" created by MIDITONES V1.17 on Wed Dec  1 14:52:24 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 game-over 
-const unsigned char PROGMEM smb3_gameover [] = {
+const unsigned char smb3_gameover [] = {
 'P','t', 6, 0x00, 0x00,  3, // (Playtune file header)
 0x90,67, 0x91,76, 0x92,57, 0,202, 0x80, 0x81, 0x82, 0,4, 0x90,67, 0x91,76, 0,202, 0x80, 0x81, 0,4, 0x90,67, 0x91,76, 
 0,202, 0x80, 0x81, 0,4, 0x90,74, 0x91,83, 0x92,50, 1,88, 0x80, 0x81, 0x82, 0,68, 0x90,72, 0x91,81, 0x92,50, 0,202, 
@@ -346,3 +347,5 @@ const unsigned char PROGMEM smb3_gameover [] = {
 0x80, 0x81, 0x82, 0,4, 0x90,71, 0x91,79, 0x92,55, 0,202, 0x82, 0,142, 0x80, 0x81, 1,19, 0x90,61, 0x92,49, 0,202, 
 0x80, 0x82, 0,4, 0x90,62, 0x92,50, 0,202, 0x80, 0x82, 0,4, 0x90,55, 0x92,43, 0,202, 0x80, 0x82, 0xf0};
 // This score contains 135 bytes, and 3 tone generators are used.
+
+#endif
