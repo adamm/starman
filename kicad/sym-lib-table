@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/espressif/libraries/Espressif.kicad_sym")(options "")(descr ""))
   (lib (name "starman")(type "KiCad")(uri "${KIPRJMOD}/starman.kicad_sym")(options "")(descr ""))
+  (lib (name "starman-rescue")(type "Legacy")(uri "${KIPRJMOD}/starman-rescue.lib")(options "")(descr ""))
 )
