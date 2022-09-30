@@ -1,51 +1,69 @@
-# Arduino Starman Christmas Ornament
+# Starman Christmas Tree Topper
 
-Youtube Demo: https://www.youtube.com/watch?v=mx5et6Ui8Hc
+Disclaimer: This work is a *work-in-progress*.  This project is still under
+active development and is estimated to be completed _December 1st, 2022_.
+What you see here is code that is largely incomplete, buggy, crashes,
+and could catch fire. The PCB board is largely inefficient, expensive,
+broken, and could catch fire.
 
-![Starman tree video](starman-tree.gif)
+Version 1 of the star is a POC I created a few years ago which was literally
+a 3d-printed star with 24 LEDs hot-glued onto it, driven by a [LED PWM
+driver](https://github.com/adafruit/Adafruit_TLC5947) from Adafruit,
+running from an Arduino.
+
+There is a Youtube demo of version 1: https://www.youtube.com/watch?v=mx5et6Ui8Hc but here it is in action.
+
+![Starman v1 tree video](starman-tree.gif)
+
+Version 2 is a complete redesign for 2022, including a custom
+PCB, 144 LEDs, 235 components, ESP32-S3 MCU, esp-idf framework, and
+WiFi/Bluetooth support.
+
+![Starman v2 PCB front](pcba-front.png)
+![Starman v2 PCB back](pcba-back.png)
+
+I plan on producing 10 units for friends and family, but if you are
+interested please reach out.  Build cost is currently estimated at
+CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
 ## TODO
 
-- [X] Add music button
-- [X] Flash lights in sequence with music
-- [ ] Create different light sequences based on music playing
-- [ ] Randomize the music pattern
+- [X] Finalize PCB design
+- [X] Play music
+- [ ] Flash lights in sequence with music
+- [ ] Create bluetooth/wifi trigger
+- [ ] Create onboarding process
+
+## Milestones
+
+2022-09-01
+- PCB layout identified and key components selected
+
+2022-09-25
+- Components ordered and footprints verified
+
+2022-09-27
+- Upgrade from ESP32-S2 to ESP32-S3
+
+2022-09-29
+- PCB design delivered for production
+
+## Key Components
+
+- ESP32-S3-Mini module
+
+- 9x LED1642GW drivers
+
+- 144 OSRAM LY P47 2mm LEDs
+
+- PAM8302A amplifer
+
+- 239 total components (35 unique)
+
+- Translate MIDI to Playtune C array
+  - https://github.com/lenshustek/miditones
 
 ## Build Dependencies
 
-- 3D-printed Pixel tree topper star
-  https://www.thingiverse.com/thing:194864
-
-- Adafruit TLC5947 breakout board
-  http://www.adafruit.com/products/1429
-
-- Arduino (or compatible)
-  - 7 digital pins minimum (3 audio, 3 SPI, 1 interrupt)
-
-- 24 LEDs
-
-- Solder & Wire
-
-## External Libraries / Credits
-
-- Adafruit TLC5947 Driver
-  https://github.com/adafruit/Adafruit_TLC5947
-
-- Playtune: An Arduino polyphonic music generator
-  https://github.com/LenShustek/arduino-playtune
-
-- MarioPiano.com Starman Theme MIDI
-  http://www.mariopiano.com/midi-sound-file-starman-theme.html
-
-- Translate MIDI to Playtune C array
-  https://github.com/lenshustek/miditones
-
-## Build
-
-1. Download Arduino IDE
-
-2. Open arduino-starman.ino
-
-3. Compile and upload
-
-
+- ESP-IDF framework
+  - https://www.thingiverse.com/thing:194864
