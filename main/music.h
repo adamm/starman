@@ -6,6 +6,7 @@
 #define CMD_INSTRUMENT 0xC0  /* change instrument; low nibble is generator #, instrument is next byte */
 #define CMD_RESTART    0XE0  /* restart the score from the beginning */
 #define CMD_STOP       0XF0  /* stop playing */
+#define CMD_TEMPO      0XFE  /* set tempo */
 
 #define HDR_F1_VOLUME_PRESENT      0x80
 #define HDR_F1_INSTRUMENTS_PRESENT 0x40
@@ -22,8 +23,9 @@ typedef struct {  // the optional bytestream file header
 
 typedef unsigned char byte;
 
-void music_callback(void (*callback)(uint32_t));
+void music_callback(bool (*callback)(uint32_t));
 void music_playscore(const byte* score);
+void music_settempo(uint8_t);
 void music_init(void);
 void music_stop(void);
 

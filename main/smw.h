@@ -3,7 +3,7 @@
 
 // Playtune bytestream for file "overworld-2.mid" created by MIDITONES V1.17 on Wed Dec  1 13:55:52 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 overworld-2 
-const unsigned char PROGMEM smw_overworld [] = {
+const unsigned char smw_overworld [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,45, 0x91,41, 0x92,71, 0,100, 0x92,69, 0,66, 0x80, 0x81, 0,33, 0x90,65, 0x82, 0,100, 0x90,45, 0x91,71, 0x92,41, 
 0,200, 0x91,69, 0,33, 0x80, 0x82, 0,66, 0x90,65, 0x81, 0,100, 0x90,44, 0x91,40, 0x92,64, 0,166, 0x82, 0,33, 
@@ -223,7 +223,7 @@ const unsigned char PROGMEM smw_overworld [] = {
 
 // Playtune bytestream for file "donut-plains-4-.mid" created by MIDITONES V1.17 on Wed Dec  1 13:53:51 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 donut-plains-4- 
-const unsigned char PROGMEM smw_donut [] = {
+const unsigned char smw_donut [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // Super Mario World's Donut Plains
 0x90,36, 0,53, 0,160, 0x80, 0,53, 0,53, 0x90,72, 0x91,72, 0,107, 0x92,83, 0x93,76, 0x80, 0x81, 0,53, 0,53, 
@@ -329,7 +329,7 @@ const unsigned char PROGMEM smw_donut [] = {
 
 // Playtune bytestream for file "underwater.mid" created by MIDITONES V1.17 on Wed Dec  1 14:00:39 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 underwater 
-const unsigned char PROGMEM smw_underwater [] = {
+const unsigned char smw_underwater [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,67, 0x91,59, 1,26, 0x81, 0,2, 0x90,79, 0x91,71, 1,26, 0x81, 0,2, 0x90,77, 0x91,69, 1,26, 0x81, 0,2, 
 0x90,74, 0x91,65, 2,59, 0x90,67, 0x91,59, 1,26, 0x81, 0,2, 0x90,69, 0x91,60, 1,26, 0x81, 0,2, 0x90,70, 
@@ -438,7 +438,7 @@ const unsigned char PROGMEM smw_underwater [] = {
 
 // Playtune bytestream for file "castle.mid" created by MIDITONES V1.17 on Wed Dec  1 13:59:11 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 castle 
-const unsigned char PROGMEM smw_castle [] = {
+const unsigned char smw_castle [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 0x90,43, 0,147, 0x91,44, 0,147, 0x92,48, 0,147, 0x93,49, 0,147, 0,147, 0x91,56, 0,147, 0,147, 0x93,67, 
 0,147, 0,98, 0,98, 0,245, 0x83, 2,174, 0x80, 0x81, 0x82, 0,49, 0x90,72, 0x91,77, 0,73, 0x80, 0x81, 0,73, 
@@ -828,7 +828,7 @@ const unsigned char PROGMEM smw_castle [] = {
 
 // Playtune bytestream for file "smw_p-switch.mid" created by MIDITONES V1.17 on Wed Dec  1 14:10:14 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 smw_p-switch 
-const unsigned char PROGMEM smw_p_switch [] = {
+const unsigned char smw_p_switch [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 3,232, 0x90,95, 0x91,109, 0x92,48, 0x93,48, 0,10, 0x90,97, 0x91,111, 0,10, 0x90,99, 0x91,113, 0,10, 0x90,102, 
 0x91,116, 0x83, 0,10, 0x90,104, 0x91,118, 0,10, 0x90,107, 0x91,121, 0,20, 0x80, 0x81, 0,10, 0x90,95, 0x91,109, 0,10, 
@@ -904,7 +904,7 @@ const unsigned char PROGMEM smw_p_switch [] = {
 
 // Playtune bytestream for file "secret-sblive-.mid" created by MIDITONES V1.17 on Wed Dec  1 14:07:51 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 secret-sblive- 
-const unsigned char PROGMEM smw_secret [] = {
+const unsigned char smw_secret [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // You hear this sometimes in Super Mario World
 0x90,60, 0x91,64, 0x92,67, 0x93,45, 1,2, 0x80, 0x81, 0x82, 0,86, 0x90,60, 0x91,64, 0x92,67, 0x93,45, 1,2, 0x80, 
@@ -1092,7 +1092,7 @@ const unsigned char PROGMEM smw_secret [] = {
 
 // Playtune bytestream for file "course-clear-2-.mid" created by MIDITONES V1.17 on Wed Dec  1 14:02:36 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 course-clear-2- 
-const unsigned char PROGMEM smw_course_clear [] = {
+const unsigned char smw_course_clear [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // Track 0
 0x90,77, 0x91,72, 0x92,41, 0x93,81, 0,218, 0x80, 0x81, 0x82, 0,47, 0x83, 0,7, 0x93,81, 0x90,77, 0,54, 0x80, 0x83, 
@@ -1119,7 +1119,7 @@ const unsigned char PROGMEM smw_course_clear [] = {
 
 // Playtune bytestream for file "mario-dies-2-.mid" created by MIDITONES V1.17 on Wed Dec  1 13:58:02 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 mario-dies-2- 
-const unsigned char PROGMEM smw_death [] = {
+const unsigned char smw_death [] = {
 'P','t', 6, 0x00, 0x00,  3, // (Playtune file header)
 // untitled
 0x90,48, 0x91,87, 0,53, 0x81, 0,53, 0x90,88, 0,53, 0x80, 0,53, 0x90,52, 0x91,55, 0x92,87, 0,53, 0x82, 0,53, 
@@ -1133,7 +1133,7 @@ const unsigned char PROGMEM smw_death [] = {
 
 // Playtune bytestream for file "game-over.mid" created by MIDITONES V1.17 on Wed Dec  1 13:57:12 2021
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 game-over 
-const unsigned char PROGMEM smw_gameover [] = {
+const unsigned char smw_gameover [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
 // Super Mario World - Game Over
 0x90,74, 0,75, 0x91,77, 0,75, 0x92,81, 1,187, 0x81, 0,6, 0x91,77, 1,37, 0x80, 0x81, 0x82, 0,6, 0x90,72, 

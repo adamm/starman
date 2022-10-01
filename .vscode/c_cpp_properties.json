@@ -11,7 +11,7 @@
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
             ],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/Users/adamm/.espressif/tools/xtensa-esp32s2-elf/esp-2021r2-patch3-8.4.0/xtensa-esp32s2-elf/bin/xtensa-esp32s2-elf-gcc",
             "cStandard": "c11",
             "cppStandard": "c++98",
             "intelliSenseMode": "macos-clang-x64"
