@@ -26,10 +26,24 @@ I plan on producing 10 units for friends and family, but if you are
 interested please reach out.  Build cost is currently estimated at
 CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
+## HOW TO PLAY
+
+- Press the button to start the game.
+- Start the game with three lives at level 1 (overworld).  If you lose all lives, it's game over.
+- There is a 50% chance you will complete each level.  If you do, you move onto next level.  If not, you die and need to retry.
+  - Death can occur randomly within the level.
+  - Press the button again to start the next level, or retry the same level.
+- There is a 40% chance you'll get a star.
+  - Stars can occur randomly within the level.
+  - Stars do not negate death (ie, falling into a pit).
+- There is a 25% chance you'll get a 1-up, resulting in an extra life.
+- If you make it to level 4 (castle) and complete it, there is a 25% chance the princess will be there and the game is over.
+
 ## TODO
 
 - [X] Finalize PCB design
 - [X] Play music
+- [ ] Implement game logic
 - [ ] Flash lights in sequence with music
 - [ ] Create bluetooth/wifi trigger
 - [ ] Create onboarding process
