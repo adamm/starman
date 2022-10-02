@@ -11,6 +11,11 @@ void patterns_step_sequence() {
 }
 
 
+void patterns_checkered() {
+    ESP_LOGI(TAG, "Begin CHECKERED pattern");
+}
+
+
 void patterns_diamonds() {
     ESP_LOGI(TAG, "Begin DIAMONDS pattern");
 }
@@ -28,6 +33,16 @@ void patterns_flash() {
 
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
+}
+
+
+void patterns_radar() {
+    ESP_LOGI(TAG, "Begin RADAR pattern");
+}
+
+
+void patterns_siren() {
+    ESP_LOGI(TAG, "Begin SIREN pattern");
 }
 
 

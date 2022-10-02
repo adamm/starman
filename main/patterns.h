@@ -6,6 +6,8 @@ void patterns_diamonds();
 void patterns_fireworks();
 void patterns_flash();
 void patterns_lines();
+void patterns_radar();
+void patterns_siren();
 void patterns_sparkle();
 void patterns_sprinkle();
 void patterns_sweep();
