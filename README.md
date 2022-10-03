@@ -45,6 +45,7 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Play music
 - [ ] Implement game logic
 - [ ] Flash lights in sequence with music
+- [X] Unique light pattern per music song/state
 - [ ] Create bluetooth/wifi trigger
 - [ ] Create onboarding process
 

@@ -57,10 +57,10 @@ void app_main(void)
     patterns_waves();
     music_playscore(smb_underwater);
 
-    patterns_swoosh();
+    patterns_siren();
     music_playscore(smb_castle);
 
-    patterns_fireworks();
+    patterns_checkered();
     music_playscore(smb_fanfare);
 
     patterns_diamonds();
