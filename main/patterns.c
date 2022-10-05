@@ -41,6 +41,7 @@ static void patterns_spiral_step();
 static void patterns_sweep_step();
 static void patterns_swoosh_step();
 static void patterns_swoop_step();
+static void patterns_thump_step();
 static void patterns_waves_step();
 
 
@@ -320,8 +321,22 @@ void patterns_swoop() {
 }
 
 
-void patterns_swoop_step() {
+static void patterns_swoop_step() {
     scroll(0, 1, true, 0);
+}
+
+
+void patterns_thump() {
+    ESP_LOGI(TAG, "Begin WAVES pattern");
+
+    memcpy(framebuffer, thump[0], PATTERN_LENGTH);
+    callback_func = patterns_thump_step;
+}
+
+
+static void patterns_thump_step() {
+    // TBD:  Jump right to largest "thump" image at instrument play, decay to smallest "thump" image while not playing
+    // You know, like a drum.
 }
 
 
