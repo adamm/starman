@@ -44,10 +44,12 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Finalize PCB design
 - [X] Play music
 - [ ] Implement game logic
-- [ ] Flash lights in sequence with music
 - [X] Unique light pattern per music song/state
-- [ ] Create bluetooth/wifi trigger
-- [ ] Create onboarding process
+- [ ] Flash lights in sequence with music
+- [ ] GPIO play button
+- [ ] WiFi play button
+- [ ] WiFi onboarding process
+- [ ] Bluetooth play button/app?
 
 ## Milestones
 
