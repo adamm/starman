@@ -10848,7 +10848,10 @@
       (reference "C38") (unit 1) (value "220pF") (footprint "Capacitor_SMD:C_0805_2012Metric")
     )
     (path "/78acf351-6bbc-4d06-809e-55b029018a59/740b31aa-098b-40ad-9da3-85e73f50a6df"
-      (reference "C39") (unit 1) (value "10uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+      (reference "C39") (unit 1) (value "1uF") (footprint "Capacitor_SMD:C_0805_2012Metric")
+    )
+    (path "/78acf351-6bbc-4d06-809e-55b029018a59/0f038af7-cb27-4656-a394-9e83a5256f44"
+      (reference "C40") (unit 1) (value "10uF") (footprint "Capacitor_Tantalum_SMD:CP_EIA-3216-10_Kemet-I")
     )
     (path "/00000000-0000-0000-0000-0000625fd46d"
       (reference "D1") (unit 1) (value "LED") (footprint "starman:LED_Osram_Lx_P47F_D2mm_ReverseMount")
@@ -11403,7 +11406,7 @@
       (reference "R25") (unit 1) (value "100") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/78acf351-6bbc-4d06-809e-55b029018a59/b29c4d45-a917-4c71-babb-8ebafca46a87"
-      (reference "R26") (unit 1) (value "10k") (footprint "Resistor_SMD:R_0805_2012Metric")
+      (reference "R26") (unit 1) (value "1k") (footprint "Resistor_SMD:R_0805_2012Metric")
     )
     (path "/78acf351-6bbc-4d06-809e-55b029018a59/569047a1-2494-45e4-8286-e1d25b1defc7"
       (reference "RV1") (unit 1) (value "10k") (footprint "Potentiometer_THT:Potentiometer_Bourns_3339P_Vertical")
