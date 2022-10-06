@@ -11327,6 +11327,9 @@
     (path "/78acf351-6bbc-4d06-809e-55b029018a59/b92c2105-03f3-4fd2-9702-8fdee9d0fd0d"
       (reference "J11") (unit 1) (value "Conn_02x01") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
     )
+    (path "/78acf351-6bbc-4d06-809e-55b029018a59/11c47f36-be86-4278-a45f-0541cca90026"
+      (reference "J12") (unit 1) (value "Conn_02x01") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
+    )
     (path "/78acf351-6bbc-4d06-809e-55b029018a59/75b4c2a0-49d9-4bc1-af2a-5442f501ceaf"
       (reference "LS1") (unit 1) (value "SMS-1508MS-HT-R") (footprint "starman:SPKR_SMS-1508MS-HT-R")
     )
