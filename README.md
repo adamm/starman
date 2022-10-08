@@ -22,6 +22,12 @@ WiFi/Bluetooth support.
 ![Starman v2 PCB front](pcba-front.png)
 ![Starman v2 PCB back](pcba-back.png)
 
+The sound module connects to the spine of the star through 20mm pin socket
+risers.  Finally, a 3d-printed mount secures the display to the christmas
+tree's top branch via the risers.
+
+![](mount/mount.png)
+
 I plan on producing 10 units for friends and family, but if you are
 interested please reach out.  Build cost is currently estimated at
 CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
