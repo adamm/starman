@@ -8,25 +8,28 @@ broken, and could catch fire.
 
 Version 1 of the star is a POC I created a few years ago which was literally
 a 3d-printed star with 24 LEDs hot-glued onto it, driven by a [LED PWM
-driver](https://github.com/adafruit/Adafruit_TLC5947) from Adafruit,
-running from an Arduino.
+module](https://github.com/adafruit/Adafruit_TLC5947) from Adafruit,
+running from an Arduino Uno.
+
+Music was produced using 3 PWM channels driven by [Arduino Playtune](https://github.com/LenShustek/arduino-playtune) library.
 
 There is a Youtube demo of version 1: https://www.youtube.com/watch?v=mx5et6Ui8Hc but here it is in action.
 
-![Starman v1 tree video](starman-tree.gif)
+![Starman v1 tree video](images/starman-tree.gif)
 
-Version 2 is a complete redesign for 2022, including a custom
-PCB, 144 LEDs, 235 components, ESP32-S3 MCU, esp-idf framework, and
-WiFi/Bluetooth support.
+Version 2 is a complete redesign for 2022, including a custom PCB, 144
+LEDs, 235 components, ESP32-S3 MCU, esp-idf framework, and WiFi/Bluetooth
+support.  Audio is driven by 4 PWM channels, featuring a volume control and
+a class-D amplifier.
 
-![Starman v2 PCB front](pcba-front.png)
-![Starman v2 PCB back](pcba-back.png)
+![Starman v2 PCB front](images/pcba-front.png)
+![Starman v2 PCB back](images/pcba-back.png)
 
 The sound module connects to the spine of the star through 20mm pin socket
 risers.  Finally, a 3d-printed mount secures the display to the christmas
-tree's top branch via the risers.
+tree's top branch via the risers:
 
-![](mount/mount.png)
+![3D-printed mount](images/mount.png)
 
 I plan on producing 10 units for friends and family, but if you are
 interested please reach out.  Build cost is currently estimated at
