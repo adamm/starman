@@ -52,7 +52,7 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
 - [X] Finalize PCB design
 - [X] Play music
-- [ ] Implement game logic
+- [X] Implement game logic
 - [X] Unique light pattern per music song/state
 - [ ] Flash lights in sequence with music
 - [X] GPIO play button

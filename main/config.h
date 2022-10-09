@@ -1,6 +1,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// Game logic defaults
+#define GAME_START_LIVES      3
+#define GAME_DIE_PERCENT     50
+#define GAME_STAR_PERCENT    40
+#define GAME_1UP_PERCENT     25
+#define GAME_FANFARE_PERCENT 25
+
+
+// GPIO pin ports
 #define PLAY_GAME_GPIO        1
 
 #ifdef CONFIG_IDF_TARGET_ESP32C3

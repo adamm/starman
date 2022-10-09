@@ -4,6 +4,7 @@ idf_component_register(SRCS
                     "lights.c"
                     "music.c"
                     "patterns.c"
+                    "random.c"
                     "status.c"
                     "util.c"
                     INCLUDE_DIRS ".")

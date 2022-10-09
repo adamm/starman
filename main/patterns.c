@@ -1,4 +1,5 @@
 #include <esp_log.h>
+#include <esp_random.h>
 #include <string.h>
 
 #include "patterns.h"
@@ -226,11 +227,12 @@ void patterns_random() {
 
     memset(framebuffer, 0, PATTERN_LENGTH);
     callback_func = patterns_lines_step;
+    patterns_random_step();
 }
 
 
 static void patterns_random_step() {
-    // TBD
+    esp_fill_random(framebuffer, PATTERN_LENGTH);
 }
 
 
