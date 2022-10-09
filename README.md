@@ -55,7 +55,7 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [ ] Implement game logic
 - [X] Unique light pattern per music song/state
 - [ ] Flash lights in sequence with music
-- [ ] GPIO play button
+- [X] GPIO play button
 - [ ] WiFi play button
 - [ ] WiFi onboarding process
 - [ ] Bluetooth play button/app?
