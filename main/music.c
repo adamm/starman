@@ -288,7 +288,7 @@ void music_init(void) {
 
     ledc_channel[0].channel = LEDC_CHANNEL_0;
     ledc_channel[0].duty = 0;
-    ledc_channel[0].gpio_num = MUSIC_CHANNEL_1_PIN;
+    ledc_channel[0].gpio_num = MUSIC_CHANNEL_1_GPIO;
     ledc_channel[0].speed_mode = LEDC_LOW_SPEED_MODE;
     ledc_channel[0].hpoint = 0;
     ledc_channel[0].intr_type = LEDC_INTR_DISABLE;
@@ -297,7 +297,7 @@ void music_init(void) {
 
     ledc_channel[1].channel = LEDC_CHANNEL_1;
     ledc_channel[1].duty = 0;
-    ledc_channel[1].gpio_num = MUSIC_CHANNEL_2_PIN;
+    ledc_channel[1].gpio_num = MUSIC_CHANNEL_2_GPIO;
     ledc_channel[1].speed_mode = LEDC_LOW_SPEED_MODE;
     ledc_channel[1].hpoint = 0;
     ledc_channel[1].intr_type = LEDC_INTR_DISABLE;
@@ -306,7 +306,7 @@ void music_init(void) {
 
     ledc_channel[2].channel = LEDC_CHANNEL_2;
     ledc_channel[2].duty = 0;
-    ledc_channel[2].gpio_num = MUSIC_CHANNEL_3_PIN;
+    ledc_channel[2].gpio_num = MUSIC_CHANNEL_3_GPIO;
     ledc_channel[2].speed_mode = LEDC_LOW_SPEED_MODE;
     ledc_channel[2].hpoint = 0;
     ledc_channel[2].intr_type = LEDC_INTR_DISABLE;
@@ -315,7 +315,7 @@ void music_init(void) {
 
     ledc_channel[3].channel = LEDC_CHANNEL_3;
     ledc_channel[3].duty = 0;
-    ledc_channel[3].gpio_num = MUSIC_CHANNEL_4_PIN;
+    ledc_channel[3].gpio_num = MUSIC_CHANNEL_4_GPIO;
     ledc_channel[3].speed_mode = LEDC_LOW_SPEED_MODE;
     ledc_channel[3].hpoint = 0;
     ledc_channel[3].intr_type = LEDC_INTR_DISABLE;
@@ -327,7 +327,7 @@ void music_init(void) {
         ESP_LOGE(TAG, "ledc_channel_config[%d]: %d", i, err);
     }
 
-    ESP_LOGI(TAG, "Music initialized");
+    ESP_LOGI(TAG, "Init success");
 }
 
 

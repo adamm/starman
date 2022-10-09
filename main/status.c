@@ -19,9 +19,11 @@ static const char *TAG = "starman-status";
 #define BLUE  MAX_BRIGHTNESS
 
 void status_init() {
-    // One addressable LED is found on the STATUS_LED_PIN port
-    status_light = led_strip_init(0, STATUS_LED_PIN, 1);
+    // One addressable LED is found on the STATUS_LED_GPIO port
+    status_light = led_strip_init(0, STATUS_LED_GPIO, 1);
     status_clear();
+
+    ESP_LOGI(TAG, "Init success");
 }
 
 
