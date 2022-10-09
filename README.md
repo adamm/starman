@@ -74,6 +74,9 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 2022-09-29
 - PCB design delivered for production
 
+2022-10-09
+- Complete migration of core game logic from Arduino version (v1) to esp-idf version (v2)
+
 ## Key Components
 
 - ESP32-S3-Mini module
