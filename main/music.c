@@ -76,52 +76,52 @@ static void music_test_chords(void) {
 
     for (int i = 36; i < total - 10; i++) {
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz", i, notes[i], freqs[i]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz", i, notes[i], freqs[i]);
         ledc_set_freq(ledc_channel[0].speed_mode, ledc_timer[0].timer_num, freqs[i]);
         ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, freqs[i]);
         ledc_update_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4]);
         ledc_set_freq(ledc_channel[1].speed_mode, ledc_timer[1].timer_num, freqs[i+4]);
         ledc_set_duty(ledc_channel[1].speed_mode, ledc_channel[1].channel, freqs[i+4]);
         ledc_update_duty(ledc_channel[1].speed_mode, ledc_channel[1].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4], notes[i+7], freqs[i+7]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4], notes[i+7], freqs[i+7]);
         ledc_set_freq(ledc_channel[2].speed_mode, ledc_timer[2].timer_num, freqs[i+7]);
         ledc_set_duty(ledc_channel[2].speed_mode, ledc_channel[2].channel, freqs[i+7]);
         ledc_update_duty(ledc_channel[2].speed_mode, ledc_channel[2].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4], notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz, %s %dhz", i, notes[i], freqs[i], notes[i+4], freqs[i+4], notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
         ledc_set_freq(ledc_channel[3].speed_mode, ledc_timer[3].timer_num, freqs[i+12]);
         ledc_set_duty(ledc_channel[3].speed_mode, ledc_channel[3].channel, freqs[i+12]);
         ledc_update_duty(ledc_channel[3].speed_mode, ledc_channel[3].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz", i, notes[i+4], freqs[i+4], notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz, %s %dhz, %s %dhz", i, notes[i+4], freqs[i+4], notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
         ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, 0);
         ledc_update_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz, %s %dhz", i, notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz, %s %dhz", i, notes[i+7], freqs[i+7], notes[i+12], freqs[i+12]);
         ledc_set_duty(ledc_channel[1].speed_mode, ledc_channel[1].channel, 0);
         ledc_update_duty(ledc_channel[1].speed_mode, ledc_channel[1].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: %s %dhz", i, notes[i+12], freqs[i+12]);
+        ESP_LOGD(TAG, "Music note %d: %s %dhz", i, notes[i+12], freqs[i+12]);
         ledc_set_duty(ledc_channel[2].speed_mode, ledc_channel[2].channel, 0);
         ledc_update_duty(ledc_channel[2].speed_mode, ledc_channel[2].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
 
-        ESP_LOGI(TAG, "Music note %d: ", i );
+        ESP_LOGD(TAG, "Music note %d: ", i );
         ledc_set_duty(ledc_channel[3].speed_mode, ledc_channel[3].channel, 0);
         ledc_update_duty(ledc_channel[3].speed_mode, ledc_channel[3].channel);
         vTaskDelay(1000 / portTICK_PERIOD_MS * 0.5);
     }
 
-    ESP_LOGI(TAG, "Music off");
+    ESP_LOGD(TAG, "Music off");
     for (int i = 0; i < MAX_CHANNELS; i++) {
         ledc_set_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel, 0);
         ledc_update_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel);
@@ -140,7 +140,7 @@ static void music_playnote(byte chan, byte note) {
     if (chan > MAX_CHANNELS)
         return;
 
-    ESP_LOGI(TAG, "chan: %d\tnote: %s\tfreq: %d", chan, notes[note], freq);
+    ESP_LOGD(TAG, "chan: %d\tnote: %s\tfreq: %d", chan, notes[note], freq);
     ledc_set_freq(ledc_channel[chan].speed_mode, ledc_timer[chan].timer_num, freq);
     ledc_set_duty(ledc_channel[chan].speed_mode, ledc_channel[chan].channel, freq);
     ledc_update_duty(ledc_channel[chan].speed_mode, ledc_channel[chan].channel);
@@ -151,13 +151,18 @@ static void music_stopnote(byte chan) {
     if (chan > MAX_CHANNELS)
         return;
 
-    // ESP_LOGI(TAG, "chan: %d\tstop", chan);
+    // ESP_LOGD(TAG, "chan: %d\tstop", chan);
     ledc_set_duty(ledc_channel[chan].speed_mode, ledc_channel[chan].channel, 0);
     ledc_update_duty(ledc_channel[chan].speed_mode, ledc_channel[chan].channel);
 }
 
 
 void music_playscore(const byte* score) {
+    music_playscore_at_pos(score, 0);
+}
+
+
+void music_playscore_at_pos(const byte* score, uint16_t pos) {
     music_header_t file_header;
 
     score_start = score;
@@ -167,10 +172,10 @@ void music_playscore(const byte* score) {
     memcpy(&file_header, score, sizeof(music_header_t)); // copy possible header from PROGMEM to RAM
     if (file_header.id1 == 'P' && file_header.id2 == 't') { // validate it
         volume_present = file_header.f1 & HDR_F1_VOLUME_PRESENT;
-        ESP_LOGI(TAG, "header: volume_present=%d, tones=%d", volume_present, file_header.num_tgens);
+        ESP_LOGD(TAG, "header: volume_present=%d, tones=%d", volume_present, file_header.num_tgens);
         score_start += file_header.hdr_length; // skip the whole header
     }
-    score_cursor = score_start;
+    score_cursor = score_start + pos;
     music_playing = true;
     music_stepscore();  /* execute initial commands */
 }
@@ -189,7 +194,7 @@ static void music_stepscore(void) {
             if (_tune_speed != 100)
                 duration = (unsigned) (((unsigned long)duration * 100UL) / _tune_speed);
 
-            ESP_LOGI(TAG, "wait: %d ms", duration);
+            ESP_LOGD(TAG, "wait: %d ms", duration);
 
             if (callback_func != NULL && music_playing) {
                 bool stop = callback_func((uint32_t)(score_cursor - score_start));

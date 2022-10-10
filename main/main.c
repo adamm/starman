@@ -33,21 +33,32 @@ static const char *TAG = "starman";
 static uint8_t level = 0;
 static uint8_t lives = GAME_START_LIVES;
 static bool playing  = false;
+static uint32_t player_gets_star    = 0;
+static uint32_t player_gets_1up     = 0;
+static uint32_t player_gets_fanfare = 0;
+static uint32_t player_dies         = 0;
+static byte* music;
  
 bool step_sequence(uint32_t time) {
     patterns_step_sequence();
 
-    // TODO: Return true to stop the music early (ie, player got a star, 1up, died, etc.)
+    // Stop the current track if the random time has passed to get a star, 1up, or die
+    if (player_gets_star && player_gets_star < time) {
+        return true;
+    }
+    else if (player_gets_1up && player_gets_1up < time) {
+        return true;
+    }
+    else if (player_dies && player_dies < time) {
+        return true;
+    }
+
+    // Allow the music to continue
     return false;
 }
 
 
 void play_game(void) {
-    bool player_gets_star    = false;
-    bool player_gets_1up     = false;
-    bool player_gets_fanfare = false;
-    bool player_dies         = false;
-
     // Ignore subsequent play_game() calls if game is already playing
     if (playing == false)
         playing = true;
@@ -55,10 +66,10 @@ void play_game(void) {
         return;
 
     level++;
-    player_gets_star = random_percent(GAME_STAR_PERCENT);
-    player_gets_1up = random_percent(GAME_1UP_PERCENT);
-    player_gets_fanfare = random_percent(GAME_FANFARE_PERCENT);
-    player_dies = random_percent(GAME_DIE_PERCENT);
+    player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
+    player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
+    player_gets_fanfare = random_bool_under_percent(GAME_FANFARE_PERCENT);
+    player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
     ESP_LOGI(TAG, "Player level:  %d", level);
     ESP_LOGI(TAG, "Player lives:  %d", lives);
@@ -68,24 +79,29 @@ void play_game(void) {
         ESP_LOGI(TAG, "Player gets fanfare?  %s", player_gets_1up ? "Yes" : "No");
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
 
-    // TODO: If the user gets a 1up, star, interrupt the music at random point and contunue when sound effect is done
-    // TODO: If the user dies, interrupt the music at a random point and stop when sound effect is done
+    // If the user gets a 1up, star, interrupt the music at random point and contunue when sound effect is done
+    // If the user dies, interrupt the music at a random point and stop when sound effect is done
+    uint32_t length = 0;
 
     if (level == 1) {
         patterns_sprinkle();
-        music_playscore(smb_overworld);
+        music = smb_overworld;
+        length = sizeof(smb_overworld);
     }
     else if (level == 2) {
         patterns_lines();
-        music_playscore(smb_underworld);
+        music = smb_underworld;
+        length = sizeof(smb_underworld);
     }
     else if (level == 3) {
         patterns_waves();
-        music_playscore(smb_underwater);
+        music = smb_underwater;
+        length = sizeof(smb_underwater);
     }
     else if (level == 4) {
         patterns_siren();
-        music_playscore(smb_castle);
+        music = smb_castle;
+        length = sizeof(smb_castle);
     }
     else {
         // We shouldn't get here.  Reset!
@@ -96,20 +112,41 @@ void play_game(void) {
         return;
     }
 
+    // Now that the music has been identified, pick a random location in
+    // the song to stop and play the 1up, starman, or die music.
+    if (player_gets_1up)
+        player_gets_1up = random_value_within_int(length);
+    if (player_gets_star)
+        player_gets_star = random_value_within_int(length);
+    if (player_dies)
+        player_dies = random_value_within_int(length);
+
+    music_playscore(music);
+
     if (player_gets_star) {
-        lives++;
+        player_gets_star = 0;
+        patterns_flash();
+        music_playscore(smb_block);
+        music_playscore(smb_powerup);
         patterns_swoosh();
         music_playscore(smb_starman);
     }
 
     if (player_gets_1up) {
         lives++;
+        player_gets_1up = 0;
+        patterns_flash();
+        music_playscore(smb_block);
         patterns_checkered();
         music_playscore(smb_1up);
     }
 
+    // TODO: If the user gets a star or 1up, continue the original level music 
+    // from where it was interrupted.
+
     if (level == 4 && !player_dies) {
         if (player_gets_fanfare) {
+            player_gets_fanfare = 0;
             patterns_checkered();
             music_playscore(smb_fanfare);
 
@@ -122,8 +159,15 @@ void play_game(void) {
 
     if (player_dies) {
         lives--;
+        level--; // level gets incremented when starting play --
+                 //decrementing means user needs to replay the same level again
+        player_dies = 0;
         patterns_spiral();
         music_playscore(smb_death);
+    }
+    else {
+        patterns_radar();
+        music_playscore(smb_course_clear);
     }
 
     if (lives == 0) {

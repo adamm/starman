@@ -285,7 +285,8 @@ void patterns_spiral() {
 
 
 static void patterns_spiral_step() {
-    rotate(90);
+    // XXX: Debug random crash in rotate()
+    // rotate(90);
 }
 
 void patterns_sweep() {

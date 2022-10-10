@@ -25,6 +25,7 @@ typedef unsigned char byte;
 
 void music_callback(bool (*callback)(uint32_t));
 void music_playscore(const byte* score);
+void music_playscore_at_pos(const byte*, uint16_t);
 void music_settempo(uint8_t);
 void music_init(void);
 void music_stop(void);
