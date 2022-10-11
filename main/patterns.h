@@ -30,6 +30,10 @@
 #define PATTERN_HEIGHT 16
 #define PATTERN_LENGTH (PATTERN_WIDTH * PATTERN_HEIGHT)
 
+struct pattern {
+    uint8_t active[PATTERN_HEIGHT][PATTERN_WIDTH];
+} typedef pattern_t;
+
 static const uint8_t checkered[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     { 255, 255, 255, 200,   0,   0,   0,   0, 255, 255, 255, 200,   0,   0,   0,   0 },
     { 255, 144, 144, 144,   0,   0,   0,   0, 255, 144, 144, 144,   0,   0,   0,   0 },
