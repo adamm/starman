@@ -6,10 +6,10 @@
 
 #include "config.h"
 #include "lights.h"
+#include "led1642gw.h"
 #include "patterns.h"
 
 static const char *TAG = "starman-lights";
-static spi_device_handle_t spi;
 
 //  0 indicates no LED in physical display
 // >0 indicates where in the MOSI array the LED is found
@@ -51,39 +51,7 @@ void lights_map_led(pattern_t pattern) {
 
 
 void lights_init(void) {
-    esp_err_t err;
-    gpio_config_t io_conf = {};
+    led1642gw_init();
 
-    io_conf.intr_type = GPIO_INTR_DISABLE;
-    io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1ULL << LIGHTS_LE_GPIO);
-    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
-    io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&io_conf);
-    gpio_set_level(LIGHTS_LE_GPIO, 1);
-
-    spi_bus_config_t buscfg = {
-        .mosi_io_num = LIGHTS_MOSI_GPIO,
-        .miso_io_num = LIGHTS_MISO_GPIO,
-        .sclk_io_num = LIGHTS_SCLK_GPIO,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .max_transfer_sz = 4092,
-    };
-    spi_device_interface_config_t devcfg = {
-        //.flags = SPI_DEVICE_HALFDUPLEX,
-        .mode = 0,
-        .clock_speed_hz = 1*1000*1000,   // 10 MHz
-        .spics_io_num = -1,
-        .queue_size = 1,
-        // CS is controlled manually during spiWrite() and spiWriteRead()
-    };
-
-    err = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    ESP_ERROR_CHECK(err);
-
-    err = spi_bus_add_device(SPI2_HOST, &devcfg, &spi);
-    ESP_ERROR_CHECK(err);
-
-    ESP_LOGE(TAG, "Init sucessful");
+    ESP_LOGI(TAG, "Init sucessful");
 }
