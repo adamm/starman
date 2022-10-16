@@ -20,6 +20,7 @@ void led1642gw_read_config(void);
 void led1642gw_flush_config(void);
 void led1642gw_flush_buffer(void);
 void led1642gw_set_channel(uint8_t, uint16_t);
+void led1642gw_set_buffer(uint16_t*, size_t);
 void led1642gw_clear(void);
 void led1642gw_init(void);
 

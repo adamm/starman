@@ -31,22 +31,26 @@ static const uint8_t LED_LUT[LIGHTS_HEIGHT][LIGHTS_WIDTH] = {
     {  70,  71,  72,  73,  74,   0,   0,   0,   0,   0,   0, 103, 104, 105, 106, 107 },
     {  69,  77,  76,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 110, 109, 108 },
 };
-uint8_t lights_out[LIGHTS_TOTAL];
+uint16_t lights_out[LIGHTS_TOTAL];
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
 void lights_map_led(pattern_t pattern) {
-    bzero(lights_out, LIGHTS_TOTAL);
+    memset(lights_out, 0, LIGHTS_TOTAL * 2);
 
     for (int y = 0; y < LIGHTS_HEIGHT; y++) {
         for (int x = 0; x < LIGHTS_WIDTH; x++) {
+            // Positions in the LED_LUT that are 0 have no physical LED; just ignore out the pattern data.
             if (LED_LUT[x][y] > 0) {
-                lights_out[LED_LUT[x][y]-1] = pattern.active[x][y];
+                // The pattern range is 8-bits, but the LED PWM driver supports 16-bits of brightnesses.
+                // Until the pattern is expanded to 16-bits, just multiply the pattern value by 256.
+                lights_out[LED_LUT[x][y]-1] = pattern.active[x][y] * 256;
             }
         }
     }
 
-    // TODO: Send lights_out array to LED1642GW via MOSI pin
+    led1642gw_set_buffer(lights_out, LIGHTS_TOTAL);
+    led1642gw_flush_buffer();
 }
 
 

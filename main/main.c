@@ -37,7 +37,7 @@ static uint32_t player_gets_star    = 0;
 static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_fanfare = 0;
 static uint32_t player_dies         = 0;
-static byte* music;
+static const byte* music;
  
 bool step_sequence(uint32_t time) {
     patterns_step_sequence();

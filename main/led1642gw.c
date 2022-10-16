@@ -264,6 +264,13 @@ void led1642gw_set_channel(uint8_t channel, uint16_t value)
 }
 
 
+void led1642gw_set_buffer(uint16_t* buffer, size_t length) {
+    led1642gw_clear();
+
+    memcpy(ledbuffer, buffer, (length > NUM_LED_CHANNELS) ? NUM_LED_CHANNELS : length);
+}
+
+
 void led1642gw_clear(void)
 {
     memset(ledbuffer, 0x00, sizeof(ledbuffer));
