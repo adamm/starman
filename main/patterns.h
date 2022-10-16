@@ -5,7 +5,7 @@
 
 // Techncially the star is 16 LEDs wide and 15 LEDs tall, and is only 144 LEDs total. 
 // In order to make the math for rotation and flipping easier, we assume it's 16x16 square.
-// and the top row will get cut off when updating the lights.
+// Thus, the top row of the pattern will be ignored when updating the lights.
 // 
 // In other words, if XX is a LED, data outside of XX will be thrown away:
 // 

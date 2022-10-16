@@ -35,7 +35,7 @@ uint16_t lights_out[DISPLAY_LIGHTS_TOTAL];
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
-void lights_map_led(pattern_t pattern) {
+void lights_update_leds(pattern_t pattern) {
     memset(lights_out, 0, DISPLAY_LIGHTS_TOTAL * 2);
 
     for (int y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
