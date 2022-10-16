@@ -1,6 +1,8 @@
 #ifndef PATTERNS_H
 #define PATTERNS_H
 
+#include "config.h"
+
 // Techncially the star is 16 LEDs wide and 15 LEDs tall, and is only 144 LEDs total. 
 // In order to make the math for rotation and flipping easier, we assume it's 16x16 square.
 // and the top row will get cut off when updating the lights.
@@ -26,15 +28,11 @@
 // 16  XX XX XX __ __ __ __ __ __ __ __ __ __ XX XX XX
 //
 
-#define PATTERN_WIDTH  16
-#define PATTERN_HEIGHT 16
-#define PATTERN_LENGTH (PATTERN_WIDTH * PATTERN_HEIGHT)
-
 struct pattern {
-    uint8_t active[PATTERN_HEIGHT][PATTERN_WIDTH];
+    uint8_t active[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
 } typedef pattern_t;
 
-static const uint8_t checkered[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t checkered[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     { 255, 255, 255, 200,   0,   0,   0,   0, 255, 255, 255, 200,   0,   0,   0,   0 },
     { 255, 144, 144, 144,   0,   0,   0,   0, 255, 144, 144, 144,   0,   0,   0,   0 },
     { 255, 144, 144, 144,   0,   0,   0,   0, 255, 144, 144, 144,   0,   0,   0,   0 },
@@ -53,7 +51,7 @@ static const uint8_t checkered[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   0,   0, 200, 100, 100, 100,   0,   0,   0,   0, 200, 100, 100, 100 },
 };
 
-static const uint8_t curtains[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t curtains[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     { 242, 255, 255, 242, 255, 255, 242, 255, 255, 242, 255, 255, 242, 255, 255, 242 },
     { 126, 255, 255, 126, 255, 255, 126, 255, 255, 126, 255, 255, 126, 255, 255, 126 },
     {  42, 143, 143,  42, 143, 143,  42, 143, 143,  42, 143, 143,  42, 143, 143,  42 },
@@ -72,7 +70,7 @@ static const uint8_t curtains[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
 };
 
-static const uint8_t radar[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t radar[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
@@ -91,7 +89,7 @@ static const uint8_t radar[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   3,  10,  24,  38,  50,  65,  85,  95, 111, 126, 138, 147, 159, 165 },
 };
 
-static const uint8_t siren[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t siren[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0, 240, 255, 255, 255, 255, 255, 255, 255 },
     {   0,   0,   0,   0,   0,   0,   0,   0, 240, 255, 255, 255, 255, 255, 255, 255 },
     {   0,   0,   0,   0,   0,   0,   0,   0, 240, 255, 255, 255, 255, 255, 255, 255 },
@@ -110,7 +108,7 @@ static const uint8_t siren[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
 };
 
-static const uint8_t spiral[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t spiral[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     { 180,  47,  77, 116, 150, 179, 200, 216, 221, 220, 204, 185, 160, 127,  91,  50 },
     {  50,  77, 125, 168, 205, 183, 109,  56,  48,  52,  88, 158, 214, 181, 141,  96 },
     {  64, 117, 169, 210, 115,  42,  68,  86,  96,  88,  75,  49,  69, 197, 187, 141 },
@@ -129,7 +127,7 @@ static const uint8_t spiral[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     { 176, 213, 126,  45,  59,  77,  86,  88,  86,  73,  52,  55, 175, 203, 159, 113 },
 };
 
-static const uint8_t sweep[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t sweep[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
@@ -148,7 +146,7 @@ static const uint8_t sweep[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
 };
 
-static const uint8_t swipe[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t swipe[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,  28,  93, 167, 220, 247, 233, 191, 124,  55,   9,   0,   0,   0 },
     {   0,   0,   0,  28,  93, 167, 220, 247, 233, 191, 124,  55,   9,   0,   0,   0 },
     {   0,   0,   0,  28,  93, 167, 220, 247, 233, 191, 124,  55,   9,   0,   0,   0 },
@@ -167,7 +165,7 @@ static const uint8_t swipe[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     {   0,   0,   0,  28,  93, 167, 220, 247, 233, 191, 124,  55,   9,   0,   0,   0 },
 };
 
-static const uint8_t swoosh[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t swoosh[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     { 222, 192, 160, 128,  96,  64,  32,   6,  32,  64,  96, 127, 160, 192, 222, 245 },
     { 192, 160, 128,  96,  64,  32,   6,  32,  64,  96, 128, 160, 192, 222, 245, 222 },
     { 160, 128,  96,  64,  32,   6,  32,  64,  96, 128, 160, 192, 222, 245, 222, 192 },
@@ -186,7 +184,7 @@ static const uint8_t swoosh[PATTERN_HEIGHT][PATTERN_WIDTH] = {
     { 245, 222, 192, 160, 128,  96,  64,  32,   6,  32,  64,  96, 128, 160, 192, 222 },
 };
 
-static const uint8_t thump[][PATTERN_HEIGHT][PATTERN_WIDTH] =  {
+static const uint8_t thump[][DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] =  {
     {
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
         {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
@@ -377,7 +375,7 @@ static const uint8_t thump[][PATTERN_HEIGHT][PATTERN_WIDTH] =  {
     },
 };
 
-static const uint8_t waves[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static const uint8_t waves[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },

@@ -1,6 +1,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// PCB Display Lights Layout
+// Techncially the star is 16 LEDs wide and 15 LEDs tall, and is only 144 LEDs total.
+// But we still need to treat the drawable area as a 16x16 square when the patterns are applied.
+// See patterns.h
+#define DISPLAY_LIGHTS_WIDTH  16
+#define DISPLAY_LIGHTS_HEIGHT 16
+#define DISPLAY_LIGHTS_TOTAL  144
+#define DISPLAY_LIGHTS_TOTAL_AREA (DISPLAY_LIGHTS_WIDTH * DISPLAY_LIGHTS_HEIGHT)
+
+
 // Game logic defaults
 #define GAME_START_LIVES      3
 #define GAME_DIE_PERCENT     50

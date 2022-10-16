@@ -2,12 +2,13 @@
 #include <esp_random.h>
 #include <string.h>
 
+#include "config.h"
 #include "patterns.h"
 
 static const char *TAG = "starman-patterns";
 
 static void (*callback_func)(void) = NULL;
-static uint8_t framebuffer[PATTERN_HEIGHT][PATTERN_WIDTH] = {
+static uint8_t framebuffer[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -47,8 +48,8 @@ static void patterns_waves_step();
 
 
 static void invert() {
-    for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
-        for (uint8_t x = 0; x < PATTERN_WIDTH; x++) {
+    for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+        for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             framebuffer[y][x] += 255;
         }
     }
@@ -56,8 +57,8 @@ static void invert() {
 
 
 static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
-    for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
-        for (uint8_t x = 0; x < PATTERN_WIDTH; x++) {
+    for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+        for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
         }
     }
 }
@@ -71,40 +72,40 @@ static void rotate(int8_t degrees) {
         uint8_t temp = 0;
 
         // Transpose x,y then reverse columns
-        for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
-            for (uint8_t x = 0; x < PATTERN_WIDTH; x++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
                 temp = framebuffer[x][y];
                 framebuffer[x][y] = framebuffer[y][x];
                 framebuffer[y][x] = temp;
             }
         }
 
-        for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             temp = framebuffer[y][0];
-            for (uint8_t x = 0; x < PATTERN_WIDTH - 1; x++) {
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
                 framebuffer[y][x] = framebuffer[y][x + 1];
             }
-            framebuffer[y][PATTERN_WIDTH] = temp;
+            framebuffer[y][DISPLAY_LIGHTS_WIDTH] = temp;
         }
     }
     else if (degrees == -90) {
-        uint8_t temp[PATTERN_WIDTH];
+        uint8_t temp[DISPLAY_LIGHTS_WIDTH];
 
         // transpose x,y then reverse rows
-        for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
-            for (uint8_t x = 0; x < PATTERN_WIDTH; x++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
                 temp[0] = framebuffer[x][y];
                 framebuffer[x][y] = framebuffer[y][x];
                 framebuffer[y][x] = temp[0];
             }
         }
 
-        for (uint8_t y = 0; y < PATTERN_HEIGHT; y++) {
-            for (uint8_t x = 0; x < PATTERN_WIDTH; x++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
                 if (x == 0) {
                     temp[x] = framebuffer[y][x];
                 }
-                else if (x < PATTERN_WIDTH - 1) {
+                else if (x < DISPLAY_LIGHTS_WIDTH - 1) {
                     framebuffer[y-1][x] = framebuffer[y][x];
                 }
                 else {
@@ -131,7 +132,7 @@ void patterns_step_sequence() {
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
-    memcpy(framebuffer, checkered, PATTERN_LENGTH);
+    memcpy(framebuffer, checkered, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_checkered_step;
 }
 
@@ -145,7 +146,7 @@ static void patterns_checkered_step() {
 void patterns_curtains() {
     ESP_LOGI(TAG, "Begin CURTAINS pattern");
 
-    memcpy(framebuffer, curtains, PATTERN_LENGTH);
+    memcpy(framebuffer, curtains, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_curtains_step;
 }
 
@@ -185,7 +186,7 @@ static void patterns_fireworks_step() {
 void patterns_flash() {
     ESP_LOGI(TAG, "Begin FLASH pattern");
 
-    memset(framebuffer, 0, PATTERN_LENGTH);
+    memset(framebuffer, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_flash_step;
 }
 
@@ -211,7 +212,7 @@ static void patterns_lines_step() {
 void patterns_radar() {
     ESP_LOGI(TAG, "Begin RADAR pattern");
 
-    memcpy(framebuffer, radar, PATTERN_LENGTH);
+    memcpy(framebuffer, radar, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_radar_step;
 }
 
@@ -225,21 +226,21 @@ static void patterns_radar_step() {
 void patterns_random() {
     ESP_LOGI(TAG, "Begin RANDOM pattern");
 
-    memset(framebuffer, 0, PATTERN_LENGTH);
+    memset(framebuffer, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
     patterns_random_step();
 }
 
 
 static void patterns_random_step() {
-    esp_fill_random(framebuffer, PATTERN_LENGTH);
+    esp_fill_random(framebuffer, DISPLAY_LIGHTS_TOTAL_AREA);
 }
 
 
 void patterns_siren() {
     ESP_LOGI(TAG, "Begin SIREN pattern");
 
-    memcpy(framebuffer, radar, PATTERN_LENGTH);
+    memcpy(framebuffer, radar, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_siren_step;
 }
     
@@ -279,7 +280,7 @@ static void patterns_sprinkle_step() {
 void patterns_spiral() {
     ESP_LOGI(TAG, "Begin SPIRAL pattern");
 
-    memcpy(framebuffer, spiral, PATTERN_LENGTH);
+    memcpy(framebuffer, spiral, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_spiral_step;
 }
 
@@ -292,7 +293,7 @@ static void patterns_spiral_step() {
 void patterns_sweep() {
     ESP_LOGI(TAG, "Begin SWEEP pattern");
 
-    memcpy(framebuffer, sweep, PATTERN_LENGTH);
+    memcpy(framebuffer, sweep, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_sweep_step;
 }
 
@@ -306,7 +307,7 @@ static void patterns_sweep_step() {
 void patterns_swoosh() {
     ESP_LOGI(TAG, "Begin SWOOP pattern");
 
-    memcpy(framebuffer, swoosh, PATTERN_LENGTH);
+    memcpy(framebuffer, swoosh, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoosh_step;
 }
     
@@ -332,7 +333,7 @@ static void patterns_swoop_step() {
 void patterns_thump() {
     ESP_LOGI(TAG, "Begin WAVES pattern");
 
-    memcpy(framebuffer, thump[0], PATTERN_LENGTH);
+    memcpy(framebuffer, thump[0], DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_thump_step;
 }
 
@@ -346,7 +347,7 @@ static void patterns_thump_step() {
 void patterns_waves() {
     ESP_LOGI(TAG, "Begin WAVES pattern");
 
-    memcpy(framebuffer, waves, PATTERN_LENGTH);
+    memcpy(framebuffer, waves, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_waves_step;
 }
 

@@ -12,8 +12,8 @@
 static const char *TAG = "starman-lights";
 
 //  0 indicates no LED in physical display
-// >0 indicates where in the MOSI array the LED is found
-static const uint8_t LED_LUT[LIGHTS_HEIGHT][LIGHTS_WIDTH] = {
+// >0 indicates where in the ledbuffer array the LED is located
+static const uint8_t LED_LUT[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,   0,  18,  31,   0,   0,   0,   0,   0,   0,   0 },
     {   0,   0,   0,   0,   0,   0,  19,  17,  32,  30,   0,   0,   0,   0,   0,   0 },
@@ -31,15 +31,15 @@ static const uint8_t LED_LUT[LIGHTS_HEIGHT][LIGHTS_WIDTH] = {
     {  70,  71,  72,  73,  74,   0,   0,   0,   0,   0,   0, 103, 104, 105, 106, 107 },
     {  69,  77,  76,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 110, 109, 108 },
 };
-uint16_t lights_out[LIGHTS_TOTAL];
+uint16_t lights_out[DISPLAY_LIGHTS_TOTAL];
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
 void lights_map_led(pattern_t pattern) {
-    memset(lights_out, 0, LIGHTS_TOTAL * 2);
+    memset(lights_out, 0, DISPLAY_LIGHTS_TOTAL * 2);
 
-    for (int y = 0; y < LIGHTS_HEIGHT; y++) {
-        for (int x = 0; x < LIGHTS_WIDTH; x++) {
+    for (int y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+        for (int x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             // Positions in the LED_LUT that are 0 have no physical LED; just ignore out the pattern data.
             if (LED_LUT[x][y] > 0) {
                 // The pattern range is 8-bits, but the LED PWM driver supports 16-bits of brightnesses.
@@ -49,7 +49,7 @@ void lights_map_led(pattern_t pattern) {
         }
     }
 
-    led1642gw_set_buffer(lights_out, LIGHTS_TOTAL);
+    led1642gw_set_buffer(lights_out, DISPLAY_LIGHTS_TOTAL);
     led1642gw_flush_buffer();
 }
 
