@@ -7,5 +7,6 @@ idf_component_register(SRCS
                     "patterns.c"
                     "random.c"
                     "status.c"
+                    "sparkle.c"
                     "util.c"
                     INCLUDE_DIRS ".")

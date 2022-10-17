@@ -7,6 +7,7 @@
 #include "music.h"
 #include "patterns.h"
 #include "random.h"
+#include "sparkle.h"
 #include "status.h"
 #include "smb.h"
 #include "smb2.h"
@@ -78,6 +79,9 @@ void play_game(void) {
     if (level == 4)
         ESP_LOGI(TAG, "Player gets fanfare?  %s", player_gets_1up ? "Yes" : "No");
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
+
+    // Stop sparkling becuase we're about to play some music/lights!
+    sparkle_stop();
 
     // If the user gets a 1up, star, interrupt the music at random point and contunue when sound effect is done
     // If the user dies, interrupt the music at a random point and stop when sound effect is done
@@ -180,6 +184,8 @@ void play_game(void) {
 
     ESP_LOGI(TAG, "Done!");
     playing = false;
+
+    sparkle_start();
 }
 
 
@@ -196,10 +202,7 @@ void app_main(void) {
     // Loop music with lights via step_sequence();
     music_callback(step_sequence);
 
-    patterns_sparkle();
-    // Sparkle runs continiously while we wait for the user to press Play
-
-    // TODO: Implement another thread for step_sequence() to loop
-    // while playing = false. The thread should pause while playing = true,
-    // then automatically switch back on when playing is false again.
+    // Sparkle runs continiously in another thread while we wait for the user
+    // to press Play
+    sparkle_start();
 }

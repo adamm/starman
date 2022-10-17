@@ -404,7 +404,6 @@ void patterns_lines();
 void patterns_radar();
 void patterns_random();
 void patterns_siren();
-void patterns_sparkle();
 void patterns_sprinkle();
 void patterns_spiral();
 void patterns_sweep();

@@ -20,7 +20,6 @@ static void patterns_lines_step();
 static void patterns_radar_step();
 static void patterns_random_step();
 static void patterns_siren_step();
-static void patterns_sparkle_step();
 static void patterns_sprinkle_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
@@ -231,19 +230,6 @@ void patterns_siren() {
 static void patterns_siren_step() {
     // Flip vertically, then horizontally, then vertically, then horizontally (effectively rotate 90˚ each frame)
     rotate(90);
-}
-
-
-void patterns_sparkle() {
-    ESP_LOGI(TAG, "Begin SPARKLE pattern");
-
-    // TBD
-    callback_func = patterns_sparkle_step;
-}
-
-
-static void patterns_sparkle_step() {
-    // Sparkle
 }
 
 

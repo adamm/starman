@@ -54,7 +54,7 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Play music
 - [X] Implement game logic
 - [X] Unique light pattern per music song/state
-- [ ] Flash lights in sequence with music
+- [X] Flash lights in sequence with music
 - [X] GPIO play button
 - [ ] WiFi play button
 - [ ] WiFi onboarding process

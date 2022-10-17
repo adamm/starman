@@ -10,6 +10,9 @@
 #define DISPLAY_LIGHTS_TOTAL  144
 #define DISPLAY_LIGHTS_TOTAL_AREA (DISPLAY_LIGHTS_WIDTH * DISPLAY_LIGHTS_HEIGHT)
 
+// When the game isn't playing, the star sparkles
+#define SPARKLE_MAX_LEDS        10
+#define SPARKLE_MAX_STATE       255
 
 // Game logic defaults
 #define GAME_START_LIVES      3
