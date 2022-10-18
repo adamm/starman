@@ -50,7 +50,7 @@ void buttons_init(void) {
     gpio_config(&io_conf);
 
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-    xTaskCreate(gpio_play_task, "gpio_play_task", 2048, NULL, 10, NULL);
+    xTaskCreate(gpio_play_task, "gpio_play_task", 8196, NULL, 10, NULL);
 
     gpio_install_isr_service(ESP_INTR_FLAG_LOWMED);
     gpio_isr_handler_add(PLAY_GAME_GPIO, gpio_isr_handler, (void*) PLAY_GAME_GPIO);

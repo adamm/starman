@@ -230,8 +230,8 @@ void led1642gw_flush_buffer(void)
 {
     uint8_t ic;
 
-    ESP_LOGI(TAG, "Sending ledbuffer:");
-    ESP_LOG_BUFFER_HEX_LEVEL(TAG, ledbuffer, sizeof(ledbuffer), ESP_LOG_INFO);
+    ESP_LOGD(TAG, "Sending ledbuffer:");
+    ESP_LOG_BUFFER_HEX_LEVEL(TAG, ledbuffer, sizeof(ledbuffer), ESP_LOG_DEBUG);
 
     // for each of the first 15 channels, do the following:
     for (uint8_t channel = 0; channel < NUM_LED1642GW_CHANNELS; channel++) {
