@@ -1,5 +1,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <driver/gpio.h>
 #include <driver/ledc.h>
 #include <esp_log.h>
 #include <string.h>
@@ -258,6 +259,21 @@ static void music_stopscore(void) {
 
 
 void music_init(void) {
+    gpio_config_t io_conf = {};
+
+    // Ensure all sound channels are set to output and at zero.
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = ((1ULL << MUSIC_CHANNEL_1_GPIO) | (1ULL << MUSIC_CHANNEL_2_GPIO) |
+                            (1ULL << MUSIC_CHANNEL_3_GPIO) | (1ULL << MUSIC_CHANNEL_4_GPIO));
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+    gpio_set_level(MUSIC_CHANNEL_1_GPIO, 0);
+    gpio_set_level(MUSIC_CHANNEL_2_GPIO, 0);
+    gpio_set_level(MUSIC_CHANNEL_3_GPIO, 0);
+    gpio_set_level(MUSIC_CHANNEL_4_GPIO, 0);
+
     ledc_timer   = malloc(sizeof(ledc_timer_config_t) * MAX_CHANNELS);
 
     ledc_timer[0].duty_resolution = LEDC_TIMER_13_BIT;
