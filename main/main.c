@@ -36,18 +36,21 @@ static uint8_t lives = GAME_START_LIVES;
 static bool playing  = false;
 static uint32_t player_gets_star    = 0;
 static uint32_t player_gets_1up     = 0;
+static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_fanfare = 0;
 static uint32_t player_dies         = 0;
-static const byte* music;
  
 bool step_sequence(uint32_t time) {
     patterns_step_sequence();
 
-    // Stop the current track if the random time has passed to get a star, 1up, or die
+    // Stop the current track if the random time has passed to get a star, 1up, warning, or die
     if (player_gets_star && player_gets_star < time) {
         return true;
     }
     else if (player_gets_1up && player_gets_1up < time) {
+        return true;
+    }
+    else if (player_gets_warning && player_gets_warning < time) {
         return true;
     }
     else if (player_dies && player_dies < time) {
@@ -69,6 +72,7 @@ void play_game(void) {
     level++;
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
+    player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
     player_gets_fanfare = random_bool_under_percent(GAME_FANFARE_PERCENT);
     player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
@@ -76,6 +80,7 @@ void play_game(void) {
     ESP_LOGI(TAG, "Player lives:  %d", lives);
     ESP_LOGI(TAG, "Player gets star?  %s", player_gets_star ? "Yes" : "No");
     ESP_LOGI(TAG, "Player gets 1up?  %s", player_gets_1up ? "Yes" : "No");
+    ESP_LOGI(TAG, "Player gets time warning?  %s", player_gets_warning ? "Yes" : "No");
     if (level == 4)
         ESP_LOGI(TAG, "Player gets fanfare?  %s", player_gets_1up ? "Yes" : "No");
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
@@ -86,25 +91,27 @@ void play_game(void) {
     // If the user gets a 1up, star, interrupt the music at random point and contunue when sound effect is done
     // If the user dies, interrupt the music at a random point and stop when sound effect is done
     uint32_t length = 0;
+    const byte* level_music;
+    void (*level_pattern)(void);
 
     if (level == 1) {
-        patterns_sprinkle();
-        music = smb_overworld;
+        level_pattern = patterns_sprinkle;
+        level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
     else if (level == 2) {
-        patterns_lines();
-        music = smb_underworld;
+        level_pattern = patterns_lines;
+        level_music = smb_underworld;
         length = sizeof(smb_underworld);
     }
     else if (level == 3) {
-        patterns_waves();
-        music = smb_underwater;
+        level_pattern = patterns_waves;
+        level_music = smb_underwater;
         length = sizeof(smb_underwater);
     }
     else if (level == 4) {
-        patterns_siren();
-        music = smb_castle;
+        level_pattern = patterns_siren;
+        level_music = smb_castle;
         length = sizeof(smb_castle);
     }
     else {
@@ -117,36 +124,57 @@ void play_game(void) {
     }
 
     // Now that the music has been identified, pick a random location in
-    // the song to stop and play the 1up, starman, or die music.
+    // the song to stop and play the 1up, starman, time warning, or die music.
     if (player_gets_1up)
         player_gets_1up = random_value_within_int(length);
     if (player_gets_star)
         player_gets_star = random_value_within_int(length);
+    if (player_gets_warning)
+        // The warning music should be within 300 notes from the end of the level
+        player_gets_warning = random_value_within_int(300) + length - 300;
     if (player_dies)
         player_dies = random_value_within_int(length);
 
-    music_playscore(music);
+    uint32_t stopped_music_time = 0;
+    music_settempo(100);
 
-    if (player_gets_star) {
-        player_gets_star = 0;
-        patterns_flash();
-        music_playscore(smb_block);
-        music_playscore(smb_powerup);
-        patterns_swoosh();
-        music_playscore(smb_starman);
+    // If the user is destined to get a star, 1up, or time warning, play the
+    // sound effect queue, then resume the normal level music.
+    while (stopped_music_time <= length) {
+        level_pattern();
+        stopped_music_time = music_playscore_at_time(level_music, stopped_music_time);
+
+        if (player_gets_star >= stopped_music_time) {
+            player_gets_star = 0;
+            patterns_flash();
+            music_playscore(smb_block);
+            music_playscore(smb_powerup);
+            patterns_swoosh();
+            music_playscore(smb_starman);
+        }
+
+        if (player_gets_1up >= stopped_music_time) {
+            lives++;
+            player_gets_1up = 0;
+            patterns_flash();
+            music_playscore(smb_block);
+            patterns_checkered();
+            music_playscore(smb_1up);
+        }
+
+        if (player_gets_warning >= stopped_music_time) {
+            player_gets_warning = 0;
+            patterns_swipe();
+            music_playscore(smb_warning);
+            music_settempo(150);
+        }
+
+        // If the user is destined to die, the level music will not resume
+        if (player_dies >= stopped_music_time)
+            break;
     }
 
-    if (player_gets_1up) {
-        lives++;
-        player_gets_1up = 0;
-        patterns_flash();
-        music_playscore(smb_block);
-        patterns_checkered();
-        music_playscore(smb_1up);
-    }
-
-    // TODO: If the user gets a star or 1up, continue the original level music 
-    // from where it was interrupted.
+    music_settempo(100);
 
     if (level == 4 && !player_dies) {
         if (player_gets_fanfare) {

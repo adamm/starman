@@ -23,6 +23,7 @@ static void patterns_siren_step();
 static void patterns_sprinkle_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
+static void patterns_swipe_step();
 static void patterns_swoosh_step();
 static void patterns_swoop_step();
 static void patterns_thump_step();
@@ -270,6 +271,20 @@ void patterns_sweep() {
 static void patterns_sweep_step() {
     // Sweep from right to left
     scroll(0, 1, true, 0);
+}
+
+
+void patterns_swipe() {
+    ESP_LOGI(TAG, "Begin SWIPE pattern");
+
+    memcpy(framebuffer.active, swipe, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_swipe_step;
+}
+
+
+static void patterns_swipe_step() {
+    // Sweep from right to left
+    scroll(1, 1, true, 0);
 }
 
 

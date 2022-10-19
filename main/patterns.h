@@ -408,6 +408,7 @@ void patterns_sprinkle();
 void patterns_spiral();
 void patterns_sweep();
 void patterns_swirl();
+void patterns_swipe();
 void patterns_swoosh();
 void patterns_swoop();
 void patterns_thump();

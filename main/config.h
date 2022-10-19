@@ -18,9 +18,10 @@
 
 // Game logic defaults
 #define GAME_START_LIVES      3
-#define GAME_DIE_PERCENT     50
 #define GAME_STAR_PERCENT    40
 #define GAME_1UP_PERCENT     25
+#define GAME_WARNING_PERCENT 25
+#define GAME_DIE_PERCENT     50
 #define GAME_FANFARE_PERCENT 25
 
 

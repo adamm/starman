@@ -158,12 +158,12 @@ static void music_stopnote(byte chan) {
 }
 
 
-void music_playscore(const byte* score) {
-    music_playscore_at_pos(score, 0);
+uint32_t music_playscore(const byte* score) {
+    return music_playscore_at_time(score, 0);
 }
 
 
-void music_playscore_at_pos(const byte* score, uint16_t pos) {
+uint32_t music_playscore_at_time(const byte* score, uint32_t start_time) {
     music_header_t file_header;
 
     score_start = score;
@@ -176,9 +176,12 @@ void music_playscore_at_pos(const byte* score, uint16_t pos) {
         ESP_LOGD(TAG, "header: volume_present=%d, tones=%d", volume_present, file_header.num_tgens);
         score_start += file_header.hdr_length; // skip the whole header
     }
-    score_cursor = score_start + pos;
+    score_cursor = score_start + start_time;
     music_playing = true;
     music_stepscore();  /* execute initial commands */
+
+    // If the song stops early, return the current timestamp
+    return (uint32_t)(score_cursor - score_start);
 }
 
 
