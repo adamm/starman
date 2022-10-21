@@ -178,6 +178,10 @@ uint32_t music_playscore_at_time(const byte* score, uint32_t start_time) {
     }
     score_cursor = score_start + start_time;
     music_playing = true;
+
+    // Mute on the amplifier is active-low
+    gpio_set_level(MUSIC_AMP_MUTE_GPIO, 1);
+
     music_stepscore();  /* execute initial commands */
 
     // If the song stops early, return the current timestamp
@@ -250,6 +254,7 @@ void music_settempo(uint8_t new_tempo) {
 
 
 static void music_stopscore(void) {
+    gpio_set_level(MUSIC_AMP_MUTE_GPIO, 0);
     for (int i = 0; i < MAX_CHANNELS; i++) {
         ledc_set_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel, 0);
         ledc_update_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel);
@@ -261,6 +266,20 @@ static void music_stopscore(void) {
 }
 
 
+void music_amp_unmute(void) {
+    // Mute is active-low
+    gpio_set_level(MUSIC_AMP_MUTE_GPIO, 1);
+}
+
+
+
+void music_amp_mute(void) {
+    // Mute is active-low
+    gpio_set_level(MUSIC_AMP_MUTE_GPIO, 0);
+}
+
+
+
 void music_init(void) {
     gpio_config_t io_conf = {};
 
@@ -268,7 +287,8 @@ void music_init(void) {
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
     io_conf.pin_bit_mask = ((1ULL << MUSIC_CHANNEL_1_GPIO) | (1ULL << MUSIC_CHANNEL_2_GPIO) |
-                            (1ULL << MUSIC_CHANNEL_3_GPIO) | (1ULL << MUSIC_CHANNEL_4_GPIO));
+                            (1ULL << MUSIC_CHANNEL_3_GPIO) | (1ULL << MUSIC_CHANNEL_4_GPIO) |
+                            (1ULL << MUSIC_AMP_MUTE_GPIO));
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
@@ -276,6 +296,7 @@ void music_init(void) {
     gpio_set_level(MUSIC_CHANNEL_2_GPIO, 0);
     gpio_set_level(MUSIC_CHANNEL_3_GPIO, 0);
     gpio_set_level(MUSIC_CHANNEL_4_GPIO, 0);
+    music_amp_mute();
 
     ledc_timer   = malloc(sizeof(ledc_timer_config_t) * MAX_CHANNELS);
 

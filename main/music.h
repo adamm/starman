@@ -27,6 +27,8 @@ void music_callback(bool (*callback)(uint32_t));
 uint32_t music_playscore(const byte* score);
 uint32_t music_playscore_at_time(const byte*, uint32_t);
 void music_settempo(uint8_t);
+void music_amp_unmute(void);
+void music_amp_mute(void);
 void music_init(void);
 void music_stop(void);
 

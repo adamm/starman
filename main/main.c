@@ -69,6 +69,8 @@ void play_game(void) {
     else
         return;
 
+    music_amp_unmute();
+
     level++;
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
@@ -209,6 +211,8 @@ void play_game(void) {
         level = 0;
         lives = GAME_START_LIVES;
     }
+
+    music_amp_mute();
 
     ESP_LOGI(TAG, "Done!");
     playing = false;
