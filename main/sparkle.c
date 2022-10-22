@@ -15,6 +15,7 @@ static const char *TAG = "starman-sparkle";
 static uint8_t sparkle_leds[SPARKLE_MAX_LEDS];
 static int16_t sparkle_state[SPARKLE_MAX_LEDS];
 static bool sparkle_direction[SPARKLE_MAX_LEDS];
+static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
 static pattern_t framebuffer;
 
@@ -29,6 +30,10 @@ void sparkle_step() {
             // "brightness" up to SPARKLE_MAX_STATE, then reverse the
             // direction.  When sparkle_state is zero, pick a new LED at
             // random and restart the process.
+
+            sparkle_delay[i] -= SPARKLE_RATE_MS;
+            if (sparkle_delay[i] > 0)
+                continue;
 
             if (sparkle_direction[i] == true) {
                 sparkle_state[i] += SPARKLE_STEP;
@@ -47,6 +52,7 @@ void sparkle_step() {
             if (sparkle_state[i] <= 0) {
                 sparkle_state[i] = SPARKLE_STEP - 1;
                 sparkle_leds[i] = random_value_within_int(DISPLAY_LIGHTS_TOTAL_AREA);
+                // sparkle_delay[i] = random_value_within_int(2000);
                 sparkle_direction[i] = true;
             }
 
@@ -117,7 +123,7 @@ void sparkle_step() {
         // ESP_LOG_BUFFER_HEX(TAG, framebuffer.active, DISPLAY_LIGHTS_TOTAL_AREA);
         lights_update_leds(framebuffer);
 
-        vTaskDelay(25 / portTICK_RATE_MS);
+        vTaskDelay(SPARKLE_RATE_MS / portTICK_RATE_MS);
     }
 }
 
@@ -131,6 +137,7 @@ void sparkle_start(void) {
         sparkle_leds[i] = random_value_within_int(DISPLAY_LIGHTS_TOTAL_AREA);
         sparkle_state[i] = random_value_within_int(SPARKLE_STEPS) * SPARKLE_STEP;
         sparkle_direction[i] = random_value_within_int(2);
+        sparkle_delay[i] = random_value_within_int(2000);
     }
 
     xTaskCreate(sparkle_step, "sparkle", 8192, NULL, 5, &sparkle_task);

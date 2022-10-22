@@ -12,9 +12,10 @@
 
 // When the game isn't playing, the star sparkles
 #define SPARKLE_MAX_LEDS     10
-#define SPARKLE_MAX_STATE   255
-#define SPARKLE_STEP         32
-#define SPARKLE_STEPS         8
+#define SPARKLE_MAX_STATE   100
+#define SPARKLE_STEP          4
+#define SPARKLE_STEPS        64
+#define SPARKLE_RATE_MS      50
 
 // Game logic defaults
 #define GAME_START_LIVES      3
