@@ -18,7 +18,7 @@
 #define LED1642GW_END_ERR_LATCH         12
 #define LED1642GW_THERMAL_ERR_LATCH     13
 
-#define NUM_LED1642GW_ICs      3
+#define NUM_LED1642GW_ICs      9
 #define NUM_LED1642GW_CHANNELS 16
 #define NUM_LED_CHANNELS (NUM_LED1642GW_CHANNELS*NUM_LED1642GW_ICs)
 
@@ -153,8 +153,8 @@ void led1642gw_set_gain(uint8_t gain)
 
     if (g > 0x3f)
         g = 0x3f;
-    
-    ESP_LOGD(TAG, "Setting gain: %d", g);
+
+    ESP_LOGI(TAG, "Setting gain: %d", g);
     for (uint8_t ic = 0; ic < NUM_LED1642GW_ICs; ic++) {
         // config_register[ic] &= ~(0x003f);
         // config_register[ic] |=  g;
@@ -230,8 +230,8 @@ void led1642gw_flush_buffer(void)
 {
     uint8_t ic;
 
-    ESP_LOGD(TAG, "Sending ledbuffer:");
-    ESP_LOG_BUFFER_HEX_LEVEL(TAG, ledbuffer, sizeof(ledbuffer), ESP_LOG_DEBUG);
+    // ESP_LOGI(TAG, "Sending ledbuffer:");
+    // ESP_LOG_BUFFER_HEX_LEVEL(TAG, ledbuffer, sizeof(ledbuffer), ESP_LOG_INFO);
 
     // for each of the first 15 channels, do the following:
     for (uint8_t channel = 0; channel < NUM_LED1642GW_CHANNELS; channel++) {
@@ -267,7 +267,7 @@ void led1642gw_set_channel(uint8_t channel, uint16_t value)
 void led1642gw_set_buffer(uint16_t* buffer, size_t length) {
     led1642gw_clear();
 
-    memcpy(ledbuffer, buffer, (length > NUM_LED_CHANNELS) ? NUM_LED_CHANNELS : length);
+    memcpy(ledbuffer, buffer, ((length > NUM_LED_CHANNELS) ? NUM_LED_CHANNELS : length)* 2);
 }
 
 
@@ -334,7 +334,9 @@ void led1642gw_init(void) {
     for (uint8_t ic = 0; ic < NUM_LED1642GW_ICs-1; ic++) {
         memset(&config_register[ic], 0, sizeof(config_register_t));
     }
+    led1642gw_set_gain(50);
     led1642gw_flush_config();
+    led1642gw_activate();
 
     ESP_LOGI(TAG, "Init sucessful");
 }

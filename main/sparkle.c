@@ -21,7 +21,7 @@ static pattern_t framebuffer;
 
 void sparkle_step() {
     while(1) {
-        memset(framebuffer.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+        memset(framebuffer.active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
         for (uint8_t i = 0; i < SPARKLE_MAX_LEDS; i++) {
             // Go through each of the active sparkle LEDs, and use 
             // sparkle_state to identify how "bright" the sparkle is.
@@ -117,7 +117,7 @@ void sparkle_step() {
         // ESP_LOG_BUFFER_HEX(TAG, framebuffer.active, DISPLAY_LIGHTS_TOTAL_AREA);
         lights_update_leds(framebuffer);
 
-        vTaskDelay(250 / portTICK_RATE_MS);
+        vTaskDelay(25 / portTICK_RATE_MS);
     }
 }
 
