@@ -12468,7 +12468,7 @@
 
   (footprint "Symbol:Symbol_Barrel_Polarity" (layer "F.Cu")
     (tedit 5765E9A7) (tstamp 331b82fb-eeff-4d69-b04a-f68150fe348e)
-    (at 194.025 148.4)
+    (at 193.8 148.375)
     (descr "Barrel connector polarity indicator")
     (tags "barrel polarity")
     (attr board_only exclude_from_pos_files exclude_from_bom)
@@ -17860,10 +17860,13 @@
   (gr_text "+" (at 123 70) (layer "F.SilkS") (tstamp 0cae261c-238e-4dcd-8405-46ca0142b8a0)
     (effects (font (size 1 1) (thickness 0.15)))
   )
+  (gr_text "5" (at 198.3 148.497732) (layer "F.SilkS") (tstamp 112590bd-1188-49b1-b97e-a851b9ea7d3b)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
   (gr_text "PLAY" (at 207.5 108) (layer "F.SilkS") (tstamp 1646b584-6d9b-495a-9d88-8b9e62c05bf7)
     (effects (font (size 1.5 1.5) (thickness 0.3)))
   )
-  (gr_text "-" (at 191 148.4) (layer "F.SilkS") (tstamp 1fc3a569-fde2-4783-a478-d37c05251c08)
+  (gr_text "-" (at 190.8 148.375) (layer "F.SilkS") (tstamp 1fc3a569-fde2-4783-a478-d37c05251c08)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text "Gnd 16 15 14 13 12 11 10" (at 182.6 133 90) (layer "F.SilkS") (tstamp 25c7e443-8848-4e33-b45d-29e0cbc0bf8c)
@@ -17893,7 +17896,7 @@
   (gr_text "3v" (at 211.4 118.6 270) (layer "F.SilkS") (tstamp 588f61bc-0cf0-467d-830a-62f5dc983084)
     (effects (font (size 0.8 0.95) (thickness 0.15)))
   )
-  (gr_text "7-12v" (at 200.7 148.5) (layer "F.SilkS") (tstamp 58dba351-188e-4da5-8549-af94a64a665e)
+  (gr_text "7V 2A" (at 201.4 148.5) (layer "F.SilkS") (tstamp 58dba351-188e-4da5-8549-af94a64a665e)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text "Reset" (at 186.5 108) (layer "F.SilkS") (tstamp 7005ae7e-bd82-492d-bcd2-97d8af394f1b)
@@ -17911,7 +17914,10 @@
   (gr_text "+" (at 96.9 50) (layer "F.SilkS") (tstamp a93b9ef3-df49-4a33-924a-2d322c52cdbe)
     (effects (font (size 1 1) (thickness 0.15)))
   )
-  (gr_text "+" (at 197 148.4) (layer "F.SilkS") (tstamp b2486af0-c994-41e2-886c-3c96cc44eba0)
+  (gr_text "–" (at 199 148.3) (layer "F.SilkS") (tstamp ab9288b5-6bc7-4c8e-9ab8-71b74b09d724)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (gr_text "+" (at 196.8 148.375) (layer "F.SilkS") (tstamp b2486af0-c994-41e2-886c-3c96cc44eba0)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text "+" (at 56.9 80) (layer "F.SilkS") (tstamp bd82c197-2c78-4629-8f2d-571b5ecae808)
@@ -86553,6 +86559,19 @@
     (members
       1fc3a569-fde2-4783-a478-d37c05251c08
       b2486af0-c994-41e2-886c-3c96cc44eba0
+    )
+  )
+  (group "" (id 698e7e40-f981-4fe9-865c-35bbf2da090e)
+    (members
+      112590bd-1188-49b1-b97e-a851b9ea7d3b
+      58dba351-188e-4da5-8549-af94a64a665e
+      ab9288b5-6bc7-4c8e-9ab8-71b74b09d724
+    )
+  )
+  (group "" (id 78fceabd-63d0-49b1-b9dd-466d01e652df)
+    (members
+      331b82fb-eeff-4d69-b04a-f68150fe348e
+      57a6c2f1-f324-4329-9d7c-139a7390a2bd
     )
   )
 )
