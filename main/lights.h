@@ -4,6 +4,7 @@
 #include "patterns.h"
 
 void lights_update_leds(pattern_t);
+void lights_update_leds_raw(uint8_t*);
 void lights_init(void);
 
 #endif
