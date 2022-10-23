@@ -33,15 +33,29 @@ static void patterns_waves_step();
 static void invert() {
     for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-            framebuffer.active[y][x] += 255;
+            framebuffer.active[y][x] = 255 - framebuffer.active[y][x];
         }
     }
 }
 
 
 static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
-    for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-        for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
+    if (rows) {
+        uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
+        memcpy(temp, framebuffer.active[0], DISPLAY_LIGHTS_WIDTH);
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
+            memcpy(framebuffer.active[y], framebuffer.active[y+1], DISPLAY_LIGHTS_WIDTH);
+        }
+        memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT-1], temp, DISPLAY_LIGHTS_WIDTH);
+    }
+    if (cols) {
+        uint8_t temp = 0;
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
+            temp = framebuffer.active[y][0];
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
+                framebuffer.active[y][x] = framebuffer.active[y][x+1];
+            }
+            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH] = temp;
         }
     }
 }
