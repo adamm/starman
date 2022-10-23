@@ -137,7 +137,7 @@ void sparkle_start(void) {
         sparkle_leds[i] = random_value_within_int(DISPLAY_LIGHTS_TOTAL_AREA);
         sparkle_state[i] = random_value_within_int(SPARKLE_STEPS) * SPARKLE_STEP;
         sparkle_direction[i] = random_value_within_int(2);
-        sparkle_delay[i] = random_value_within_int(2000);
+        sparkle_delay[i] = i * 250;
     }
 
     xTaskCreate(sparkle_step, "sparkle", 8192, NULL, 5, &sparkle_task);
