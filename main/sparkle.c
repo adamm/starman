@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "buttons.h"
 #include "config.h"
 #include "lights.h"
 #include "patterns.h"
@@ -128,6 +129,18 @@ void sparkle_step() {
 }
 
 
+void debug_step() {
+    static uint8_t leds[DISPLAY_LIGHTS_TOTAL] = {0};
+    static int i = 0;
+
+    leds[i] = 0x4f;
+    ESP_LOGI(TAG, "Light up #%d", i+1);
+    lights_update_leds_raw(leds);
+
+    i++;
+}
+
+
 void sparkle_start(void) {
     ESP_LOGI(TAG, "Start sparkle thread");
 
@@ -140,7 +153,9 @@ void sparkle_start(void) {
         sparkle_delay[i] = i * 250;
     }
 
+    // DEBUG: swap commented lines to debug light orientation.
     xTaskCreate(sparkle_step, "sparkle", 8192, NULL, 5, &sparkle_task);
+    // buttons_play_callback(debug_step);
 }
 
 
