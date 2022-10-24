@@ -43,71 +43,58 @@ static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
     if (rows) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
         memcpy(temp, framebuffer.active[0], DISPLAY_LIGHTS_WIDTH);
-        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
-            memcpy(framebuffer.active[y], framebuffer.active[y+1], DISPLAY_LIGHTS_WIDTH);
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - rows; y++) {
+            memcpy(framebuffer.active[y], framebuffer.active[y + rows], DISPLAY_LIGHTS_WIDTH);
         }
-        memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT-1], temp, DISPLAY_LIGHTS_WIDTH);
+        memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT - rows], temp, DISPLAY_LIGHTS_WIDTH);
     }
     if (cols) {
         uint8_t temp = 0;
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
             temp = framebuffer.active[y][0];
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
-                framebuffer.active[y][x] = framebuffer.active[y][x+1];
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - cols; x++) {
+                framebuffer.active[y][x] = framebuffer.active[y][x + cols];
             }
-            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH] = temp;
+            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - cols] = temp;
         }
     }
 }
 
 
+static void swap(uint8_t *x, uint8_t *y) {
+    uint8_t temp = *x;
+    *x = *y;
+    *y = temp;
+}
+
+
 static void rotate(int8_t degrees) {
-
     // TODO: For rotations not 90˚, implement https://en.wikipedia.org/wiki/Rotation_matrix
-
     if (degrees == 90) {
-        uint8_t temp = 0;
-
         // Transpose x,y then reverse columns
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                temp = framebuffer.active[x][y];
-                framebuffer.active[x][y] = framebuffer.active[y][x];
-                framebuffer.active[y][x] = temp;
+            for (uint8_t x = y+1; x < DISPLAY_LIGHTS_WIDTH; x++) {
+                swap(&framebuffer.active[y][x], &framebuffer.active[x][y]);
             }
         }
 
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            temp = framebuffer.active[y][0];
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
-                framebuffer.active[y][x] = framebuffer.active[y][x + 1];
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
+                swap(&framebuffer.active[y][x], &framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - x - 1]);
             }
-            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH] = temp;
         }
     }
     else if (degrees == -90) {
-        uint8_t temp[DISPLAY_LIGHTS_WIDTH];
-
         // transpose x,y then reverse rows
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                temp[0] = framebuffer.active[x][y];
-                framebuffer.active[x][y] = framebuffer.active[y][x];
-                framebuffer.active[y][x] = temp[0];
+            for (uint8_t x = y+1; x < DISPLAY_LIGHTS_WIDTH; x++) {
+                swap(&framebuffer.active[y][x], &framebuffer.active[x][y]);
             }
         }
 
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                if (x == 0) {
-                    temp[x] = framebuffer.active[y][x];
-                }
-                else if (x < DISPLAY_LIGHTS_WIDTH - 1) {
-                    framebuffer.active[y-1][x] = framebuffer.active[y][x];
-                }
-                else {
-                    framebuffer.active[y][x] = temp[x];
-                }
+                swap(&framebuffer.active[y][x], &framebuffer.active[DISPLAY_LIGHTS_HEIGHT - y - 1][x]);
             }
         }
     }
@@ -216,7 +203,7 @@ void patterns_radar() {
 
 static void patterns_radar_step() {
     // Rotate 15˚ every frame
-    rotate(15);
+    rotate(90);
 }
 
 
@@ -271,7 +258,7 @@ void patterns_spiral() {
 
 static void patterns_spiral_step() {
     // XXX: Debug random crash in rotate()
-    // rotate(90);
+    rotate(90);
 }
 
 void patterns_sweep() {
