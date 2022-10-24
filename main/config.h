@@ -5,10 +5,15 @@
 // Techncially the star is 16 LEDs wide and 15 LEDs tall, and is only 144 LEDs total.
 // But we still need to treat the drawable area as a 16x16 square when the patterns are applied.
 // See patterns.h
+#define DISPLAY_LIGHTS_GAIN   25 // WARNING: Do not exceed 50
 #define DISPLAY_LIGHTS_WIDTH  16
 #define DISPLAY_LIGHTS_HEIGHT 16
 #define DISPLAY_LIGHTS_TOTAL 144
 #define DISPLAY_LIGHTS_TOTAL_AREA (DISPLAY_LIGHTS_WIDTH * DISPLAY_LIGHTS_HEIGHT)
+
+#if DISPLAY_LIGHTS_GAIN > 50
+#error DISPLAY_LIGHTS_GAIN must be 50 or less -- turning on all LEDs will overdraw power/overheat components!
+#endif
 
 // When the game isn't playing, the star sparkles
 #define SPARKLE_MAX_LEDS     20

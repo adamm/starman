@@ -334,7 +334,10 @@ void led1642gw_init(void) {
     for (uint8_t ic = 0; ic < NUM_LED1642GW_ICs-1; ic++) {
         memset(&config_register[ic], 0, sizeof(config_register_t));
     }
-    led1642gw_set_gain(50);
+
+    if (DISPLAY_LIGHTS_GAIN <= 50) {
+        led1642gw_set_gain(DISPLAY_LIGHTS_GAIN);
+    }
     led1642gw_flush_config();
     led1642gw_activate();
 
