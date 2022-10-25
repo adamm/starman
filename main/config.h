@@ -16,7 +16,7 @@
 #endif
 
 // When the game isn't playing, the star sparkles
-#define SPARKLE_MAX_LEDS     20
+#define SPARKLE_MAX_LEDS     10
 #define SPARKLE_MAX_STATE   100
 #define SPARKLE_STEP          4
 #define SPARKLE_STEPS        64

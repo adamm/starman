@@ -195,7 +195,7 @@ static void patterns_flash_step() {
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
-    memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
+    // memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
