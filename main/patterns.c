@@ -51,7 +51,7 @@ static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
     }
     if (cols) {
         uint8_t temp = 0;
-        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             temp = framebuffer.active[y][0];
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
                 framebuffer.active[y][x] = framebuffer.active[y][x + 1];

@@ -250,7 +250,7 @@ void led1642gw_flush_buffer(void)
             write_data_latch(ledbuffer[channel+(NUM_LED1642GW_CHANNELS*ic)]);
         }
         else {
-            write_global_latch(ledbuffer[(ic*NUM_LED1642GW_CHANNELS)-1]);
+            write_global_latch(ledbuffer[channel+(NUM_LED1642GW_CHANNELS*ic)]);
         }
     }
 }
