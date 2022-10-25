@@ -92,7 +92,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_sprinkle;
+        level_pattern = patterns_sprinkles;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }

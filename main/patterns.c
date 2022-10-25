@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "gol.h"
 #include "lights.h"
 #include "patterns.h"
 
@@ -11,6 +12,7 @@ static const char *TAG = "starman-patterns";
 static void (*callback_func)(void) = NULL;
 static pattern_t framebuffer;
 
+static void patterns_game_of_life_step();
 static void patterns_checkered_step();
 static void patterns_curtains_step();
 static void patterns_diamonds_step();
@@ -20,7 +22,6 @@ static void patterns_lines_step();
 static void patterns_radar_step();
 static void patterns_random_step();
 static void patterns_siren_step();
-static void patterns_sprinkle_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
 static void patterns_swipe_step();
@@ -115,6 +116,15 @@ void patterns_step_sequence() {
 }
 
 
+
+static void patterns_game_of_life_step() {
+    // Use Game of Life rules to animate the active pattern
+    gol_next_generation(&framebuffer);
+}
+
+
+
+
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
@@ -185,13 +195,13 @@ static void patterns_flash_step() {
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
-    // TBD
+    memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
 
 static void patterns_lines_step() {
-    // TBD
+    scroll(0, 1, true, 0);
 }
 
 
@@ -238,16 +248,12 @@ static void patterns_siren_step() {
 }
 
 
-void patterns_sprinkle(){
-    ESP_LOGI(TAG, "Begin SPRINKLE pattern");
+void patterns_sprinkles(){
+    ESP_LOGI(TAG, "Begin SPRINKLES pattern");
 
-    // TBD
-    callback_func = patterns_sprinkle_step;
-}
-
-
-static void patterns_sprinkle_step() {
-    // Sprinkle (like sparkles, but 1x2 and 1x3 lines)
+    // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
+    memcpy(framebuffer.active, gol_sprinkles, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_game_of_life_step;
 }
 
 
@@ -288,7 +294,7 @@ void patterns_swipe() {
 
 static void patterns_swipe_step() {
     // Sweep from right to left
-    scroll(1, 1, true, 0);
+    scroll(0, 1, true, 0);
 }
 
 

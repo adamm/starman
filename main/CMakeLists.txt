@@ -1,6 +1,7 @@
 idf_component_register(SRCS
                     "main.c"
                     "buttons.c"
+                    "gol.c"
                     "led1642gw.c"
                     "lights.c"
                     "music.c"
