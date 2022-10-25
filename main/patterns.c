@@ -43,19 +43,19 @@ static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
     if (rows) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
         memcpy(temp, framebuffer.active[0], DISPLAY_LIGHTS_WIDTH);
-        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - rows; y++) {
-            memcpy(framebuffer.active[y], framebuffer.active[y + rows], DISPLAY_LIGHTS_WIDTH);
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
+            memcpy(framebuffer.active[y], framebuffer.active[y + 1], DISPLAY_LIGHTS_WIDTH);
         }
-        memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT - rows], temp, DISPLAY_LIGHTS_WIDTH);
+        memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT - 1], temp, DISPLAY_LIGHTS_WIDTH);
     }
     if (cols) {
         uint8_t temp = 0;
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
             temp = framebuffer.active[y][0];
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - cols; x++) {
-                framebuffer.active[y][x] = framebuffer.active[y][x + cols];
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
+                framebuffer.active[y][x] = framebuffer.active[y][x + 1];
             }
-            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - cols] = temp;
+            framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - 1] = temp;
         }
     }
 }
@@ -79,7 +79,7 @@ static void rotate(int8_t degrees) {
         }
 
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
+            for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH / 2; x++) {
                 swap(&framebuffer.active[y][x], &framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - x - 1]);
             }
         }
@@ -92,7 +92,7 @@ static void rotate(int8_t degrees) {
             }
         }
 
-        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT / 2; y++) {
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
                 swap(&framebuffer.active[y][x], &framebuffer.active[DISPLAY_LIGHTS_HEIGHT - y - 1][x]);
             }
@@ -109,6 +109,8 @@ void patterns_step_sequence() {
         callback_func();
     }
 
+    // ESP_LOG_BUFFER_HEXDUMP(TAG, framebuffer.active, DISPLAY_LIGHTS_TOTAL_AREA, ESP_LOG_INFO);
+
     lights_update_leds(framebuffer);
 }
 
@@ -123,7 +125,7 @@ void patterns_checkered() {
 
 static void patterns_checkered_step() {
     // Scroll the checkered display up and to the left every frame
-    scroll(-1, -1, true, 0);
+    scroll(-1, 0, true, 0);
 }
 
 
@@ -202,8 +204,9 @@ void patterns_radar() {
 
 
 static void patterns_radar_step() {
-    // Rotate 15˚ every frame
-    rotate(90);
+    // TODO: Actually only rotate 15˚ every frame. Alternatively, draw the
+    // lines dynamically and fill.
+    rotate(-90);
 }
 
 
