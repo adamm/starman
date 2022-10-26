@@ -21,6 +21,7 @@
 #define GOL_GRID_WIDTH    24
 #define GOL_GRID_OFFSET_Y 8
 #define GOL_GRID_OFFSET_X 4
+#define GOL_GRID_TOTAL_AREA (GOL_GRID_HEIGHT * GOL_GRID_WIDTH)
 
 // When the game isn't playing, the star sparkles
 #define SPARKLE_MAX_LEDS     10

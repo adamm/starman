@@ -32,9 +32,9 @@ void gol_next_generation(pattern_t *pattern) {
     int8_t this_gen[GOL_GRID_HEIGHT][GOL_GRID_WIDTH] = { 0 };
     int8_t next_gen[GOL_GRID_HEIGHT][GOL_GRID_WIDTH] = { 0 };
 
-    for (y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-        for (x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-            if (pattern->active[y][x] > 0)
+    for (y = 0; y < GOL_GRID_HEIGHT; y++) {
+        for (x = 0; x < GOL_GRID_WIDTH; x++) {
+            if (pattern->grid[y][x] > 0)
                 this_gen[y][x] = 1;
         }
     }
@@ -54,12 +54,13 @@ void gol_next_generation(pattern_t *pattern) {
         }
     }
  
+    memset(pattern->active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
     for (y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             if (next_gen[y+GOL_GRID_OFFSET_Y][x+GOL_GRID_OFFSET_X] > 0)
-                pattern->active[y+GOL_GRID_OFFSET_Y][x+GOL_GRID_OFFSET_X] = 255;
-            else
-                pattern->active[y+GOL_GRID_OFFSET_Y][x+GOL_GRID_OFFSET_X] = 0;
+                pattern->active[y][x] = 255;
         }
     }
+
+    memcpy(pattern->grid, next_gen, GOL_GRID_TOTAL_AREA);
 }

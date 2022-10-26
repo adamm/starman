@@ -174,13 +174,13 @@ static void patterns_curtains_step() {
 void patterns_diamonds() {
     ESP_LOGI(TAG, "Begin DIAMONDS pattern");
 
-    // TBD
+    memcpy(framebuffer.active, diamonds, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_diamonds_step;
 }
 
 
 static void patterns_diamonds_step() {
-    // TBD
+    invert();
 }
 
 
@@ -219,7 +219,7 @@ static void patterns_gol_step() {
 void patterns_gol_cross_2() {
     ESP_LOGI(TAG, "Begin GOL_CROSS_2 pattern");
 
-    memcpy(framebuffer.active, patterns_gol_cross_2, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.grid, gol_cross_2, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -227,7 +227,7 @@ void patterns_gol_cross_2() {
 void patterns_gol_galaxy() {
     ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
 
-    memcpy(framebuffer.active, patterns_gol_galaxy, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -235,7 +235,7 @@ void patterns_gol_galaxy() {
 void patterns_gol_four_blinkers_four_blocks() {
     ESP_LOGI(TAG, "Begin GOL_FOUR_BLINKERS_FOUR_BLOCKS pattern");
 
-    memcpy(framebuffer.active, patterns_gol_four_blinkers_four_blocks, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.grid, gol_four_blinkers_four_blocks, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -243,7 +243,7 @@ void patterns_gol_four_blinkers_four_blocks() {
 void patterns_gol_pentadecathlon() {
     ESP_LOGI(TAG, "Begin GOL_PENTADECATHLON pattern");
 
-    memcpy(framebuffer.active, patterns_gol_pentadecathlon, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.grid, gol_pentadecathlon, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -252,7 +252,7 @@ void patterns_gol_sprinkles() {
     ESP_LOGI(TAG, "Begin GOL_SPRINKLES pattern");
 
     // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
-    memcpy(framebuffer.active, patterns_gol_sprinkles, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.grid, gol_sprinkles, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -260,7 +260,7 @@ void patterns_gol_sprinkles() {
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
-    // memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
@@ -412,17 +412,17 @@ void patterns_waves() {
 
 static void patterns_waves_step() {
     // The waves pattern scrolls from left to right, and simultaneously slides up and down
-    if (waves_height < -3 || waves_height > 3)
+    if (waves_height < -2 || waves_height > 2)
         waves_down = !waves_down;
 
     if (waves_down) {
-        scroll(-1, 0, false, 0);
-        scroll(0, -1, true, 0);
+        scroll(-1, 0, false, 4);
+        scroll(0, -1, true, 4);
         waves_height++;
     }
     else {
-        scroll(1, 0, false, 255);
-        scroll(0, -1, true, 255);
+        scroll(1, 0, false, 64);
+        scroll(0, -1, true, 64);
         waves_height--;
     }
 }

@@ -6,6 +6,7 @@
 #include "lights.h"
 #include "music.h"
 #include "patterns.h"
+#include "patterns_gol.h"
 #include "random.h"
 #include "sparkle.h"
 #include "status.h"
@@ -37,7 +38,7 @@ static bool playing  = false;
 static uint32_t player_gets_star    = 0;
 static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_warning = 0;
-static uint32_t player_gets_fanfare = 0;
+static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
  
 bool step_sequence(uint32_t time) {
@@ -79,7 +80,7 @@ void play_game(void) {
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
     player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
-    player_gets_fanfare = random_bool_under_percent(GAME_FANFARE_PERCENT);
+    player_gets_ending = random_bool_under_percent(GAME_FANFARE_PERCENT);
     player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
     // Stop sparkling becuase we're about to play some music/lights!
@@ -148,7 +149,7 @@ void play_game(void) {
     if (player_gets_warning)
         ESP_LOGI(TAG, " ... at %d", player_gets_warning);
     if (level == 4)
-        ESP_LOGI(TAG, "Player gets fanfare?  %s", player_gets_1up ? "Yes" : "No");
+        ESP_LOGI(TAG, "Player gets ending?  %s", player_gets_ending ? "Yes" : "No");
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
     if (player_dies)
         ESP_LOGI(TAG, " ... at %d", player_dies);
@@ -194,26 +195,25 @@ void play_game(void) {
 
     music_settempo(100);
 
-    if (level == 4 && !player_dies) {
-        if (player_gets_fanfare) {
-            player_gets_fanfare = 0;
-            patterns_checkered();
-            music_playscore(smb_fanfare);
+    if (player_dies) {
+        lives--;
+        level--; // level gets incremented when starting play --
+                 //d ecrementing means user needs to replay the same level again
+        player_dies = 0;
+        patterns_spiral();
+        music_playscore(smb_death);
+    }
+    else if (level == 4) {
+        patterns_checkered();
+        music_playscore(smb_fanfare);
 
+        if (player_gets_ending) {
+            player_gets_ending = 0;
             patterns_diamonds();
             music_playscore(smb_ending);
         }
         level = 0;
         lives = GAME_START_LIVES;
-    }
-
-    if (player_dies) {
-        lives--;
-        level--; // level gets incremented when starting play --
-                 //decrementing means user needs to replay the same level again
-        player_dies = 0;
-        patterns_spiral();
-        music_playscore(smb_death);
     }
     else {
         patterns_sweep();
