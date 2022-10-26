@@ -15,6 +15,13 @@
 #error DISPLAY_LIGHTS_GAIN must be 50 or less -- turning on all LEDs will overdraw power/overheat components!
 #endif
 
+// Game of Life has a playgrid larger than the display area.  This allows for more
+// complex designs that aren't constrainted to the 16x16 display framebuffer
+#define GOL_GRID_HEIGHT   32
+#define GOL_GRID_WIDTH    24
+#define GOL_GRID_OFFSET_Y 8
+#define GOL_GRID_OFFSET_X 4
+
 // When the game isn't playing, the star sparkles
 #define SPARKLE_MAX_LEDS     10
 #define SPARKLE_MAX_STATE   100

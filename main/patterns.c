@@ -6,18 +6,19 @@
 #include "gol.h"
 #include "lights.h"
 #include "patterns.h"
+#include "patterns_gol.h"
 
 static const char *TAG = "starman-patterns";
 
 static void (*callback_func)(void) = NULL;
 static pattern_t framebuffer;
 
-static void patterns_game_of_life_step();
 static void patterns_checkered_step();
 static void patterns_curtains_step();
 static void patterns_diamonds_step();
 static void patterns_fireworks_step();
 static void patterns_flash_step();
+static void patterns_gol_step();
 static void patterns_lines_step();
 static void patterns_radar_step();
 static void patterns_random_step();
@@ -142,15 +143,6 @@ void patterns_step_sequence() {
 }
 
 
-
-static void patterns_game_of_life_step() {
-    // Use Game of Life rules to animate the active pattern
-    gol_next_generation(&framebuffer);
-}
-
-
-
-
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
@@ -218,6 +210,53 @@ static void patterns_flash_step() {
 }
 
 
+static void patterns_gol_step() {
+    // Use Game of Life rules to animate the active pattern
+    gol_next_generation(&framebuffer);
+}
+
+
+void patterns_gol_cross_2() {
+    ESP_LOGI(TAG, "Begin GOL_CROSS_2 pattern");
+
+    memcpy(framebuffer.active, patterns_gol_cross_2, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
+void patterns_gol_galaxy() {
+    ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
+
+    memcpy(framebuffer.active, patterns_gol_galaxy, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
+void patterns_gol_four_blinkers_four_blocks() {
+    ESP_LOGI(TAG, "Begin GOL_FOUR_BLINKERS_FOUR_BLOCKS pattern");
+
+    memcpy(framebuffer.active, patterns_gol_four_blinkers_four_blocks, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
+void patterns_gol_pentadecathlon() {
+    ESP_LOGI(TAG, "Begin GOL_PENTADECATHLON pattern");
+
+    memcpy(framebuffer.active, patterns_gol_pentadecathlon, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
+void patterns_gol_sprinkles() {
+    ESP_LOGI(TAG, "Begin GOL_SPRINKLES pattern");
+
+    // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
+    memcpy(framebuffer.active, patterns_gol_sprinkles, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
@@ -271,15 +310,6 @@ void patterns_siren() {
 static void patterns_siren_step() {
     // Flip vertically, then horizontally, then vertically, then horizontally (effectively rotate 90˚ each frame)
     rotate(90);
-}
-
-
-void patterns_sprinkles(){
-    ESP_LOGI(TAG, "Begin SPRINKLES pattern");
-
-    // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
-    memcpy(framebuffer.active, gol_sprinkles, DISPLAY_LIGHTS_TOTAL_AREA);
-    callback_func = patterns_game_of_life_step;
 }
 
 
