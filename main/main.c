@@ -92,7 +92,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_sprinkles;
+        level_pattern = patterns_sweep;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
@@ -182,7 +182,7 @@ void play_game(void) {
 
         if (player_gets_warning && player_gets_warning <= stopped_music_time) {
             player_gets_warning = 0;
-            patterns_swipe();
+            patterns_siren();
             music_playscore(smb_warning);
             music_settempo(150);
         }

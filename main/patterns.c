@@ -40,23 +40,49 @@ static void invert() {
 }
 
 
-static void scroll(int8_t rows, int8_t cols, bool copy, int8_t fill) {
-    if (rows) {
+static void scroll(int8_t rows, int8_t cols, bool copy, uint8_t fill) {
+    if (rows > 0) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
         memcpy(temp, framebuffer.active[0], DISPLAY_LIGHTS_WIDTH);
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
             memcpy(framebuffer.active[y], framebuffer.active[y + 1], DISPLAY_LIGHTS_WIDTH);
         }
+        if (!copy)
+            memset(temp, fill, DISPLAY_LIGHTS_WIDTH);
         memcpy(framebuffer.active[DISPLAY_LIGHTS_HEIGHT - 1], temp, DISPLAY_LIGHTS_WIDTH);
     }
-    if (cols) {
+    else if (rows < 0) {
+        uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
+        memcpy(temp, framebuffer.active[DISPLAY_LIGHTS_HEIGHT-1], DISPLAY_LIGHTS_WIDTH);
+        for (uint8_t y = DISPLAY_LIGHTS_HEIGHT - 1; y > 0; y--) {
+            memcpy(framebuffer.active[y], framebuffer.active[y - 1], DISPLAY_LIGHTS_WIDTH);
+        }
+        if (!copy)
+            memset(temp, fill, DISPLAY_LIGHTS_WIDTH);
+        memcpy(framebuffer.active[0], temp, DISPLAY_LIGHTS_WIDTH);
+    }
+    if (cols > 0) {
         uint8_t temp = 0;
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             temp = framebuffer.active[y][0];
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
                 framebuffer.active[y][x] = framebuffer.active[y][x + 1];
             }
+            if (!copy)
+                temp = fill;
             framebuffer.active[y][DISPLAY_LIGHTS_WIDTH - 1] = temp;
+        }
+    }
+    else if (cols < 0) {
+        uint8_t temp = 0;
+        for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
+            temp = framebuffer.active[y][DISPLAY_LIGHTS_WIDTH-1];
+            for (uint8_t x = DISPLAY_LIGHTS_WIDTH - 1; x > 0; x--) {
+                framebuffer.active[y][x] = framebuffer.active[y][x - 1];
+            }
+            if (!copy)
+                temp = fill;
+            framebuffer.active[y][0] = temp;
         }
     }
 }
@@ -270,6 +296,7 @@ static void patterns_spiral_step() {
     rotate(90);
 }
 
+
 void patterns_sweep() {
     ESP_LOGI(TAG, "Begin SWEEP pattern");
 
@@ -280,7 +307,7 @@ void patterns_sweep() {
 
 static void patterns_sweep_step() {
     // Sweep from right to left
-    scroll(0, 1, true, 0);
+    scroll(1, 0, true, 0);
 }
 
 
@@ -338,8 +365,15 @@ static void patterns_thump_step() {
 }
 
 
+// Incase the waves pattern is interrupted and needs to restart, store the state statically and reset it at start;
+static int8_t waves_height = 0;
+static bool waves_down = true;
+
 void patterns_waves() {
     ESP_LOGI(TAG, "Begin WAVES pattern");
+
+    waves_height = 0;
+    waves_down = true;
 
     memcpy(framebuffer.active, waves, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_waves_step;
@@ -347,19 +381,18 @@ void patterns_waves() {
 
 
 static void patterns_waves_step() {
-    static int8_t x = 0;
-    static bool down = true;
     // The waves pattern scrolls from left to right, and simultaneously slides up and down
+    if (waves_height < -3 || waves_height > 3)
+        waves_down = !waves_down;
 
-    if (x < -3 || x > 3)
-        down = !down;
-
-    if (down) {
-        scroll(1, 1, false, 0);
-        x++;
+    if (waves_down) {
+        scroll(-1, 0, false, 0);
+        scroll(0, -1, true, 0);
+        waves_height++;
     }
     else {
-        scroll(-1, 1, false, 255);
-        x--;
+        scroll(1, 0, false, 255);
+        scroll(0, -1, true, 255);
+        waves_height--;
     }
 }
