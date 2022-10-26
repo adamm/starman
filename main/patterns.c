@@ -13,6 +13,7 @@ static const char *TAG = "starman-patterns";
 static void (*callback_func)(void) = NULL;
 static pattern_t framebuffer;
 
+static void patterns_castle_step();
 static void patterns_checkered_step();
 static void patterns_curtains_step();
 static void patterns_diamonds_step();
@@ -143,6 +144,20 @@ void patterns_step_sequence() {
 }
 
 
+void patterns_castle() {
+    ESP_LOGI(TAG, "Begin CASTLE pattern");
+
+    memcpy(framebuffer.active, castle, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_castle_step;
+}
+
+
+static void patterns_castle_step() {
+    // Scroll the checkered display up and to the left every frame
+    scroll(0, 1, true, 0);
+}
+
+
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
@@ -224,18 +239,18 @@ void patterns_gol_cross_2() {
 }
 
 
-void patterns_gol_galaxy() {
-    ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
-
-    memcpy(framebuffer.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
-    callback_func = patterns_gol_step;
-}
-
-
 void patterns_gol_four_blinkers_four_blocks() {
     ESP_LOGI(TAG, "Begin GOL_FOUR_BLINKERS_FOUR_BLOCKS pattern");
 
     memcpy(framebuffer.grid, gol_four_blinkers_four_blocks, GOL_GRID_TOTAL_AREA);
+    callback_func = patterns_gol_step;
+}
+
+
+void patterns_gol_galaxy() {
+    ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
+
+    memcpy(framebuffer.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 

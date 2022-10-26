@@ -93,7 +93,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_sweep;
+        level_pattern = patterns_swipe;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
@@ -108,7 +108,7 @@ void play_game(void) {
         length = sizeof(smb_underwater);
     }
     else if (level == 4) {
-        level_pattern = patterns_siren;
+        level_pattern = patterns_castle;
         level_music = smb_castle;
         length = sizeof(smb_castle);
     }
