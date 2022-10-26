@@ -415,19 +415,24 @@ const unsigned char smb_gameover [] = {
 // This score contains 134 bytes, and 3 tone generators are used.
 
 
-// Playtune bytestream for file "./Mario-Sheet-Music-Flagpole-Fanfare.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:55 2018
-// command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Flagpole-Fanfare 
-const unsigned char smb_course_clear[] = {
-'P','t', 6, 0xE0, 0x00,  5, // (Playtune file header)
+const unsigned char smb_flagpole[] = {
+'P','t', 6, 0xE0, 0x00,  3, // (Playtune file header)
 0,1, 0x90,55,52, 0,36, 0x91,57,52, 0,34, 0x80, 0,3, 0x90,59,52, 0,34, 0x81, 0,3, 0x91,60,52, 
 0,34, 0x80, 0,3, 0x90,62,52, 0,34, 0x81, 0,3, 0x91,64,52, 0,34, 0x80, 0,3, 0x90,65,52, 0,34, 
 0x81, 0,3, 0x91,67,52, 0,34, 0x80, 0,3, 0x90,69,52, 0,34, 0x81, 0,3, 0x91,71,52, 0,34, 0x80, 0,3, 
 0x90,72,52, 0,34, 0x81, 0,3, 0x91,74,52, 0,34, 0x80, 0,3, 0x90,76,52, 0,34, 0x81, 0,3, 0x91,77,52, 
 0,34, 0x80, 0,3, 0x90,79,52, 0,34, 0x81, 0,3, 0x91,81,52, 0,34, 0x80, 0,3, 0x90,83,52, 0,34, 
 0x81, 0,3, 0x91,84,52, 0,34, 0x80, 0,3, 0x90,86,52, 0,34, 0x81, 0,3, 0x91,88,52, 0,34, 0x80, 0,3, 
-0x90,89,64, 0,34, 0x81, 0,4, 0x91,91,69, 0,4, 0x80, 0,49, 0x81, 2,234, 0x90,55,57, 0,139, 0x91,60,52, 
-0x92,52,52, 0,7, 0x80, 0,123, 0x90,64,52, 0x93,55,52, 0,7, 0x81, 0x82, 0,125, 0x91,67,52, 0x92,48,52, 
-0,7, 0x80, 0x83, 0,125, 0x90,72,52, 0x93,52,52, 0,7, 0x81, 0x82, 0,121, 0x91,76,52, 0x92,55,52, 0,7, 
+0x90,89,64, 0,34, 0x81, 0,4, 0x91,91,69, 0,4, 0x80, 0,49, 0x81, 2,234, 0x83, 0xf0
+};
+
+
+// Playtune bytestream for file "./Mario-Sheet-Music-Flagpole-Fanfare.mid" created by MIDITONES V1.17 on Tue Dec  4 00:04:55 2018
+// command line: ./miditones -v -i -pt -d ./Mario-Sheet-Music-Flagpole-Fanfare
+const unsigned char smb_course_clear[] = {
+'P','t', 6, 0xE0, 0x00,  5, // (Playtune file header)
+0x90,55,57, 0,139, 0x91,60,52, 0x92,52,52, 0,7, 0x80, 0,123, 0x90,64,52, 0x93,55,52, 0,7, 0x81, 0x82, 0,125,
+0x91,67,52, 0x92,48,52, 0,7, 0,125, 0x90,72,52, 0x93,52,52, 0,7, 0x81, 0x82, 0,121, 0x91,76,52, 0x92,55,52, 0,7,
 0x80, 0x83, 0,125, 0x90,79,69, 0x93,64,69, 0,7, 0x81, 0x82, 1,140, 0x90,76,64, 0x91,60,64, 0x83, 1,139, 0x90,56,57, 
 0x81, 0,139, 0x91,60,52, 0x92,51,52, 0,7, 0x80, 0,123, 0x90,63,52, 0x93,56,52, 0,7, 0x81, 0x82, 0,121, 
 0,4, 0x91,68,52, 0x92,48,52, 0,7, 0x80, 0x83, 0,37, 0,50, 0,37, 0x90,72,52, 0x93,51,52, 0,7, 

@@ -216,6 +216,8 @@ void play_game(void) {
         music_playscore(smb_death);
     }
     else {
+        patterns_sweep();
+        music_playscore(smb_flagpole);
         patterns_radar();
         music_playscore(smb_course_clear);
     }
