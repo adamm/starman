@@ -26,15 +26,14 @@ static uint8_t count_live_neighbours(int8_t grid[GOL_GRID_HEIGHT][GOL_GRID_WIDTH
 }
 
 
-
-void gol_next_generation(pattern_t *pattern) {
+void gol_next_generation(display_t *display) {
     int8_t y, x;
     int8_t this_gen[GOL_GRID_HEIGHT][GOL_GRID_WIDTH] = { 0 };
     int8_t next_gen[GOL_GRID_HEIGHT][GOL_GRID_WIDTH] = { 0 };
 
     for (y = 0; y < GOL_GRID_HEIGHT; y++) {
         for (x = 0; x < GOL_GRID_WIDTH; x++) {
-            if (pattern->grid[y][x] > 0)
+            if (display->grid[y][x] > 0)
                 this_gen[y][x] = 1;
         }
     }
@@ -54,13 +53,13 @@ void gol_next_generation(pattern_t *pattern) {
         }
     }
  
-    memset(pattern->active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(display->active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
     for (y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             if (next_gen[y+GOL_GRID_OFFSET_Y][x+GOL_GRID_OFFSET_X] > 0)
-                pattern->active[y][x] = 255;
+                display->active[y][x] = 255;
         }
     }
 
-    memcpy(pattern->grid, next_gen, GOL_GRID_TOTAL_AREA);
+    memcpy(display->grid, next_gen, GOL_GRID_TOTAL_AREA);
 }

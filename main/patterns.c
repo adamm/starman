@@ -11,7 +11,7 @@
 static const char *TAG = "starman-patterns";
 
 static void (*callback_func)(void) = NULL;
-static pattern_t framebuffer;
+static display_t framebuffer;
 
 static void patterns_castle_step();
 static void patterns_checkered_step();
@@ -147,7 +147,8 @@ void patterns_step_sequence() {
 void patterns_castle() {
     ESP_LOGI(TAG, "Begin CASTLE pattern");
 
-    memcpy(framebuffer.active, castle, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &castle;
+    memcpy(framebuffer.active, castle.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_castle_step;
 }
 
@@ -161,7 +162,8 @@ static void patterns_castle_step() {
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
-    memcpy(framebuffer.active, checkered, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &checkered;
+    memcpy(framebuffer.active, checkered.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_checkered_step;
 }
 
@@ -175,7 +177,8 @@ static void patterns_checkered_step() {
 void patterns_curtains() {
     ESP_LOGI(TAG, "Begin CURTAINS pattern");
 
-    memcpy(framebuffer.active, curtains, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &curtains;
+    memcpy(framebuffer.active, curtains.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_curtains_step;
 }
 
@@ -189,7 +192,8 @@ static void patterns_curtains_step() {
 void patterns_diamonds() {
     ESP_LOGI(TAG, "Begin DIAMONDS pattern");
 
-    memcpy(framebuffer.active, diamonds, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &diamonds;
+    memcpy(framebuffer.active, diamonds.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_diamonds_step;
 }
 
@@ -203,6 +207,8 @@ void patterns_fireworks() {
     ESP_LOGI(TAG, "Begin FIREWORKS pattern");
 
     // TBD
+    // framebuffer.pattern = &fireworks;
+    // memcpy(framebuffer.active, fireworks.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_fireworks_step;
 }
 
@@ -215,6 +221,7 @@ static void patterns_fireworks_step() {
 void patterns_flash() {
     ESP_LOGI(TAG, "Begin FLASH pattern");
 
+    framebuffer.pattern = NULL;
     memset(framebuffer.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_flash_step;
 }
@@ -234,6 +241,7 @@ static void patterns_gol_step() {
 void patterns_gol_cross_2() {
     ESP_LOGI(TAG, "Begin GOL_CROSS_2 pattern");
 
+    framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_cross_2, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
@@ -242,6 +250,7 @@ void patterns_gol_cross_2() {
 void patterns_gol_four_blinkers_four_blocks() {
     ESP_LOGI(TAG, "Begin GOL_FOUR_BLINKERS_FOUR_BLOCKS pattern");
 
+    framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_four_blinkers_four_blocks, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
@@ -250,6 +259,7 @@ void patterns_gol_four_blinkers_four_blocks() {
 void patterns_gol_galaxy() {
     ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
 
+    framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
@@ -258,6 +268,7 @@ void patterns_gol_galaxy() {
 void patterns_gol_pentadecathlon() {
     ESP_LOGI(TAG, "Begin GOL_PENTADECATHLON pattern");
 
+    framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_pentadecathlon, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
@@ -267,6 +278,7 @@ void patterns_gol_sprinkles() {
     ESP_LOGI(TAG, "Begin GOL_SPRINKLES pattern");
 
     // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
+    framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_sprinkles, GOL_GRID_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
@@ -275,7 +287,8 @@ void patterns_gol_sprinkles() {
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
-    memcpy(framebuffer.active, lines, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &lines;
+    memcpy(framebuffer.active, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
@@ -288,7 +301,8 @@ static void patterns_lines_step() {
 void patterns_radar() {
     ESP_LOGI(TAG, "Begin RADAR pattern");
 
-    memcpy(framebuffer.active, radar, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &radar;
+    memcpy(framebuffer.active, radar.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_radar_step;
 }
 
@@ -303,6 +317,7 @@ static void patterns_radar_step() {
 void patterns_random() {
     ESP_LOGI(TAG, "Begin RANDOM pattern");
 
+    framebuffer.pattern = NULL;
     memset(framebuffer.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
     patterns_random_step();
@@ -317,7 +332,8 @@ static void patterns_random_step() {
 void patterns_siren() {
     ESP_LOGI(TAG, "Begin SIREN pattern");
 
-    memcpy(framebuffer.active, radar, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &siren;
+    memcpy(framebuffer.active, siren.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_siren_step;
 }
     
@@ -331,7 +347,8 @@ static void patterns_siren_step() {
 void patterns_spiral() {
     ESP_LOGI(TAG, "Begin SPIRAL pattern");
 
-    memcpy(framebuffer.active, spiral, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &spiral;
+    memcpy(framebuffer.active, spiral.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_spiral_step;
 }
 
@@ -345,7 +362,8 @@ static void patterns_spiral_step() {
 void patterns_sweep() {
     ESP_LOGI(TAG, "Begin SWEEP pattern");
 
-    memcpy(framebuffer.active, sweep, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &sweep;
+    memcpy(framebuffer.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_sweep_step;
 }
 
@@ -359,7 +377,8 @@ static void patterns_sweep_step() {
 void patterns_swipe() {
     ESP_LOGI(TAG, "Begin SWIPE pattern");
 
-    memcpy(framebuffer.active, swipe, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &swipe;
+    memcpy(framebuffer.active, swipe.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swipe_step;
 }
 
@@ -373,7 +392,8 @@ static void patterns_swipe_step() {
 void patterns_swoosh() {
     ESP_LOGI(TAG, "Begin SWOOP pattern");
 
-    memcpy(framebuffer.active, swoosh, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &swoosh;
+    memcpy(framebuffer.active, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoosh_step;
 }
     
@@ -387,6 +407,8 @@ void patterns_swoop() {
     ESP_LOGI(TAG, "Begin SWOOP pattern");
 
     // TBD
+    // framebuffer.pattern = &swoop;
+    // memcpy(framebuffer.active, swoop.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoop_step;
 }
 
@@ -399,7 +421,9 @@ static void patterns_swoop_step() {
 void patterns_thump() {
     ESP_LOGI(TAG, "Begin WAVES pattern");
 
-    memcpy(framebuffer.active, thump[0], DISPLAY_LIGHTS_TOTAL_AREA);
+    // TBD
+    // framebuffer.pattern = thump[0];
+    // memcpy(framebuffer.active, thump[0].data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_thump_step;
 }
 
@@ -420,7 +444,8 @@ void patterns_waves() {
     waves_height = 0;
     waves_down = true;
 
-    memcpy(framebuffer.active, waves, DISPLAY_LIGHTS_TOTAL_AREA);
+    framebuffer.pattern = &waves;
+    memcpy(framebuffer.active, waves.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_waves_step;
 }
 

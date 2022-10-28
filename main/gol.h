@@ -5,6 +5,6 @@
 
 // Game of Life patterns found in patterns-gol.h
 
-void gol_next_generation(pattern_t* pattern);
+void gol_next_generation(display_t* display);
 
 #endif

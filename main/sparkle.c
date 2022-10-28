@@ -18,7 +18,7 @@ static int16_t sparkle_state[SPARKLE_MAX_LEDS];
 static bool sparkle_direction[SPARKLE_MAX_LEDS];
 static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
-static pattern_t framebuffer;
+static display_t framebuffer;
 
 // static const uint8_t sparkle_1[3][3] = {
 //     {  25,  92,  25 },
