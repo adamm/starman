@@ -165,8 +165,9 @@ void play_game(void) {
 
         if (player_gets_star && player_gets_star <= stopped_music_time) {
             player_gets_star = 0;
-            patterns_flash();
+            patterns_question();
             music_playscore(smb_block);
+            patterns_flash();
             music_playscore(smb_powerup);
             patterns_swoosh();
             music_playscore(smb_starman);
@@ -175,7 +176,7 @@ void play_game(void) {
         if (player_gets_1up && player_gets_1up <= stopped_music_time) {
             lives++;
             player_gets_1up = 0;
-            patterns_flash();
+            patterns_question();
             music_playscore(smb_block);
             patterns_checkered();
             music_playscore(smb_1up);

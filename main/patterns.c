@@ -21,6 +21,7 @@ static void patterns_fireworks_step();
 static void patterns_flash_step();
 static void patterns_gol_step();
 static void patterns_lines_step();
+static void patterns_question_step();
 static void patterns_radar_step();
 static void patterns_random_step();
 static void patterns_siren_step();
@@ -295,6 +296,20 @@ void patterns_lines() {
 
 static void patterns_lines_step() {
     scroll(0, 1, true, 0);
+}
+
+
+void patterns_question() {
+    ESP_LOGI(TAG, "Begin QUESTION pattern");
+
+    framebuffer.pattern = &question;
+    memcpy(framebuffer.active, question.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_question_step;
+}
+
+
+static void patterns_question_step() {
+    invert();
 }
 
 
