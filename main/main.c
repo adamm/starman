@@ -245,8 +245,17 @@ void app_main(void) {
     buttons_init();
     lights_init();
     music_init();
-    status_init();
     random_init();
+
+    // XXX: Unfortunately ESP32S3 only has 4 channels for transmitting, and all
+    // are taken up by the PWM LEDC music channels. This means the WS2812
+    // status light cannot be used as an RMT component :(
+    //
+    // TODO: Maybe an SPI channel can be used to simulate the RMT signal?
+    // http://cdn.sparkfun.com/datasheets/BreakoutBoards/WS2812B.pdf
+    //
+    // status_init();
+
 
     // Execute the play_game() function when the play button is pressed.
     buttons_play_callback(play_game);
