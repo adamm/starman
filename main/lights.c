@@ -41,10 +41,13 @@ void lights_update_leds(display_t display) {
     for (int y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (int x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             // Positions in the LED_LUT that are 0 have no physical LED; just ignore out the pattern data.
-            if (LED_LUT[x][y] > 0) {
+            if (LED_LUT[y][x] > 0) {
                 // The pattern range is 8-bits, but the LED PWM driver supports 16-bits of brightnesses.
                 // Until the pattern is expanded to 16-bits, just multiply the pattern value by 256.
-                lights_out[LED_LUT[x][y]-1] = display.active[x][y] * 256;
+                lights_out[LED_LUT[y][x]-1] = display.active[y][x] * 256;
+                if (display.overlay[y][x] > 0) {
+                    lights_out[LED_LUT[y][x]-1] = display.overlay[y][x] * 256;
+                }
             }
         }
     }

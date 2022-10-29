@@ -150,6 +150,7 @@ void patterns_castle() {
 
     framebuffer.pattern = &castle;
     memcpy(framebuffer.active, castle.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_castle_step;
 }
 
@@ -165,6 +166,7 @@ void patterns_checkered() {
 
     framebuffer.pattern = &checkered;
     memcpy(framebuffer.active, checkered.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_checkered_step;
 }
 
@@ -180,6 +182,7 @@ void patterns_curtains() {
 
     framebuffer.pattern = &curtains;
     memcpy(framebuffer.active, curtains.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_curtains_step;
 }
 
@@ -195,6 +198,7 @@ void patterns_diamonds() {
 
     framebuffer.pattern = &diamonds;
     memcpy(framebuffer.active, diamonds.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_diamonds_step;
 }
 
@@ -224,6 +228,7 @@ void patterns_flash() {
 
     framebuffer.pattern = NULL;
     memset(framebuffer.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_flash_step;
 }
 
@@ -244,6 +249,7 @@ void patterns_gol_cross_2() {
 
     framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_cross_2, GOL_GRID_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -253,6 +259,7 @@ void patterns_gol_four_blinkers_four_blocks() {
 
     framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_four_blinkers_four_blocks, GOL_GRID_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -262,6 +269,7 @@ void patterns_gol_galaxy() {
 
     framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -271,6 +279,7 @@ void patterns_gol_pentadecathlon() {
 
     framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_pentadecathlon, GOL_GRID_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -281,6 +290,7 @@ void patterns_gol_sprinkles() {
     // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
     framebuffer.pattern = NULL;
     memcpy(framebuffer.grid, gol_sprinkles, GOL_GRID_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -290,6 +300,7 @@ void patterns_lines() {
 
     framebuffer.pattern = &lines;
     memcpy(framebuffer.active, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
@@ -304,6 +315,7 @@ void patterns_question() {
 
     framebuffer.pattern = &question;
     memcpy(framebuffer.active, question.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_question_step;
 }
 
@@ -318,6 +330,7 @@ void patterns_radar() {
 
     framebuffer.pattern = &radar;
     memcpy(framebuffer.active, radar.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_radar_step;
 }
 
@@ -334,6 +347,7 @@ void patterns_random() {
 
     framebuffer.pattern = NULL;
     memset(framebuffer.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
     patterns_random_step();
 }
@@ -349,6 +363,7 @@ void patterns_siren() {
 
     framebuffer.pattern = &siren;
     memcpy(framebuffer.active, siren.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_siren_step;
 }
     
@@ -364,6 +379,7 @@ void patterns_spiral() {
 
     framebuffer.pattern = &spiral;
     memcpy(framebuffer.active, spiral.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_spiral_step;
 }
 
@@ -379,6 +395,7 @@ void patterns_sweep() {
 
     framebuffer.pattern = &sweep;
     memcpy(framebuffer.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_sweep_step;
 }
 
@@ -394,6 +411,7 @@ void patterns_swipe() {
 
     framebuffer.pattern = &swipe;
     memcpy(framebuffer.active, swipe.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swipe_step;
 }
 
@@ -409,11 +427,35 @@ void patterns_swoosh() {
 
     framebuffer.pattern = &swoosh;
     memcpy(framebuffer.active, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoosh_step;
+
+    size_t border_length = sizeof(star_border)/3;
+    uint8_t intensity = 0xF0;
+
+    for (uint8_t i = 0; i < border_length; i++ ) {
+        star_border[i][2] = intensity;
+        intensity -= 0x30;
+    }
 }
     
 
 static void patterns_swoosh_step() {
+    size_t border_length = sizeof(star_border)/3;
+    uint8_t i, x, y;
+
+    y = star_border[border_length-1][0];
+    x = star_border[border_length-1][1];
+    star_border[border_length-1][2] = star_border[0][2];
+    framebuffer.overlay[y][x] = star_border[border_length-1][2];
+
+    for (i = 0; i < border_length - 1; i++ ) {
+        y = star_border[i][0];
+        x = star_border[i][1];
+        star_border[i][2] = star_border[i+1][2];
+        framebuffer.overlay[y][x] = star_border[i][2];
+    }
+
     scroll(0, 1, true, 0);
 }
 
@@ -424,6 +466,7 @@ void patterns_swoop() {
     // TBD
     // framebuffer.pattern = &swoop;
     // memcpy(framebuffer.active, swoop.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoop_step;
 }
 
@@ -439,6 +482,7 @@ void patterns_thump() {
     // TBD
     // framebuffer.pattern = thump[0];
     // memcpy(framebuffer.active, thump[0].data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_thump_step;
 }
 
@@ -461,6 +505,7 @@ void patterns_waves() {
 
     framebuffer.pattern = &waves;
     memcpy(framebuffer.active, waves.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(framebuffer.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_waves_step;
 }
 
