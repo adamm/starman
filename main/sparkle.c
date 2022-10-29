@@ -89,6 +89,7 @@ void sparkle_step() {
                 sparkle_state[i] = 0;
                 sparkle_leds[i] = random_value_within_int(DISPLAY_LIGHTS_TOTAL_AREA);
                 // sparkle_delay[i] = random_value_within_int(2000);
+                sparkle_delay[i] = 0;
                 sparkle_direction[i] = true;
             }
 
