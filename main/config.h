@@ -74,4 +74,36 @@
 
 #endif
 
+/* Set EXTERN macro: */
+#ifdef CONFIG_IMPORT
+    #define CONFIG_EXTERN
+#else
+    #define CONFIG_EXTERN extern
+#endif
+
+#ifndef CONFIG_ESP_MAX_RETRY
+#define CONFIG_ESP_MAX_RETRY 5
+#endif
+#ifndef CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM
+#define CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM 32
+#endif
+#ifndef CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM
+#define CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM 32
+#endif
+#ifndef CONFIG_ESP32_WIFI_TX_BUFFER_TYPE
+#define CONFIG_ESP32_WIFI_TX_BUFFER_TYPE 1
+#endif
+
+#define CONFIG_DEFAULT_FIRMWARE_URL "https://starman.array.org"
+#define CONFIG_FIRMWARE_URL_MAXLEN 50
+
+CONFIG_EXTERN char config_firmware_service_url[CONFIG_FIRMWARE_URL_MAXLEN]
+#ifdef CONFIG_IMPORT
+= CONFIG_DEFAULT_FIRMWARE_URL
+#endif
+;
+
+void config_init(void);
+void config_save(void);
+
 #endif

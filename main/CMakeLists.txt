@@ -1,13 +1,18 @@
 idf_component_register(SRCS
                     "main.c"
                     "buttons.c"
+                    "config.c"
                     "gol.c"
                     "led1642gw.c"
                     "lights.c"
                     "music.c"
+                    "network.c"
+                    "ota.c"
                     "patterns.c"
                     "random.c"
                     "status.c"
+                    "storage.c"
                     "sparkle.c"
                     "util.c"
+                    "wifi.c"
                     INCLUDE_DIRS ".")

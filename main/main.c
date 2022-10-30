@@ -10,10 +10,12 @@
 #include "random.h"
 #include "sparkle.h"
 #include "status.h"
+#include "storage.h"
 #include "smb.h"
 #include "smb2.h"
 #include "smb3.h"
 #include "smw.h"
+#include "wifi.h"
 
 static const char *TAG = "starman";
   
@@ -242,6 +244,8 @@ void play_game(void) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "Main startup");
+    config_init();
+    storage_init();
     buttons_init();
     lights_init();
     music_init();
@@ -255,6 +259,8 @@ void app_main(void) {
     // http://cdn.sparkfun.com/datasheets/BreakoutBoards/WS2812B.pdf
     //
     // status_init();
+
+    wifi_init();
 
 
     // Execute the play_game() function when the play button is pressed.
