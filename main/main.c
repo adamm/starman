@@ -3,7 +3,7 @@
 
 #include "buttons.h"
 #include "config.h"
-#include "lights.h"
+#include "display.h"
 #include "music.h"
 #include "patterns.h"
 #include "patterns_gol.h"
@@ -247,7 +247,7 @@ void app_main(void) {
     config_init();
     storage_init();
     buttons_init();
-    lights_init();
+    display_init();
     music_init();
     random_init();
 

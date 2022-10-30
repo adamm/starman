@@ -1,7 +1,7 @@
 #ifndef GOL_H
 #define GOL_H
 
-#include "patterns.h"
+#include "display.h"
 
 // Game of Life patterns found in patterns-gol.h
 

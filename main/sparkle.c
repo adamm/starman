@@ -7,8 +7,7 @@
 
 #include "buttons.h"
 #include "config.h"
-#include "lights.h"
-#include "patterns.h"
+#include "display.h"
 #include "random.h"
 #include "sparkle.h"
 
@@ -18,7 +17,7 @@ static int16_t sparkle_state[SPARKLE_MAX_LEDS];
 static bool sparkle_direction[SPARKLE_MAX_LEDS];
 static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
-static display_t framebuffer;
+static display_t display;
 
 // static const uint8_t sparkle_1[3][3] = {
 //     {  25,  92,  25 },
@@ -58,7 +57,7 @@ static const uint8_t sparkle_ball[9][9] = {
 
 void sparkle_step() {
     while(1) {
-        memset(framebuffer.active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
+        memset(display.active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
         for (uint8_t i = 0; i < SPARKLE_MAX_LEDS; i++) {
             // Go through each of the active sparkle LEDs, and use 
             // sparkle_state to identify how "bright" the sparkle is.
@@ -97,7 +96,7 @@ void sparkle_step() {
             int8_t y = sparkle_leds[i] % DISPLAY_LIGHTS_WIDTH;
 
             // ESP_LOGI(TAG, "(%d, %d) = %x", x, y, sparkle_state[i]);
-            // framebuffer.active[y][x] = sparkle_state[i];
+            // display.active[y][x] = sparkle_state[i];
 
             // Use sparkle_state to identify adjacent LEDs. Set their
             // brightness relative to the distance from the centre of the
@@ -117,16 +116,16 @@ void sparkle_step() {
                     uint16_t px = sparkle_state[i] * sparkle_ball[sy][sx] / SPARKLE_MAX_STATE;
                     
                     // Only draw the sparkle ball pixel if the current pixel is darker
-                    if (px > framebuffer.active[y+dy][x+dx]) {
-                        // ESP_LOGI(TAG, "ball(%d) xy(%d,%d) sxy(%d,%d) dxy(%d,%d) xdxy(%d,%d) state(%d) ball(%d) px(%d) -> fb(%d)", i, x, y, sx, sy, dx, dy, x+dx, dx+dy, sparkle_state[i], sparkle_1[sy][sx], px, framebuffer.active[y+sy][x+sx]);
-                        framebuffer.active[y+dy][x+dx] = px;
+                    if (px > display.active[y+dy][x+dx]) {
+                        // ESP_LOGI(TAG, "ball(%d) xy(%d,%d) sxy(%d,%d) dxy(%d,%d) xdxy(%d,%d) state(%d) ball(%d) px(%d) -> fb(%d)", i, x, y, sx, sy, dx, dy, x+dx, dx+dy, sparkle_state[i], sparkle_1[sy][sx], px, display.active[y+sy][x+sx]);
+                        display.active[y+dy][x+dx] = px;
                     }
                 }
             }
         }
 
-        // ESP_LOG_BUFFER_HEX(TAG, framebuffer.active, DISPLAY_LIGHTS_TOTAL_AREA);
-        lights_update_leds(framebuffer);
+        // ESP_LOG_BUFFER_HEX(TAG, display.active, DISPLAY_LIGHTS_TOTAL_AREA);
+        display_update_leds(display);
 
         vTaskDelay(SPARKLE_RATE_MS / portTICK_RATE_MS);
     }
@@ -139,7 +138,7 @@ void debug_step() {
 
     leds[i] = 0x4f;
     ESP_LOGI(TAG, "Light up #%d", i+1);
-    lights_update_leds_raw(leds);
+    display_update_leds_raw(leds);
 
     i++;
 }

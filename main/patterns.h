@@ -1,8 +1,6 @@
 #ifndef PATTERNS_H
 #define PATTERNS_H
 
-#include "config.h"
-
 // Techncially the star is 16 LEDs wide and 15 LEDs tall, and is only 144 LEDs total. 
 // In order to make the math for rotation and flipping easier, we assume it's 16x16 square.
 // Thus, the top row of the pattern will be ignored when updating the lights.
@@ -33,14 +31,6 @@ struct pattern {
     uint8_t width;
     uint8_t data[];
 } typedef pattern_t;
-
-struct display {
-    uint8_t active[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
-    uint8_t overlay[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
-    uint8_t grid[GOL_GRID_HEIGHT][GOL_GRID_WIDTH];
-    const pattern_t* pattern;
-} typedef display_t;
-
 
 static const pattern_t castle = {
     16, 16, {
@@ -273,17 +263,6 @@ static const pattern_t swipe = {
     }
 };
 
-// The star border is a special pattern that allows targeting the pixels along the PCB perimeter
-// Format is { y, x, intensity }, the latter of which is dynamically set in patterns.c
-static uint8_t star_border[][3] = {
-    { 1, 7, 0 }, { 1, 8, 0 }, { 2, 9, 0 }, { 3, 9, 0 }, { 4, 10, 0 }, { 5, 11, 0 }, { 5, 12, 0 }, { 5, 13, 0 },
-    { 5, 14, 0 }, { 5, 15, 0 }, { 6, 15, 0 }, { 7, 14, 0 }, { 8, 13, 0 }, { 9, 12, 0 }, { 10, 13, 0 }, { 11, 13, 0 },
-    { 12, 14, 0 }, { 13, 14, 0 }, { 14, 15, 0 }, { 15, 15, 0 }, { 15, 14, 0 }, { 15, 13, 0 }, { 14, 12, 0 },
-    { 14, 11, 0 }, { 13, 10, 0 }, { 13, 9, 0 }, { 12, 8, 0 }, { 12, 7, 0 }, { 13, 6, 0 }, { 13, 5, 0 }, { 14, 4, 0 },
-    { 14, 3, 0 }, { 15, 2, 0 }, { 15, 1, 0 }, { 15, 0, 0 }, { 14, 0, 0 }, { 13, 1, 0 }, { 12, 1, 0 }, { 11, 2, 0 },
-    { 10, 2, 0 }, { 9, 3, 0 }, { 8, 2, 0 }, { 7, 1, 0 }, { 6, 0, 0 }, { 5, 0, 0 }, { 5, 1, 0 }, { 5, 2, 0 },
-    { 5, 3, 0 }, { 5, 4, 0 }, { 4, 5, 0 }, { 3, 6, 0 }, { 2, 6, 0 }
-};
 
 static const pattern_t swoosh = {
     16, 16, {

@@ -3,9 +3,8 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "display.h"
 #include "gol.h"
-#include "patterns.h"
-#include "patterns_gol.h"
 
 // An implementation of Conway's Game of Life to apply various oscillators as starman patterns
 
