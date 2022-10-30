@@ -13,6 +13,7 @@ idf_component_register(SRCS
                     "status.c"
                     "storage.c"
                     "sparkle.c"
+                    "text.c"
                     "util.c"
                     "wifi.c"
                     INCLUDE_DIRS ".")
