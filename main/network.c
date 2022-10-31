@@ -185,7 +185,7 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
 
     while (total_read_len < content_length) {
         max_read_len = (content_length - total_read_len >= MAX_HTTP_RECV_BUFFER) ? MAX_HTTP_RECV_BUFFER : content_length - total_read_len;
-        status_downloading();
+        // status_downloading();
         read_len = esp_http_client_read(client, buffer, max_read_len);
         total_read_len += read_len;
         if (read_len <= 0) {

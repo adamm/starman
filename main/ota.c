@@ -166,7 +166,7 @@ uint8_t ota_upgrade(char* channel) {
     }
 
     while (1) {
-        status_downloading();
+        // status_downloading();
         err = esp_https_ota_perform(https_ota_handle);
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
@@ -175,9 +175,9 @@ uint8_t ota_upgrade(char* channel) {
         // monitor the status of OTA upgrade by calling esp_https_ota_get_image_len_read, which gives length of image
         // data read so far.
         ESP_LOGI(TAG, "Image bytes read: %d", esp_https_ota_get_image_len_read(https_ota_handle));
-        status_waiting();
+        // status_waiting();
     }
-    status_resetting();
+    // status_resetting();
 
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
         // the OTA image was not completely received and user can customise the response to this situation.
