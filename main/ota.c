@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "status.h"
+#include "rgb.h"
 #include "ota.h"
 
 #define BUFFSIZE 1024

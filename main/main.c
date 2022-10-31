@@ -8,8 +8,8 @@
 #include "patterns.h"
 #include "patterns_gol.h"
 #include "random.h"
+#include "rgb.h"
 #include "sparkle.h"
-#include "status.h"
 #include "storage.h"
 #include "smb.h"
 #include "smb2.h"
@@ -250,16 +250,7 @@ void app_main(void) {
     display_init();
     music_init();
     random_init();
-
-    // XXX: Unfortunately ESP32S3 only has 4 channels for transmitting, and all
-    // are taken up by the PWM LEDC music channels. This means the WS2812
-    // status light cannot be used as an RMT component :(
-    //
-    // TODO: Maybe an SPI channel can be used to simulate the RMT signal?
-    // http://cdn.sparkfun.com/datasheets/BreakoutBoards/WS2812B.pdf
-    //
-    // status_init();
-
+    // rgb_init();
     wifi_init();
 
 

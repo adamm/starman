@@ -19,7 +19,7 @@
 #include <esp_http_client.h>
 
 #include "config.h"
-#include "status.h"
+#include "rgb.h"
 #include "storage.h"
 #include "network.h"
 

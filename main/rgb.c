@@ -7,10 +7,11 @@
 #include "config.h"
 #include "util.h"
 
-#include "status.h"
+#include "rgb.h"
 
 static TaskHandle_t flashing_task;
-static const char *TAG = "starman-status";
+static const char *TAG = "starman-rgb";
+static bool rgb_gpio_ready = false;
 
 #define MAX_BRIGHTNESS 16
 #define RED   MAX_BRIGHTNESS
@@ -19,12 +20,15 @@ static const char *TAG = "starman-status";
 
 
 static void IRAM_ATTR ws2812b_bit_0() {
-  gpio_set_level(STATUS_LED_GPIO, 1);
+  gpio_set_level(RGB_LED_GPIO, 1);
 
   //delay 0.4us
   asm("nop; nop;");
+  asm("nop; nop;");
+  asm("nop; nop;");
+  asm("nop; nop;");
 
-  gpio_set_level(STATUS_LED_GPIO, 0);
+  gpio_set_level(RGB_LED_GPIO, 0);
 
   // delay 0.85us (additional dleay happens within color_display();
   asm("nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -33,7 +37,7 @@ static void IRAM_ATTR ws2812b_bit_0() {
 }
 
 static void IRAM_ATTR ws2812b_bit_1() {
-  gpio_set_level(STATUS_LED_GPIO, 1);
+  gpio_set_level(RGB_LED_GPIO, 1);
 
   //delay 0.8us
   asm("nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -44,9 +48,13 @@ static void IRAM_ATTR ws2812b_bit_1() {
     "nop; nop; nop; nop; nop; nop; nop; nop;"
     "nop; nop; nop; nop; nop; nop; nop; nop;");
 
-  gpio_set_level(STATUS_LED_GPIO, 0);
+  gpio_set_level(RGB_LED_GPIO, 0);
 
   // delay 0.45us happens naturally within color_display() function
+  asm("nop; nop;");
+  asm("nop; nop;");
+  asm("nop; nop;");
+  asm("nop; nop;");
 }
 
 
@@ -67,6 +75,10 @@ static uint8_t reverse(uint8_t num) {
 static void color_display(uint8_t red, uint8_t green, uint8_t blue) {
     uint8_t i = 0;
     uint16_t color;
+
+    if (!rgb_gpio_ready)
+        return;
+
     portDISABLE_INTERRUPTS();
 
     color = reverse(green);
@@ -102,8 +114,8 @@ static void color_display(uint8_t red, uint8_t green, uint8_t blue) {
 
 
 
-void status_init() {
-    // One addressable LED is found on the STATUS_LED_GPIO port
+void rgb_init() {
+    // One addressable LED is found on the RGB_LED_GPIO port
     // Unfortunately RMT wont work as there aren't any timers left.
     // Instead the WS2812B is bitbanged.
 
@@ -111,73 +123,82 @@ void status_init() {
 
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (1ULL << STATUS_LED_GPIO);
+    io_conf.pin_bit_mask = (1ULL << RGB_LED_GPIO);
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
-    gpio_set_level(STATUS_LED_GPIO, 0);
-    status_clear();
+    gpio_set_level(RGB_LED_GPIO, 0);
+    rgb_gpio_ready = true;
+    rgb_clear();
 
     ESP_LOGI(TAG, "Init success");
 }
 
 
-void status_clear() {
+void rgb_clear() {
     ESP_LOGI(TAG, "Clear");
     color_display(0, 0, 0);
 }
 
 
-void status_connecting() {
-    ESP_LOGI(TAG, "Connecting");
-    color_display(0, 255, 0);
-    vTaskDelay(500 / portTICK_RATE_MS);
-    color_display(0, 0, 0);
+void rgb_color_red() {
+    ESP_LOGI(TAG, "Red");
+    color_display(255, 0, 0);
 }
 
 
-
-void status_connected() {
-    ESP_LOGI(TAG, "Connectted");
+void rgb_color_green() {
+    ESP_LOGI(TAG, "Green");
     color_display(0, 255, 0);
 }
 
 
+void rgb_color_blue() {
+    ESP_LOGI(TAG, "Blue");
+    color_display(0, 0, 255);
+}
 
-void flash_provisioning() {
+
+void rgb_color_white() {
+    ESP_LOGI(TAG, "White");
+    color_display(255, 255, 255);
+}
+
+
+void flash_connecting() {
     while (1) {
-        // status_light->set_pixel(status_light, 0, RED, GREEN, BLUE);
-        // status_light->refresh(status_light, 100);
-        // gpio_set_level(STATUS_LED_GPIO, 1);
-        color_display(255,255,255);
+        // rgb_light->set_pixel(rgb_light, 0, RED, GREEN, BLUE);
+        // rgb_light->refresh(rgb_light, 100);
+        rgb_color_white();
         vTaskDelay(500 / portTICK_RATE_MS);
-        // status_light->clear(status_light, 50);
-        color_display(0, 0, 0);
+
+        // rgb_light->clear(rgb_light, 50);
+        rgb_clear();
         vTaskDelay(500 / portTICK_RATE_MS);
     }
 }
 
 
-void status_provisioning() {
-    ESP_LOGI(TAG, "Provisioning");
-    xTaskCreate(flash_provisioning, "flash", 2048, NULL, 0, &flashing_task);
+void rgb_connecting() {
+    ESP_LOGI(TAG, "Connecting");
+    xTaskCreate(flash_connecting, "flash", 2048, NULL, 0, &flashing_task);
 }
 
 
-void status_provisioned() {
-    ESP_LOGI(TAG, "Provisioned");
-    color_display(0, 0, 0);
+void rgb_connected() {
+    ESP_LOGI(TAG, "Connected");
     vTaskDelete(flashing_task);
+    color_display(0, 0, 0);
 }
 
 
-void status_error() {
+void rgb_error() {
     uint8_t blinks = 5;
     ESP_LOGE(TAG, "Error");
     for (uint8_t i = 0; i < blinks; i++) {
-        color_display(255, 0, 0);
-        delay(500);
-        color_display(0, 0, 0);
-        delay(500);
+        rgb_color_red();
+        vTaskDelay(500 / portTICK_RATE_MS);
+        rgb_clear();
+        vTaskDelay(500 / portTICK_RATE_MS);
     }
 }

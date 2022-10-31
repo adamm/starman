@@ -18,7 +18,7 @@
 #include <nvs_flash.h>
 
 #include "config.h"
-#include "status.h"
+#include "rgb.h"
 #include "storage.h"
 #include "wifi.h"
 
@@ -136,13 +136,13 @@ static void event_handler(void* arg, esp_event_base_t event_base,
             }
             case WIFI_PROV_CRED_SUCCESS:
                 ESP_LOGI(TAG, "Provisioning successful");
-                // status_provisioned();
+                // rgb_provisioned();
                 s_retry_num = 0;
                 break;
 
             case WIFI_PROV_END:
                 wifi_prov_mgr_deinit();
-                // status_ready();
+                // rgb_ready();
                 break;
 
             default:
@@ -150,6 +150,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         }
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+        rgb_connecting();
         esp_wifi_connect();
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -204,7 +205,7 @@ esp_err_t wifi_init(void)
     if (!provisioned) {
         ESP_LOGI(TAG, "Starting provisioning");
 
-        // status_provisioning();
+        // rgb_provisioning();
 
         char service_name[21];
         get_device_service_name(service_name, sizeof(service_name));
@@ -244,16 +245,16 @@ esp_err_t wifi_init(void)
     if (bits & WIFI_CONNECTED_BIT) {
         // ESP_LOGI(TAG, "Connected to SSID:%s password:%s",
         //          wifi_config.sta.ssid, wifi_config.sta.password);
-        // status_ready();
+        rgb_connected();
         err = ESP_OK;
     } else if (bits & WIFI_FAIL_BIT) {
         // ESP_LOGW(TAG, "Failed to connect to SSID:%s, password:%s",
         //          wifi_config.sta.ssid, wifi_config.sta.password);
-        // status_error();
+        rgb_error();
         err = ESP_ERR_WIFI_NOT_CONNECT;
     } else {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
-        // status_error();
+        rgb_error();
         err = ESP_ERR_WIFI_NOT_CONNECT;
     }
 
