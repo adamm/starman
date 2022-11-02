@@ -56,8 +56,10 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Unique light pattern per music song/state
 - [X] Flash lights in sequence with music
 - [X] GPIO play button
+- [ ] Show simple text messages
+- [X] WiFi onboarding process
+- [ ] Over-the-air firmware updates
 - [ ] WiFi play button
-- [ ] WiFi onboarding process
 - [ ] Bluetooth play button/app?
 
 ## Milestones
@@ -76,6 +78,9 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
 2022-10-09
 - Complete migration of core game logic from Arduino version (v1) to esp-idf version (v2)
+
+2022-10-29
+- Framework for connecting to wifi / performing OTA updates
 
 ## Key Components
 
