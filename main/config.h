@@ -65,7 +65,7 @@
 #define MUSIC_CHANNEL_4_GPIO 20
 #define MUSIC_AMP_MUTE_GPIO  21
 
-#define STATUS_LED_GPIO      38
+#define RGB_LED_GPIO         38
 
 #define LIGHTS_LE_GPIO       33
 #define LIGHTS_MISO_GPIO     34

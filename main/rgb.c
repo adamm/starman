@@ -1,7 +1,9 @@
 #include <driver/gpio.h>
+#include <driver/rmt.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
+#include <led_strip.h>
 #include <esp_log.h>
 
 #include "config.h"
@@ -9,6 +11,7 @@
 
 #include "rgb.h"
 
+static led_strip_t *rgb_light;
 static TaskHandle_t flashing_task;
 static const char *TAG = "starman-rgb";
 static bool rgb_gpio_ready = false;
@@ -58,16 +61,16 @@ static void IRAM_ATTR ws2812b_bit_1() {
 }
 
 
-static uint8_t reverse(uint8_t num) {
+static void reverse(uint8_t* num) {
     uint8_t tmp = 0;
 
     for (uint8_t i = 0; i < (sizeof(uint8_t) * 8 - 1); i++) {
-       tmp |= num & 1;
-       num >>= 1;
+       tmp |= *num & 1;
+       *num >>= 1;
        tmp <<= 1;
     }
 
-    return tmp;
+    *num = tmp;
 }
 
 
@@ -81,31 +84,35 @@ static void color_display(uint8_t red, uint8_t green, uint8_t blue) {
 
     portDISABLE_INTERRUPTS();
 
-    color = reverse(green);
+    reverse(&green);
+    reverse(&red);
+    reverse(&blue);
+
+    // Force setting GPIO to low, which speeds up the subsequent calls to bitbang the protocol
+    gpio_set_level(RGB_LED_GPIO, 0);
+
     for (i = 0; i < 8; i++) {
-        if (color & 1)
+        if (green & 1)
             ws2812b_bit_1();
         else
             ws2812b_bit_0();
-        color >>= 1;
+        green >>= 1;
     }
 
-    color = reverse(red);
     for (i = 0; i < 8; i++) {
-        if (color & 1)
+        if (red & 1)
             ws2812b_bit_1();
         else
             ws2812b_bit_0();
-        color >>= 1;
+        red >>= 1;
     }
 
-    color = reverse(blue);
     for (i = 0; i < 8; i++) {
-        if (color & 1)
+        if (blue & 1)
             ws2812b_bit_1();
         else
             ws2812b_bit_0();
-        color >>= 1;
+        blue >>= 1;
     }
 
     portENABLE_INTERRUPTS();
