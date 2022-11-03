@@ -15,7 +15,9 @@
 #include "smb2.h"
 #include "smb3.h"
 #include "smw.h"
+#include "text.h"
 #include "wifi.h"
+#include "util.h"
 
 static const char *TAG = "starman";
   
@@ -251,6 +253,17 @@ void app_main(void) {
     music_init();
     random_init();
     // rgb_init();
+
+    // FIXME: This is a POC to display text.  Move this marquee to the Game Over state.
+    display_t display = {0};
+    text_write_string(&display, " GAME OVER!");
+    display_update_leds(&display);
+    while(1) {
+        text_scroll(&display);
+        display_update_leds(&display);
+        delay(75);
+    }
+
     wifi_init();
 
 

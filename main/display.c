@@ -33,6 +33,20 @@ void display_update_leds(display_t* display) {
         }
     }
 
+    uint8_t yOffset = 5;
+
+    if (display->text) {
+        for (int y = 0; y < display->text_height; y++) {
+            for (int x = 0; x < display->text_width; x++) {
+                // ESP_LOGI(TAG, "(%d,%d) = %d", y+yOffset, x, display->text[y][x]);
+                if (9+y < DISPLAY_LIGHTS_HEIGHT && x < DISPLAY_LIGHTS_WIDTH && LED_LUT[y+yOffset][x] > 0) {
+                    // ESP_LOGI(TAG, "Write %d to (%d,%d) which is LUT pos %d", display->text[y][x], 9+y, x, LED_LUT[y+yOffset][x]-1);
+                    display_out[LED_LUT[y+yOffset][x]-1] = display->text[y][x] * 100;
+                }
+            }
+        }
+    }
+
     led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
     led1642gw_flush_buffer();
 }

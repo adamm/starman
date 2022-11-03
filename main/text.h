@@ -5,6 +5,8 @@
 
 #include "display.h"
 
-void text_draw_char(display_t*, int16_t, int16_t, char);
+void text_scroll(display_t* display);
+void text_draw_char(display_t*, uint8_t, uint8_t, char);
+void text_write_string(display_t* display, char* string);
 
 #endif

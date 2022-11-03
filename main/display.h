@@ -7,6 +7,9 @@
 struct display {
     uint8_t active[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
     uint8_t overlay[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
+    uint8_t** text;
+    uint16_t text_height;
+    uint16_t text_width;
     uint8_t grid[GOL_GRID_HEIGHT][GOL_GRID_WIDTH];
     const pattern_t* pattern;
 } typedef display_t;
