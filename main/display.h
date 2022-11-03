@@ -30,7 +30,7 @@ static const uint8_t LED_LUT[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
     {  37,  36,  35,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  69,  68,  76 },
 };
 
-void display_update_leds(display_t);
+void display_update_leds(display_t*);
 void display_update_leds_raw(uint8_t*);
 void display_init(void);
 

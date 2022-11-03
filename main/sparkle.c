@@ -125,7 +125,7 @@ void sparkle_step() {
         }
 
         // ESP_LOG_BUFFER_HEX(TAG, display.active, DISPLAY_LIGHTS_TOTAL_AREA);
-        display_update_leds(display);
+        display_update_leds(&display);
 
         vTaskDelay(SPARKLE_RATE_MS / portTICK_RATE_MS);
     }

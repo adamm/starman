@@ -153,7 +153,7 @@ void patterns_step_sequence() {
 
     // ESP_LOG_BUFFER_HEXDUMP(TAG, display.active, DISPLAY_LIGHTS_TOTAL_AREA, ESP_LOG_INFO);
 
-    display_update_leds(display);
+    display_update_leds(&display);
 }
 
 
