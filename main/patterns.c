@@ -7,6 +7,7 @@
 #include "gol.h"
 #include "patterns.h"
 #include "patterns_gol.h"
+#include "text.h"
 
 static const char *TAG = "starman-patterns";
 
@@ -31,6 +32,7 @@ static void patterns_curtains_step();
 static void patterns_diamonds_step();
 static void patterns_fireworks_step();
 static void patterns_flash_step();
+static void patterns_gameover_step();
 static void patterns_gol_step();
 static void patterns_lines_step();
 static void patterns_question_step();
@@ -247,6 +249,22 @@ void patterns_flash() {
 
 static void patterns_flash_step() {
     invert();
+}
+
+
+void patterns_gameover() {
+    display.pattern = &sweep;
+
+    memcpy(display.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    text_write_string(&display, "  GAME OVER");
+    callback_func = patterns_gameover_step;
+}
+
+
+static void patterns_gameover_step() {
+    scroll(0, -1, true, 0);
+    text_scroll(&display);
 }
 
 

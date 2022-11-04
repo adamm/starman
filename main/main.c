@@ -228,7 +228,7 @@ void play_game(void) {
     }
 
     if (lives == 0) {
-        patterns_sweep();
+        patterns_gameover();
         music_playscore(smb_gameover);
 
         level = 0;
@@ -254,19 +254,6 @@ void app_main(void) {
     random_init();
     // rgb_init();
 
-    // FIXME: This is a POC to display text.  Move this marquee to the Game Over state.
-    display_t display = {0};
-    text_write_string(&display, " GAME OVER!");
-    display_update_leds(&display);
-    while(1) {
-        text_scroll(&display);
-        display_update_leds(&display);
-        delay(75);
-    }
-
-    wifi_init();
-
-
     // Execute the play_game() function when the play button is pressed.
     buttons_play_callback(play_game);
     // Loop music with lights via step_sequence();
@@ -275,4 +262,8 @@ void app_main(void) {
     // Sparkle runs continiously in another thread while we wait for the user
     // to press Play
     sparkle_start();
+
+    // Wifi is last as it can take a few moments -- this way the sparkle and
+    // game can begin even without wifi being ready.
+    wifi_init();
 }
