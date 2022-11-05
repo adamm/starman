@@ -37,7 +37,7 @@ static const char *TAG = "starman";
 */
 
 static uint8_t level = 0;
-static uint8_t lives = GAME_START_LIVES;
+static uint8_t lives = 3;
 static bool playing  = false;
 static uint32_t player_gets_star    = 0;
 static uint32_t player_gets_1up     = 0;
@@ -97,7 +97,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_swipe;
+        level_pattern = patterns_random;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
@@ -139,6 +139,7 @@ void play_game(void) {
         player_gets_warning = random_value_within_int(900) + length - 900;
     if (player_dies)
         player_dies = random_value_within_int(length);
+
 
     ESP_LOGI(TAG, "Player level:  %d", level);
     ESP_LOGI(TAG, "Player lives:  %d", lives);
@@ -230,6 +231,7 @@ void play_game(void) {
     if (lives == 0) {
         patterns_gameover();
         music_playscore(smb_gameover);
+        patterns_gameover_stop();
 
         level = 0;
         lives = GAME_START_LIVES;

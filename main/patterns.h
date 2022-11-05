@@ -509,6 +509,7 @@ void patterns_diamonds();
 void patterns_fireworks();
 void patterns_flash();
 void patterns_gameover();
+void patterns_gameover_stop();
 void patterns_lines();
 void patterns_question();
 void patterns_radar();

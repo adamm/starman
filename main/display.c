@@ -33,7 +33,7 @@ void display_update_leds(display_t* display) {
         }
     }
 
-    uint8_t yOffset = 5;
+    uint8_t yOffset = 9;
 
     if (display->text) {
         for (int y = 0; y < display->text_height; y++) {

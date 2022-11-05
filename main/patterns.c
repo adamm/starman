@@ -1,5 +1,7 @@
 #include <esp_log.h>
 #include <esp_random.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <string.h>
 
 #include "config.h"
@@ -11,6 +13,7 @@
 
 static const char *TAG = "starman-patterns";
 
+static TaskHandle_t text_task;
 static void (*callback_func)(void) = NULL;
 static display_t display;
 
@@ -33,6 +36,7 @@ static void patterns_diamonds_step();
 static void patterns_fireworks_step();
 static void patterns_flash_step();
 static void patterns_gameover_step();
+static void patterns_gameover_text_step();
 static void patterns_gol_step();
 static void patterns_lines_step();
 static void patterns_question_step();
@@ -255,16 +259,30 @@ static void patterns_flash_step() {
 void patterns_gameover() {
     display.pattern = &sweep;
 
-    memcpy(display.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    // memcpy(display.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(display.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    text_write_string(&display, "  GAME OVER");
-    callback_func = patterns_gameover_step;
+    text_write_string(&display, "   GAME OVER");
+    // callback_func = patterns_gameover_step;
+    xTaskCreate(patterns_gameover_text_step, "gameover", 8192, NULL, 5, &text_task);
 }
 
 
 static void patterns_gameover_step() {
-    scroll(0, -1, true, 0);
-    text_scroll(&display);
+    scroll(-1, 0, true, 0);
+}
+
+
+static void patterns_gameover_text_step() {
+    while(1) {
+        text_scroll(&display);
+        vTaskDelay(75 / portTICK_RATE_MS);
+    }
+}
+
+
+void patterns_gameover_stop() {
+    vTaskDelete(text_task);
 }
 
 
