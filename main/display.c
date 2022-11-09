@@ -1,6 +1,9 @@
 #include <driver/gpio.h>
 #include <driver/spi_master.h>
 #include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/semphr.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -10,14 +13,12 @@
 
 static const char *TAG = "starman-display";
 
-//  0 indicates no LED in physical display
-// >0 indicates where in the ledbuffer array the LED is located
-uint16_t display_out[DISPLAY_LIGHTS_TOTAL];
+static SemaphoreHandle_t xSemaphore = NULL;
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
 void display_update_leds(display_t* display) {
-    memset(display_out, 0, DISPLAY_LIGHTS_TOTAL * 2);
+    uint16_t display_out[DISPLAY_LIGHTS_TOTAL] = {0};
 
     for (int y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (int x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
@@ -49,14 +50,22 @@ void display_update_leds(display_t* display) {
         }
     }
 
-    led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
-    led1642gw_flush_buffer();
+    if (xSemaphoreTake(xSemaphore, (TickType_t) 1000) == pdTRUE) {
+        led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
+        led1642gw_flush_buffer();
+
+        xSemaphoreGive(xSemaphore);
+    }
+    else {
+        // We should never be blocked for more than 1000 ticks unless something went very wrong.
+        ESP_LOGW(TAG, "Failed to get semaphore lock -- skipping frame");
+    }
 }
 
 
 // Raw access to LEDs output array, ignoring the LUT.  (Useful to debug the LUT!)
 void display_update_leds_raw(uint8_t* active) {
-    memset(display_out, 0, DISPLAY_LIGHTS_TOTAL * 2);
+    uint16_t display_out[DISPLAY_LIGHTS_TOTAL] = {0};
 
     for (int i = 0; i < DISPLAY_LIGHTS_TOTAL; i++) {
         display_out[i] = active[i] * 256;
@@ -73,13 +82,15 @@ void display_reset(display_t* display) {
             free(display->text[i]);
         }
         free(display->text);
+        display->text = NULL;
     }
-    memset(&display, 0, sizeof(display_t));
+    memset(display, 0, sizeof(display_t));
 }
 
 
 void display_init(void) {
     led1642gw_init();
+    xSemaphore = xSemaphoreCreateMutex();
 
     ESP_LOGI(TAG, "Init sucessful");
 }

@@ -260,8 +260,8 @@ void patterns_gameover() {
     display.pattern = &sweep;
 
     display_reset(&display);
-    // memcpy(display.background, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    text_write_string(&display, "   GAME OVER");
+    memcpy(display.background, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    text_write_string(&display, "  GAME OVER");
     callback_func = patterns_gameover_step;
     xTaskCreate(patterns_gameover_text_step, "gameover", 8192, NULL, 5, &text_task);
 }
@@ -276,7 +276,7 @@ static void patterns_gameover_text_step() {
     while(1) {
         text_scroll(&display);
         display_update_leds(&display);
-        vTaskDelay(75 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 }
 
