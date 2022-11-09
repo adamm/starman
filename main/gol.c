@@ -52,11 +52,11 @@ void gol_next_generation(display_t *display) {
         }
     }
  
-    memset(display->active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
+    memset(display->overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     for (y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             if (next_gen[y+GOL_GRID_OFFSET_Y][x+GOL_GRID_OFFSET_X] > 0)
-                display->active[y][x] = 255;
+                display->overlay[y][x] = 255;
         }
     }
 

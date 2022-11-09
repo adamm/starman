@@ -25,7 +25,9 @@ void display_update_leds(display_t* display) {
             if (LED_LUT[y][x] > 0) {
                 // The pattern range is 8-bits, but the LED PWM driver supports 16-bits of brightnesses.
                 // Until the pattern is expanded to 16-bits, just multiply the pattern value by 256.
-                display_out[LED_LUT[y][x]-1] = display->active[y][x] * 256;
+                if (display->background[y][x] > 0) {
+                    display_out[LED_LUT[y][x]-1] = display->background[y][x] * 256;
+                }
                 if (display->overlay[y][x] > 0) {
                     display_out[LED_LUT[y][x]-1] = display->overlay[y][x] * 256;
                 }
@@ -62,6 +64,17 @@ void display_update_leds_raw(uint8_t* active) {
 
     led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
     led1642gw_flush_buffer();
+}
+
+
+void display_reset(display_t* display) {
+    if (display->text != NULL) {
+        for (uint8_t i = 0; i < display->text_height; i++) {
+            free(display->text[i]);
+        }
+        free(display->text);
+    }
+    memset(&display, 0, sizeof(display_t));
 }
 
 
