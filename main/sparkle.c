@@ -57,7 +57,7 @@ static const uint8_t sparkle_ball[9][9] = {
 
 void sparkle_step() {
     while(1) {
-        memset(display.background, 1, DISPLAY_LIGHTS_TOTAL_AREA);
+        memset(display.background, 25, DISPLAY_LIGHTS_TOTAL_AREA);
         for (uint8_t i = 0; i < SPARKLE_MAX_LEDS; i++) {
             // Go through each of the active sparkle LEDs, and use 
             // sparkle_state to identify how "bright" the sparkle is.

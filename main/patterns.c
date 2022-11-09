@@ -389,13 +389,21 @@ void patterns_random() {
     ESP_LOGI(TAG, "Begin RANDOM pattern");
 
     display_reset(&display);
-    callback_func = patterns_lines_step;
+    callback_func = patterns_random_step;
     patterns_random_step();
 }
 
 
 static void patterns_random_step() {
+    uint8_t i, j;
     esp_fill_random(display.background, DISPLAY_LIGHTS_TOTAL_AREA);
+
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            display.background[i][j] >>= 7;
+            display.background[i][j] <<= 7;
+        }
+    }
 }
 
 

@@ -97,7 +97,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_random;
+        level_pattern = patterns_swipe;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
