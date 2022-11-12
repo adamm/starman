@@ -19,6 +19,7 @@
 
 #include "config.h"
 #include "rgb.h"
+#include "ota.h"
 #include "storage.h"
 #include "wifi.h"
 
@@ -266,6 +267,8 @@ esp_err_t wifi_init(void)
 
     if (err != ESP_OK)
         esp_wifi_stop();
+    else
+        ota_upgrade();
 
     return err;
 }

@@ -2,8 +2,8 @@
 #define OTA_H
 
 
-uint8_t ota_init();
-uint8_t ota_upgrade(char* channel);
+uint8_t ota_init(void);
+uint8_t ota_upgrade(void);
 
 
 #endif

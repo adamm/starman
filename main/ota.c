@@ -18,11 +18,11 @@
 static const char *TAG = "starman-ota";
 
 
-static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_channel)
+static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_track)
 {
     int compVersion = 0;
-    char* device_channel = server_channel;
-    // FIXME: Retrieve the device OTA channel from NVS, if it's there.
+    char* device_track = config_firmware_track;
+    // FIXME: Retrieve the device OTA track from NVS, if it's there.
     // FIXME: Remember to set it after a sucessful OTA upgrade!
 
     if (new_app_info == NULL) {
@@ -32,11 +32,11 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
     const esp_partition_t *running = esp_ota_get_running_partition();
     esp_app_desc_t running_app_info;
     if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK)
-        ESP_LOGI(TAG, "Device firmware version: %s (%s)", running_app_info.version, device_channel);
+        ESP_LOGI(TAG, "Device firmware version: %s (%s)", running_app_info.version, device_track);
     else
         return ESP_ERR_INVALID_ARG;
 
-    ESP_LOGI(TAG, "Server firmware version: %s (%s)", new_app_info->version, server_channel);
+    ESP_LOGI(TAG, "Server firmware version: %s (%s)", new_app_info->version, server_track);
 
     compVersion = memcmp(new_app_info->version, running_app_info.version, sizeof(new_app_info->version));
 
@@ -46,10 +46,10 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
     }
     else if (compVersion < 0) {
         // Technically if the user is transitioning the device from the
-        // unstable channel to testing or stable, the firmware on the server
+        // unstable track to testing or stable, the firmware on the server
         // will be older.  We should still allow the OTA download and "upgrade"
-        // to the new channel's build version.
-        if (strcmp(device_channel, server_channel) == 0) {
+        // to the new track's build version.
+        if (strcmp(device_track, server_track) == 0) {
             ESP_LOGW(TAG, "Current device version is newer than the firmware server. Nothing to update.");
             return ESP_FAIL;
         }
@@ -87,7 +87,7 @@ static void print_sha256 (const uint8_t *image_hash, const char *label)
 }
 
 
-uint8_t ota_init() {
+uint8_t ota_init(void) {
     uint8_t sha_256[HASH_LEN] = { 0 };
     esp_partition_t partition;
 
@@ -111,6 +111,10 @@ uint8_t ota_init() {
 
     const esp_partition_t *running = esp_ota_get_running_partition();
     esp_ota_img_states_t ota_state;
+    esp_app_desc_t running_app_info;
+    if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK)
+        ESP_LOGI(TAG, "Device firmware version: %s", running_app_info.version);
+
     if (esp_ota_get_state_partition(running, &ota_state) == ESP_OK) {
         if (ota_state == ESP_OTA_IMG_PENDING_VERIFY) {
             if (esp_ota_mark_app_valid_cancel_rollback() == ESP_OK) {
@@ -124,13 +128,14 @@ uint8_t ota_init() {
 }
 
 
-uint8_t ota_upgrade(char* channel) {
+uint8_t ota_upgrade(void) {
     char firmware_url[50] = {0};
+    char* track = config_firmware_track;
 
     bzero(firmware_url, sizeof(firmware_url));
     strlcpy(firmware_url, config_firmware_service_url, strlen(config_firmware_service_url) + 1);
     strlcat(firmware_url, "/", strlen(firmware_url) + 2);
-    strlcat(firmware_url, channel, strlen(firmware_url) + strlen(channel) + 1);
+    strlcat(firmware_url, track, strlen(firmware_url) + strlen(track) + 1);
     ESP_LOGI(TAG, "Starting OTA: %s", firmware_url);
 
     esp_err_t ota_finish_err = ESP_OK;
@@ -159,7 +164,7 @@ uint8_t ota_upgrade(char* channel) {
         ESP_LOGE(TAG, "esp_https_ota_read_img_desc failed");
         goto ota_end;
     }
-    err = validate_image_header(&app_desc, channel);
+    err = validate_image_header(&app_desc, track);
     if (err != ESP_OK) {
         // ESP_LOGE(TAG, "image header verification failed");
         goto ota_end;

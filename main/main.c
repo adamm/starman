@@ -5,6 +5,7 @@
 #include "config.h"
 #include "display.h"
 #include "music.h"
+#include "ota.h"
 #include "patterns.h"
 #include "patterns_gol.h"
 #include "random.h"
@@ -267,5 +268,7 @@ void app_main(void) {
 
     // Wifi is last as it can take a few moments -- this way the sparkle and
     // game can begin even without wifi being ready.
+    ota_init();
     wifi_init();
+    // wifi_init() calls ota_upgrade() once connected
 }

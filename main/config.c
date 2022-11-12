@@ -16,10 +16,14 @@ void config_init() {
 
     err = storage_get_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, &len);
     ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, len, err);
+
+    err = storage_get_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track, &len);
+    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_TRACK_KEY, config_firmware_service_url, len, err);
 }
 
 
 void config_save() {
     storage_set_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url);
+    storage_set_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track);
 }
 
