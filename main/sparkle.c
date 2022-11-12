@@ -10,6 +10,7 @@
 #include "display.h"
 #include "random.h"
 #include "sparkle.h"
+#include "text.h"
 
 static const char *TAG = "starman-sparkle";
 static uint8_t sparkle_leds[SPARKLE_MAX_LEDS];
@@ -17,6 +18,7 @@ static int16_t sparkle_state[SPARKLE_MAX_LEDS];
 static bool sparkle_direction[SPARKLE_MAX_LEDS];
 static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
+static TaskHandle_t scroller_task;
 static display_t display;
 
 // static const uint8_t sparkle_1[3][3] = {
@@ -143,9 +145,15 @@ void debug_step() {
     i++;
 }
 
+display_t* sparkle_get_display(void) {
+    return &display;
+}
+
 
 void sparkle_start(void) {
     ESP_LOGI(TAG, "Start sparkle thread");
+
+    display_reset(&display);
 
     // Seed the sparkle pattern by selecting random LEDs, each of which have
     // a random state, and moving in a random direction.
@@ -165,5 +173,42 @@ void sparkle_start(void) {
 void sparkle_stop(void) {
     ESP_LOGI(TAG, "Stop sparkle thread");
 
-    vTaskDelete(sparkle_task);
+    if (sparkle_task != NULL) {
+        vTaskDelete(sparkle_task);
+        sparkle_task = NULL;
+    }
+
+    if (scroller_task != NULL) {
+        vTaskDelete(scroller_task);
+        scroller_task = NULL;
+    }
+}
+
+
+void sparkle_scroll_step() {
+    TickType_t delay = 75;
+    TickType_t stopAt = 500;
+    TickType_t start_ticks = xTaskGetTickCount();
+    TickType_t now_ticks = xTaskGetTickCount();
+
+    while(1) {
+        now_ticks = xTaskGetTickCount();
+        text_scroll(&display);
+        if (now_ticks - start_ticks > stopAt) {
+            // Keep the display object intact; only clear the text portion.
+            text_clear_string(&display);
+            scroller_task = NULL;
+            vTaskDelete(NULL);
+        }
+        else {
+            vTaskDelay(delay / portTICK_RATE_MS);
+        }
+    }
+}
+
+
+
+void sparkle_scroll_string(char* string) {
+    text_write_string(&display, string); // Inform the user what the IP address is.
+    xTaskCreate(sparkle_scroll_step, "text", 8192, NULL, 0, &scroller_task);
 }

@@ -36,6 +36,7 @@ static EventGroupHandle_t s_wifi_event_group;
 static const char *TAG = "starman-wifi";
 
 static int s_retry_num = 0;
+static char ip_addr_str[17] = {0};
 
 
 static void get_device_service_name(char *service_name, size_t max)
@@ -167,10 +168,16 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip: " IPSTR, IP2STR(&event->ip_info.ip));
+        sprintf(ip_addr_str, IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG, "got ip: %s", ip_addr_str);
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
+}
+
+
+char* wifi_get_ip_str() {
+    return ip_addr_str;
 }
 
 

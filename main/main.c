@@ -270,6 +270,14 @@ void app_main(void) {
     // game can begin even without wifi being ready.
     if (wifi_init() == ESP_OK) {
         ota_init();
-        ota_upgrade();
+        ota_upgrade(); // Combines checking if an upgrade exists, downloading, and installing it.
+
+        // If OTA update is successful, the device reboots.  Otherwise, continue
+        // to show the current IP and start the normal game process.
+
+        char ip_str[20] = {0};
+        // Leaving a little space infront of the IP address makes it easier to read when scrolling.
+        sprintf(ip_str, "    %s", wifi_get_ip_str());
+        sparkle_scroll_string(ip_str);
     }
 }

@@ -3,7 +3,7 @@
 
 
 
-
+char* wifi_get_ip_str();
 esp_err_t wifi_init(void);
 
 

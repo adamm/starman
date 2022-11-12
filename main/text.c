@@ -1,3 +1,5 @@
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <esp_log.h>
 #include <string.h>
 #include <stdio.h>
@@ -69,12 +71,7 @@ void text_write_string(display_t* display, char* string) {
 
     ESP_LOGI(TAG, "%s", string);
 
-    if (display->text != NULL) {
-        for (uint8_t i = 0; i < display->text_height; i++) {
-            free(display->text[i]);
-        }
-        free(display->text);
-    }
+    text_clear_string(display);
 
     // Only one line of text is supported.
     display->text_height = FONT.char_height;
@@ -105,3 +102,15 @@ void text_write_string(display_t* display, char* string) {
 */
 }
 
+
+void text_clear_string(display_t* display) {
+    if (display->text != NULL) {
+        for (uint8_t i = 0; i < display->text_height; i++) {
+            free(display->text[i]);
+        }
+        free(display->text);
+        display->text = NULL;
+    }
+    display->text_height = 0;
+    display->text_width = 0;
+}
