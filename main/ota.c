@@ -192,6 +192,7 @@ uint8_t ota_upgrade(void) {
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
             ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
             vTaskDelay(4000 / portTICK_PERIOD_MS);
+            esp_restart();
             return 1;
         } else {
             if (ota_finish_err == ESP_ERR_OTA_VALIDATE_FAILED) {
