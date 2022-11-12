@@ -6,10 +6,12 @@
 #include <esp_system.h>
 #include <esp_flash_partitions.h>
 #include <esp_partition.h>
+#include <math.h>
 #include <string.h>
 
 #include "config.h"
 #include "rgb.h"
+#include "text.h"
 #include "ota.h"
 
 #define BUFFSIZE 1024
@@ -170,16 +172,26 @@ uint8_t ota_upgrade(void) {
         goto ota_end;
     }
 
+    uint32_t image_total_size = 0;
+    uint32_t image_download_size = 0;
+    float image_download_percent = 0;
+    uint8_t image_download_percent_rounded = 0;
+
     while (1) {
         // status_downloading();
         err = esp_https_ota_perform(https_ota_handle);
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
         }
+        image_total_size = esp_https_ota_get_image_size(https_ota_handle);
+        image_download_size = esp_https_ota_get_image_len_read(https_ota_handle);
+        image_download_percent = (image_download_size / image_total_size) * 100;
+        image_download_percent_rounded = floor(image_download_percent);
+
         // esp_https_ota_perform returns after every read operation which gives user the ability to
         // monitor the status of OTA upgrade by calling esp_https_ota_get_image_len_read, which gives length of image
         // data read so far.
-        ESP_LOGI(TAG, "Image bytes read: %d", esp_https_ota_get_image_len_read(https_ota_handle));
+        ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
         // status_waiting();
     }
     // status_resetting();
