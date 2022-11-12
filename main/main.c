@@ -268,7 +268,8 @@ void app_main(void) {
 
     // Wifi is last as it can take a few moments -- this way the sparkle and
     // game can begin even without wifi being ready.
-    ota_init();
-    wifi_init();
-    // wifi_init() calls ota_upgrade() once connected
+    if (wifi_init() == ESP_OK) {
+        ota_init();
+        ota_upgrade();
+    }
 }

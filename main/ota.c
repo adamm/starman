@@ -10,7 +10,9 @@
 #include <string.h>
 
 #include "config.h"
+#include "display.h"
 #include "rgb.h"
+#include "sparkle.h"
 #include "text.h"
 #include "ota.h"
 
@@ -172,10 +174,16 @@ uint8_t ota_upgrade(void) {
         goto ota_end;
     }
 
-    uint32_t image_total_size = 0;
+    uint32_t image_total_size = esp_https_ota_get_image_size(https_ota_handle);
     uint32_t image_download_size = 0;
     float image_download_percent = 0;
     uint8_t image_download_percent_rounded = 0;
+    char progress_text[10] = {0};
+    display_t* display = NULL;
+
+    sparkle_stop();
+    display = malloc(sizeof(display_t));
+    memset(display, 0, sizeof(display_t));
 
     while (1) {
         // status_downloading();
@@ -183,22 +191,24 @@ uint8_t ota_upgrade(void) {
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
         }
-        image_total_size = esp_https_ota_get_image_size(https_ota_handle);
         image_download_size = esp_https_ota_get_image_len_read(https_ota_handle);
-        image_download_percent = (image_download_size / image_total_size) * 100;
+        image_download_percent = (float)image_download_size / (float)image_total_size * 100.0;
         image_download_percent_rounded = floor(image_download_percent);
 
-        // esp_https_ota_perform returns after every read operation which gives user the ability to
-        // monitor the status of OTA upgrade by calling esp_https_ota_get_image_len_read, which gives length of image
-        // data read so far.
-        ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
+        // ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
+
+        sprintf(progress_text, "%d%%", image_download_percent_rounded);
+        text_write_string(display, progress_text);
+        display_update_leds(display);
         // status_waiting();
     }
     // status_resetting();
+    free(display);
 
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
         // the OTA image was not completely received and user can customise the response to this situation.
         ESP_LOGE(TAG, "Complete data was not received.");
+        sparkle_start();
     } else {
         ota_finish_err = esp_https_ota_finish(https_ota_handle);
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
@@ -211,6 +221,7 @@ uint8_t ota_upgrade(void) {
                 ESP_LOGE(TAG, "Image validation failed, image is corrupted");
             }
             ESP_LOGE(TAG, "ESP_HTTPS_OTA upgrade failed 0x%x", ota_finish_err);
+            sparkle_start();
             return 0;
         }
     }

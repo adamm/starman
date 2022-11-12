@@ -65,7 +65,7 @@ void text_draw_char(display_t* display, uint8_t x, uint8_t y, char chr) {
 
 void text_write_string(display_t* display, char* string) {
     uint16_t pos = 0;
-    uint16_t x = 0;
+    uint16_t x = 3;
 
     ESP_LOGI(TAG, "%s", string);
 
@@ -78,11 +78,11 @@ void text_write_string(display_t* display, char* string) {
 
     // Only one line of text is supported.
     display->text_height = FONT.char_height;
-    display->text_width = strlen(string) * FONT.char_width;
+    display->text_width = x + (strlen(string) * FONT.char_width);
     display->text = malloc(display->text_height * sizeof(uint8_t*));
     for (uint8_t i = 0; i < display->text_height; i++) {
         display->text[i] = malloc(display->text_width * sizeof(uint8_t));
-        memset(display->text[i], i, display->text_width);
+        memset(display->text[i], 0, display->text_width);
     }
 
     for (pos = 0; pos < strlen(string); pos++) {
@@ -90,6 +90,7 @@ void text_write_string(display_t* display, char* string) {
         x += FONT.char_width;
     }
 
+/*
     for (uint8_t c = 0; c < display->text_width; c++) {
         printf("\t%d", c);
     }
@@ -101,6 +102,6 @@ void text_write_string(display_t* display, char* string) {
         }
         printf("\n");
     }
-
+*/
 }
 
