@@ -264,20 +264,19 @@ void play_game(void) {
 void wifi_connected(void *pvParameter) {
     ip_event_got_ip_t* param = (ip_event_got_ip_t*)pvParameter;
 
-    /* transform IP to human readable string */
-    char ip_str[20] = {0};
-    ip_str[0] = ' ';
-    ip_str[1] = ' ';
-    ip_str[2] = ' ';
-    esp_ip4addr_ntoa(&param->ip_info.ip, ip_str+3, IP4ADDR_STRLEN_MAX);
+    // Transform IP to human readable string, preceeded by 4 spaces
+    // This makes it easier to see as it scrolls by during the sparkle routine
+    char ip_str[21] = {0};
+    memset(ip_str, ' ', 4);
+    esp_ip4addr_ntoa(&param->ip_info.ip, ip_str+4, IP4ADDR_STRLEN_MAX);
 
-    ESP_LOGI(TAG, "I have a connection and my IP is %s!", ip_str);
+    ESP_LOGI(TAG, "Our IP address is %s!", ip_str);
 
     ota_init();
     ota_upgrade(); // Combines checking if an upgrade exists, downloading, and installing it.
 
-    // If OTA update is successful, the device reboots.  Otherwise, continue
-    // to show the current IP and start the normal game process.
+    // If OTA update is successful, starman will reboot with the new firmware version.
+    // Otherwise, it will scroll the current IP, and begin the normal game process.
 
     // Leaving a little space infront of the IP address makes it easier to read when scrolling.
     sparkle_scroll_string(ip_str);

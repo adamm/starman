@@ -84,7 +84,12 @@ void text_write_string(display_t* display, char* string) {
 
     for (pos = 0; pos < strlen(string); pos++) {
         text_draw_char(display, x, 0, string[pos]);
-        x += FONT.char_width;
+        // Although this is a mono-spaced font, identify the period as 2 pixels wide, not 4.
+        // This makes reading the IP address easier as it scrolls by.
+        if (string[pos] == '.')
+            x += 2;
+        else
+            x += FONT.char_width;
     }
 
 /*
