@@ -4,6 +4,7 @@ idf_component_register(SRCS
                     "config.c"
                     "display.c"
                     "gol.c"
+                    "httpd.c"
                     "led1642gw.c"
                     "music.c"
                     "network.c"
@@ -15,5 +16,4 @@ idf_component_register(SRCS
                     "storage.c"
                     "text.c"
                     "util.c"
-                    "wifi.c"
                     INCLUDE_DIRS ".")

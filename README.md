@@ -7,20 +7,19 @@ and could catch fire. The PCB board is largely inefficient, expensive,
 broken, and could catch fire.
 
 Version 1 of the star is a POC I created a few years ago which was literally
-a 3d-printed star with 24 LEDs hot-glued onto it, driven by a [LED PWM
-module](https://github.com/adafruit/Adafruit_TLC5947) from Adafruit,
-running from an Arduino Uno.
-
-Music was produced using 3 PWM channels driven by [Arduino Playtune](https://github.com/LenShustek/arduino-playtune) library.
-
-There is a Youtube demo of version 1: https://www.youtube.com/watch?v=mx5et6Ui8Hc but here it is in action.
-
-![Starman v1 tree video](images/starman-tree.gif)
+a 3d-printed star with 24 LEDs hot-glued onto it, driven by a LED PWM
+module from Adafruit, 3 PWM channels for audio, running from an Arduino Uno.
 
 Version 2 is a complete redesign for 2022, including a custom PCB, 144
 LEDs, 235 components, ESP32-S3 MCU, esp-idf framework, and WiFi/Bluetooth
 support.  Audio is driven by 4 PWM channels, featuring a volume control and
 a class-D amplifier.
+
+You can see v2 in action here: https://www.youtube.com/watch?v=h6fquYPDars
+
+[![Starman v2 Christmas Tree Star](https://img.youtube.com/vi/h6fquYPDars/0.jpg)](https://www.youtube.com/watch?v=h6fquYPDars)
+
+The PCB is created using KiCad:
 
 ![Starman v2 PCB front](images/pcba-front.png)
 ![Starman v2 PCB back](images/pcba-back.png)
@@ -56,7 +55,7 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Unique light pattern per music song/state
 - [X] Flash lights in sequence with music
 - [X] GPIO play button
-- [ ] Show simple text messages
+- [X] Show simple text messages
 - [X] WiFi onboarding process
 - [ ] Over-the-air firmware updates
 - [ ] WiFi play button
@@ -82,6 +81,9 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 2022-10-29
 - Framework for connecting to wifi / performing OTA updates
 
+2022-11-02
+- Framework for showing basic text messages, like "Game Over", "Connect to Wifi", "Firmware Update in progress", etc
+
 ## Key Components
 
 - ESP32-S3-Mini module
@@ -99,5 +101,4 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
 ## Build Dependencies
 
-- ESP-IDF framework
-  - https://www.thingiverse.com/thing:194864
+- See [BUILDING](BUILDING.md) document.

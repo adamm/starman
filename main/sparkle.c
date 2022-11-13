@@ -10,6 +10,7 @@
 #include "display.h"
 #include "random.h"
 #include "sparkle.h"
+#include "text.h"
 
 static const char *TAG = "starman-sparkle";
 static uint8_t sparkle_leds[SPARKLE_MAX_LEDS];
@@ -17,6 +18,7 @@ static int16_t sparkle_state[SPARKLE_MAX_LEDS];
 static bool sparkle_direction[SPARKLE_MAX_LEDS];
 static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
+static TaskHandle_t scroller_task;
 static display_t display;
 
 // static const uint8_t sparkle_1[3][3] = {
@@ -57,7 +59,7 @@ static const uint8_t sparkle_ball[9][9] = {
 
 void sparkle_step() {
     while(1) {
-        memset(display.active, 1, DISPLAY_LIGHTS_TOTAL_AREA);
+        memset(display.background, 25, DISPLAY_LIGHTS_TOTAL_AREA);
         for (uint8_t i = 0; i < SPARKLE_MAX_LEDS; i++) {
             // Go through each of the active sparkle LEDs, and use 
             // sparkle_state to identify how "bright" the sparkle is.
@@ -96,7 +98,7 @@ void sparkle_step() {
             int8_t y = sparkle_leds[i] % DISPLAY_LIGHTS_WIDTH;
 
             // ESP_LOGI(TAG, "(%d, %d) = %x", x, y, sparkle_state[i]);
-            // display.active[y][x] = sparkle_state[i];
+            // display.background[y][x] = sparkle_state[i];
 
             // Use sparkle_state to identify adjacent LEDs. Set their
             // brightness relative to the distance from the centre of the
@@ -116,15 +118,15 @@ void sparkle_step() {
                     uint16_t px = sparkle_state[i] * sparkle_ball[sy][sx] / SPARKLE_MAX_STATE;
                     
                     // Only draw the sparkle ball pixel if the current pixel is darker
-                    if (px > display.active[y+dy][x+dx]) {
-                        // ESP_LOGI(TAG, "ball(%d) xy(%d,%d) sxy(%d,%d) dxy(%d,%d) xdxy(%d,%d) state(%d) ball(%d) px(%d) -> fb(%d)", i, x, y, sx, sy, dx, dy, x+dx, dx+dy, sparkle_state[i], sparkle_1[sy][sx], px, display.active[y+sy][x+sx]);
-                        display.active[y+dy][x+dx] = px;
+                    if (px > display.background[y+dy][x+dx]) {
+                        // ESP_LOGI(TAG, "ball(%d) xy(%d,%d) sxy(%d,%d) dxy(%d,%d) xdxy(%d,%d) state(%d) ball(%d) px(%d) -> fb(%d)", i, x, y, sx, sy, dx, dy, x+dx, dx+dy, sparkle_state[i], sparkle_1[sy][sx], px, display.background[y+sy][x+sx]);
+                        display.background[y+dy][x+dx] = px;
                     }
                 }
             }
         }
 
-        // ESP_LOG_BUFFER_HEX(TAG, display.active, DISPLAY_LIGHTS_TOTAL_AREA);
+        // ESP_LOG_BUFFER_HEX(TAG, display.background, DISPLAY_LIGHTS_TOTAL_AREA);
         display_update_leds(&display);
 
         vTaskDelay(SPARKLE_RATE_MS / portTICK_RATE_MS);
@@ -143,9 +145,15 @@ void debug_step() {
     i++;
 }
 
+display_t* sparkle_get_display(void) {
+    return &display;
+}
+
 
 void sparkle_start(void) {
     ESP_LOGI(TAG, "Start sparkle thread");
+
+    display_reset(&display);
 
     // Seed the sparkle pattern by selecting random LEDs, each of which have
     // a random state, and moving in a random direction.
@@ -165,5 +173,42 @@ void sparkle_start(void) {
 void sparkle_stop(void) {
     ESP_LOGI(TAG, "Stop sparkle thread");
 
-    vTaskDelete(sparkle_task);
+    if (sparkle_task != NULL) {
+        vTaskDelete(sparkle_task);
+        sparkle_task = NULL;
+    }
+
+    if (scroller_task != NULL) {
+        vTaskDelete(scroller_task);
+        scroller_task = NULL;
+    }
+}
+
+
+void sparkle_scroll_step() {
+    TickType_t delay = 75;
+    TickType_t stopAt = 500;
+    TickType_t start_ticks = xTaskGetTickCount();
+    TickType_t now_ticks = xTaskGetTickCount();
+
+    while(1) {
+        now_ticks = xTaskGetTickCount();
+        text_scroll(&display);
+        if (now_ticks - start_ticks > stopAt) {
+            // Keep the display object intact; only clear the text portion.
+            text_clear_string(&display);
+            scroller_task = NULL;
+            vTaskDelete(NULL);
+        }
+        else {
+            vTaskDelay(delay / portTICK_RATE_MS);
+        }
+    }
+}
+
+
+
+void sparkle_scroll_string(char* string) {
+    text_write_string(&display, string); // Inform the user what the IP address is.
+    xTaskCreate(sparkle_scroll_step, "text", 8192, NULL, 0, &scroller_task);
 }

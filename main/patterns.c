@@ -55,7 +55,7 @@ static void patterns_waves_step();
 static void invert() {
     for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-            display.active[y][x] = 255 - display.active[y][x];
+            display.background[y][x] = 255 - display.background[y][x];
         }
     }
 }
@@ -64,46 +64,46 @@ static void invert() {
 static void scroll(int8_t rows, int8_t cols, bool copy, uint8_t fill) {
     if (rows > 0) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
-        memcpy(temp, display.active[0], DISPLAY_LIGHTS_WIDTH);
+        memcpy(temp, display.background[0], DISPLAY_LIGHTS_WIDTH);
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT - 1; y++) {
-            memcpy(display.active[y], display.active[y + 1], DISPLAY_LIGHTS_WIDTH);
+            memcpy(display.background[y], display.background[y + 1], DISPLAY_LIGHTS_WIDTH);
         }
         if (!copy)
             memset(temp, fill, DISPLAY_LIGHTS_WIDTH);
-        memcpy(display.active[DISPLAY_LIGHTS_HEIGHT - 1], temp, DISPLAY_LIGHTS_WIDTH);
+        memcpy(display.background[DISPLAY_LIGHTS_HEIGHT - 1], temp, DISPLAY_LIGHTS_WIDTH);
     }
     else if (rows < 0) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
-        memcpy(temp, display.active[DISPLAY_LIGHTS_HEIGHT-1], DISPLAY_LIGHTS_WIDTH);
+        memcpy(temp, display.background[DISPLAY_LIGHTS_HEIGHT-1], DISPLAY_LIGHTS_WIDTH);
         for (uint8_t y = DISPLAY_LIGHTS_HEIGHT - 1; y > 0; y--) {
-            memcpy(display.active[y], display.active[y - 1], DISPLAY_LIGHTS_WIDTH);
+            memcpy(display.background[y], display.background[y - 1], DISPLAY_LIGHTS_WIDTH);
         }
         if (!copy)
             memset(temp, fill, DISPLAY_LIGHTS_WIDTH);
-        memcpy(display.active[0], temp, DISPLAY_LIGHTS_WIDTH);
+        memcpy(display.background[0], temp, DISPLAY_LIGHTS_WIDTH);
     }
     if (cols > 0) {
         uint8_t temp = 0;
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            temp = display.active[y][0];
+            temp = display.background[y][0];
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH - 1; x++) {
-                display.active[y][x] = display.active[y][x + 1];
+                display.background[y][x] = display.background[y][x + 1];
             }
             if (!copy)
                 temp = fill;
-            display.active[y][DISPLAY_LIGHTS_WIDTH - 1] = temp;
+            display.background[y][DISPLAY_LIGHTS_WIDTH - 1] = temp;
         }
     }
     else if (cols < 0) {
         uint8_t temp = 0;
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
-            temp = display.active[y][DISPLAY_LIGHTS_WIDTH-1];
+            temp = display.background[y][DISPLAY_LIGHTS_WIDTH-1];
             for (uint8_t x = DISPLAY_LIGHTS_WIDTH - 1; x > 0; x--) {
-                display.active[y][x] = display.active[y][x - 1];
+                display.background[y][x] = display.background[y][x - 1];
             }
             if (!copy)
                 temp = fill;
-            display.active[y][0] = temp;
+            display.background[y][0] = temp;
         }
     }
 }
@@ -122,13 +122,13 @@ static void rotate(int8_t degrees) {
         // Transpose x,y then reverse columns
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             for (uint8_t x = y+1; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                swap(&display.active[y][x], &display.active[x][y]);
+                swap(&display.background[y][x], &display.background[x][y]);
             }
         }
 
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH / 2; x++) {
-                swap(&display.active[y][x], &display.active[y][DISPLAY_LIGHTS_WIDTH - x - 1]);
+                swap(&display.background[y][x], &display.background[y][DISPLAY_LIGHTS_WIDTH - x - 1]);
             }
         }
     }
@@ -136,13 +136,13 @@ static void rotate(int8_t degrees) {
         // transpose x,y then reverse rows
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
             for (uint8_t x = y+1; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                swap(&display.active[y][x], &display.active[x][y]);
+                swap(&display.background[y][x], &display.background[x][y]);
             }
         }
 
         for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT / 2; y++) {
             for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-                swap(&display.active[y][x], &display.active[DISPLAY_LIGHTS_HEIGHT - y - 1][x]);
+                swap(&display.background[y][x], &display.background[DISPLAY_LIGHTS_HEIGHT - y - 1][x]);
             }
         }
     }
@@ -157,7 +157,7 @@ void patterns_step_sequence() {
         callback_func();
     }
 
-    // ESP_LOG_BUFFER_HEXDUMP(TAG, display.active, DISPLAY_LIGHTS_TOTAL_AREA, ESP_LOG_INFO);
+    // ESP_LOG_BUFFER_HEXDUMP(TAG, display.background, DISPLAY_LIGHTS_TOTAL_AREA, ESP_LOG_INFO);
 
     display_update_leds(&display);
 }
@@ -166,9 +166,9 @@ void patterns_step_sequence() {
 void patterns_castle() {
     ESP_LOGI(TAG, "Begin CASTLE pattern");
 
+    display_reset(&display);
     display.pattern = &castle;
-    memcpy(display.active, castle.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, castle.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_castle_step;
 }
 
@@ -182,9 +182,9 @@ static void patterns_castle_step() {
 void patterns_checkered() {
     ESP_LOGI(TAG, "Begin CHECKERED pattern");
 
+    display_reset(&display);
     display.pattern = &checkered;
-    memcpy(display.active, checkered.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, checkered.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_checkered_step;
 }
 
@@ -198,9 +198,9 @@ static void patterns_checkered_step() {
 void patterns_curtains() {
     ESP_LOGI(TAG, "Begin CURTAINS pattern");
 
+    display_reset(&display);
     display.pattern = &curtains;
-    memcpy(display.active, curtains.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, curtains.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_curtains_step;
 }
 
@@ -214,9 +214,9 @@ static void patterns_curtains_step() {
 void patterns_diamonds() {
     ESP_LOGI(TAG, "Begin DIAMONDS pattern");
 
+    display_reset(&display);
     display.pattern = &diamonds;
-    memcpy(display.active, diamonds.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, diamonds.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_diamonds_step;
 }
 
@@ -229,9 +229,10 @@ static void patterns_diamonds_step() {
 void patterns_fireworks() {
     ESP_LOGI(TAG, "Begin FIREWORKS pattern");
 
+    display_reset(&display);
     // TBD
     // display.pattern = &fireworks;
-    // memcpy(display.active, fireworks.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    // memcpy(display.background, fireworks.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_fireworks_step;
 }
 
@@ -244,9 +245,8 @@ static void patterns_fireworks_step() {
 void patterns_flash() {
     ESP_LOGI(TAG, "Begin FLASH pattern");
 
+    display_reset(&display);
     display.pattern = NULL;
-    memset(display.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_flash_step;
 }
 
@@ -259,11 +259,10 @@ static void patterns_flash_step() {
 void patterns_gameover() {
     display.pattern = &sweep;
 
-    // memcpy(display.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    text_write_string(&display, "   GAME OVER");
-    // callback_func = patterns_gameover_step;
+    display_reset(&display);
+    memcpy(display.background, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    text_write_string(&display, "  GAME OVER");
+    callback_func = patterns_gameover_step;
     xTaskCreate(patterns_gameover_text_step, "gameover", 8192, NULL, 5, &text_task);
 }
 
@@ -276,7 +275,8 @@ static void patterns_gameover_step() {
 static void patterns_gameover_text_step() {
     while(1) {
         text_scroll(&display);
-        vTaskDelay(75 / portTICK_RATE_MS);
+        display_update_leds(&display);
+        vTaskDelay(100 / portTICK_RATE_MS);
     }
 }
 
@@ -287,7 +287,7 @@ void patterns_gameover_stop() {
 
 
 static void patterns_gol_step() {
-    // Use Game of Life rules to animate the active pattern
+    // Use Game of Life rules to animate the.background pattern
     gol_next_generation(&display);
 }
 
@@ -295,9 +295,8 @@ static void patterns_gol_step() {
 void patterns_gol_cross_2() {
     ESP_LOGI(TAG, "Begin GOL_CROSS_2 pattern");
 
-    display.pattern = NULL;
+    display_reset(&display);
     memcpy(display.grid, gol_cross_2, GOL_GRID_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -305,9 +304,8 @@ void patterns_gol_cross_2() {
 void patterns_gol_four_blinkers_four_blocks() {
     ESP_LOGI(TAG, "Begin GOL_FOUR_BLINKERS_FOUR_BLOCKS pattern");
 
-    display.pattern = NULL;
+    display_reset(&display);
     memcpy(display.grid, gol_four_blinkers_four_blocks, GOL_GRID_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -315,9 +313,8 @@ void patterns_gol_four_blinkers_four_blocks() {
 void patterns_gol_galaxy() {
     ESP_LOGI(TAG, "Begin GOL_GALAXY pattern");
 
-    display.pattern = NULL;
+    display_reset(&display);
     memcpy(display.grid, gol_galaxy, GOL_GRID_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -325,9 +322,8 @@ void patterns_gol_galaxy() {
 void patterns_gol_pentadecathlon() {
     ESP_LOGI(TAG, "Begin GOL_PENTADECATHLON pattern");
 
-    display.pattern = NULL;
+    display_reset(&display);
     memcpy(display.grid, gol_pentadecathlon, GOL_GRID_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -336,9 +332,8 @@ void patterns_gol_sprinkles() {
     ESP_LOGI(TAG, "Begin GOL_SPRINKLES pattern");
 
     // Sprinkles (like sparkles, but 1x3 and 3x1 Game Of Life beacons)
-    display.pattern = NULL;
+    display_reset(&display);
     memcpy(display.grid, gol_sprinkles, GOL_GRID_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_gol_step;
 }
 
@@ -346,9 +341,9 @@ void patterns_gol_sprinkles() {
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
+    display_reset(&display);
     display.pattern = &lines;
-    memcpy(display.active, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_lines_step;
 }
 
@@ -361,9 +356,9 @@ static void patterns_lines_step() {
 void patterns_question() {
     ESP_LOGI(TAG, "Begin QUESTION pattern");
 
+    display_reset(&display);
     display.pattern = &question;
-    memcpy(display.active, question.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, question.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_question_step;
 }
 
@@ -376,9 +371,9 @@ static void patterns_question_step() {
 void patterns_radar() {
     ESP_LOGI(TAG, "Begin RADAR pattern");
 
+    display_reset(&display);
     display.pattern = &radar;
-    memcpy(display.active, radar.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, radar.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_radar_step;
 }
 
@@ -393,25 +388,31 @@ static void patterns_radar_step() {
 void patterns_random() {
     ESP_LOGI(TAG, "Begin RANDOM pattern");
 
-    display.pattern = NULL;
-    memset(display.active, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
-    callback_func = patterns_lines_step;
+    display_reset(&display);
+    callback_func = patterns_random_step;
     patterns_random_step();
 }
 
 
 static void patterns_random_step() {
-    esp_fill_random(display.active, DISPLAY_LIGHTS_TOTAL_AREA);
+    uint8_t i, j;
+    esp_fill_random(display.background, DISPLAY_LIGHTS_TOTAL_AREA);
+
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            display.background[i][j] >>= 7;
+            display.background[i][j] <<= 7;
+        }
+    }
 }
 
 
 void patterns_siren() {
     ESP_LOGI(TAG, "Begin SIREN pattern");
 
+    display_reset(&display);
     display.pattern = &siren;
-    memcpy(display.active, siren.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, siren.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_siren_step;
 }
     
@@ -425,15 +426,14 @@ static void patterns_siren_step() {
 void patterns_spiral() {
     ESP_LOGI(TAG, "Begin SPIRAL pattern");
 
+    display_reset(&display);
     display.pattern = &spiral;
-    memcpy(display.active, spiral.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, spiral.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_spiral_step;
 }
 
 
 static void patterns_spiral_step() {
-    // XXX: Debug random crash in rotate()
     rotate(90);
 }
 
@@ -441,9 +441,9 @@ static void patterns_spiral_step() {
 void patterns_sweep() {
     ESP_LOGI(TAG, "Begin SWEEP pattern");
 
+    display_reset(&display);
     display.pattern = &sweep;
-    memcpy(display.active, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, sweep.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_sweep_step;
 }
 
@@ -457,9 +457,9 @@ static void patterns_sweep_step() {
 void patterns_swipe() {
     ESP_LOGI(TAG, "Begin SWIPE pattern");
 
+    display_reset(&display);
     display.pattern = &swipe;
-    memcpy(display.active, swipe.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, swipe.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swipe_step;
 }
 
@@ -473,9 +473,9 @@ static void patterns_swipe_step() {
 void patterns_swoosh() {
     ESP_LOGI(TAG, "Begin SWOOP pattern");
 
+    display_reset(&display);
     display.pattern = &swoosh;
-    memcpy(display.active, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoosh_step;
 
     size_t border_length = sizeof(star_border)/3;
@@ -511,10 +511,10 @@ static void patterns_swoosh_step() {
 void patterns_swoop() {
     ESP_LOGI(TAG, "Begin SWOOP pattern");
 
+    display_reset(&display);
     // TBD
     // display.pattern = &swoop;
-    // memcpy(display.active, swoop.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    // memcpy(display.background, swoop.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swoop_step;
 }
 
@@ -527,10 +527,10 @@ static void patterns_swoop_step() {
 void patterns_thump() {
     ESP_LOGI(TAG, "Begin WAVES pattern");
 
+    display_reset(&display);
     // TBD
     // display.pattern = thump[0];
-    // memcpy(display.active, thump[0].data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    // memcpy(display.background, thump[0].data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_thump_step;
 }
 
@@ -551,9 +551,9 @@ void patterns_waves() {
     waves_height = 0;
     waves_down = true;
 
+    display_reset(&display);
     display.pattern = &waves;
-    memcpy(display.active, waves.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    memset(display.overlay, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    memcpy(display.background, waves.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_waves_step;
 }
 

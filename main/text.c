@@ -1,3 +1,5 @@
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <esp_log.h>
 #include <string.h>
 #include <stdio.h>
@@ -65,31 +67,32 @@ void text_draw_char(display_t* display, uint8_t x, uint8_t y, char chr) {
 
 void text_write_string(display_t* display, char* string) {
     uint16_t pos = 0;
-    uint16_t x = 0;
+    uint16_t x = 3;
 
     ESP_LOGI(TAG, "%s", string);
 
-    if (display->text != NULL) {
-        for (uint8_t i = 0; i < display->text_height; i++) {
-            free(display->text[i]);
-        }
-        free(display->text);
-    }
+    text_clear_string(display);
 
     // Only one line of text is supported.
     display->text_height = FONT.char_height;
-    display->text_width = strlen(string) * FONT.char_width;
+    display->text_width = x + (strlen(string) * FONT.char_width);
     display->text = malloc(display->text_height * sizeof(uint8_t*));
     for (uint8_t i = 0; i < display->text_height; i++) {
         display->text[i] = malloc(display->text_width * sizeof(uint8_t));
-        memset(display->text[i], i, display->text_width);
+        memset(display->text[i], 0, display->text_width);
     }
 
     for (pos = 0; pos < strlen(string); pos++) {
         text_draw_char(display, x, 0, string[pos]);
-        x += FONT.char_width;
+        // Although this is a mono-spaced font, identify the period as 2 pixels wide, not 4.
+        // This makes reading the IP address easier as it scrolls by.
+        if (string[pos] == '.')
+            x += 2;
+        else
+            x += FONT.char_width;
     }
 
+/*
     for (uint8_t c = 0; c < display->text_width; c++) {
         printf("\t%d", c);
     }
@@ -101,6 +104,18 @@ void text_write_string(display_t* display, char* string) {
         }
         printf("\n");
     }
-
+*/
 }
 
+
+void text_clear_string(display_t* display) {
+    if (display->text != NULL) {
+        for (uint8_t i = 0; i < display->text_height; i++) {
+            free(display->text[i]);
+        }
+        free(display->text);
+        display->text = NULL;
+    }
+    display->text_height = 0;
+    display->text_width = 0;
+}

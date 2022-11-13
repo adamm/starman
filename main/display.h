@@ -5,7 +5,7 @@
 #include "patterns.h"
 
 struct display {
-    uint8_t active[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
+    uint8_t background[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
     uint8_t overlay[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH];
     uint8_t** text;
     uint16_t text_height;
@@ -35,6 +35,7 @@ static const uint8_t LED_LUT[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
 
 void display_update_leds(display_t*);
 void display_update_leds_raw(uint8_t*);
+void display_reset(display_t*);
 void display_init(void);
 
 #endif

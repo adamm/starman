@@ -6,10 +6,14 @@
 #include <esp_system.h>
 #include <esp_flash_partitions.h>
 #include <esp_partition.h>
+#include <math.h>
 #include <string.h>
 
 #include "config.h"
+#include "display.h"
 #include "rgb.h"
+#include "sparkle.h"
+#include "text.h"
 #include "ota.h"
 
 #define BUFFSIZE 1024
@@ -18,11 +22,11 @@
 static const char *TAG = "starman-ota";
 
 
-static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_channel)
+static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_track)
 {
     int compVersion = 0;
-    char* device_channel = server_channel;
-    // FIXME: Retrieve the device OTA channel from NVS, if it's there.
+    char* device_track = config_firmware_track;
+    // FIXME: Retrieve the device OTA track from NVS, if it's there.
     // FIXME: Remember to set it after a sucessful OTA upgrade!
 
     if (new_app_info == NULL) {
@@ -32,11 +36,11 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
     const esp_partition_t *running = esp_ota_get_running_partition();
     esp_app_desc_t running_app_info;
     if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK)
-        ESP_LOGI(TAG, "Device firmware version: %s (%s)", running_app_info.version, device_channel);
+        ESP_LOGI(TAG, "Device firmware version: %s (%s)", running_app_info.version, device_track);
     else
         return ESP_ERR_INVALID_ARG;
 
-    ESP_LOGI(TAG, "Server firmware version: %s (%s)", new_app_info->version, server_channel);
+    ESP_LOGI(TAG, "Server firmware version: %s (%s)", new_app_info->version, server_track);
 
     compVersion = memcmp(new_app_info->version, running_app_info.version, sizeof(new_app_info->version));
 
@@ -46,10 +50,10 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
     }
     else if (compVersion < 0) {
         // Technically if the user is transitioning the device from the
-        // unstable channel to testing or stable, the firmware on the server
+        // unstable track to testing or stable, the firmware on the server
         // will be older.  We should still allow the OTA download and "upgrade"
-        // to the new channel's build version.
-        if (strcmp(device_channel, server_channel) == 0) {
+        // to the new track's build version.
+        if (strcmp(device_track, server_track) == 0) {
             ESP_LOGW(TAG, "Current device version is newer than the firmware server. Nothing to update.");
             return ESP_FAIL;
         }
@@ -87,7 +91,7 @@ static void print_sha256 (const uint8_t *image_hash, const char *label)
 }
 
 
-uint8_t ota_init() {
+uint8_t ota_init(void) {
     uint8_t sha_256[HASH_LEN] = { 0 };
     esp_partition_t partition;
 
@@ -111,6 +115,10 @@ uint8_t ota_init() {
 
     const esp_partition_t *running = esp_ota_get_running_partition();
     esp_ota_img_states_t ota_state;
+    esp_app_desc_t running_app_info;
+    if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK)
+        ESP_LOGI(TAG, "Device firmware version: %s", running_app_info.version);
+
     if (esp_ota_get_state_partition(running, &ota_state) == ESP_OK) {
         if (ota_state == ESP_OTA_IMG_PENDING_VERIFY) {
             if (esp_ota_mark_app_valid_cancel_rollback() == ESP_OK) {
@@ -124,13 +132,14 @@ uint8_t ota_init() {
 }
 
 
-uint8_t ota_upgrade(char* channel) {
+uint8_t ota_upgrade(void) {
     char firmware_url[50] = {0};
+    char* track = config_firmware_track;
 
     bzero(firmware_url, sizeof(firmware_url));
     strlcpy(firmware_url, config_firmware_service_url, strlen(config_firmware_service_url) + 1);
     strlcat(firmware_url, "/", strlen(firmware_url) + 2);
-    strlcat(firmware_url, channel, strlen(firmware_url) + strlen(channel) + 1);
+    strlcat(firmware_url, track, strlen(firmware_url) + strlen(track) + 1);
     ESP_LOGI(TAG, "Starting OTA: %s", firmware_url);
 
     esp_err_t ota_finish_err = ESP_OK;
@@ -159,11 +168,22 @@ uint8_t ota_upgrade(char* channel) {
         ESP_LOGE(TAG, "esp_https_ota_read_img_desc failed");
         goto ota_end;
     }
-    err = validate_image_header(&app_desc, channel);
+    err = validate_image_header(&app_desc, track);
     if (err != ESP_OK) {
         // ESP_LOGE(TAG, "image header verification failed");
         goto ota_end;
     }
+
+    uint32_t image_total_size = esp_https_ota_get_image_size(https_ota_handle);
+    uint32_t image_download_size = 0;
+    float image_download_percent = 0;
+    uint8_t image_download_percent_rounded = 0;
+    char progress_text[10] = {0};
+    display_t* display = NULL;
+
+    sparkle_stop();
+    display = malloc(sizeof(display_t));
+    memset(display, 0, sizeof(display_t));
 
     while (1) {
         // status_downloading();
@@ -171,28 +191,37 @@ uint8_t ota_upgrade(char* channel) {
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
         }
-        // esp_https_ota_perform returns after every read operation which gives user the ability to
-        // monitor the status of OTA upgrade by calling esp_https_ota_get_image_len_read, which gives length of image
-        // data read so far.
-        ESP_LOGI(TAG, "Image bytes read: %d", esp_https_ota_get_image_len_read(https_ota_handle));
+        image_download_size = esp_https_ota_get_image_len_read(https_ota_handle);
+        image_download_percent = (float)image_download_size / (float)image_total_size * 100.0;
+        image_download_percent_rounded = floor(image_download_percent);
+
+        // ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
+
+        sprintf(progress_text, "%d%%", image_download_percent_rounded);
+        text_write_string(display, progress_text);
+        display_update_leds(display);
         // status_waiting();
     }
     // status_resetting();
+    free(display);
 
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
         // the OTA image was not completely received and user can customise the response to this situation.
         ESP_LOGE(TAG, "Complete data was not received.");
+        sparkle_start();
     } else {
         ota_finish_err = esp_https_ota_finish(https_ota_handle);
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
             ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
             vTaskDelay(4000 / portTICK_PERIOD_MS);
+            esp_restart();
             return 1;
         } else {
             if (ota_finish_err == ESP_ERR_OTA_VALIDATE_FAILED) {
                 ESP_LOGE(TAG, "Image validation failed, image is corrupted");
             }
             ESP_LOGE(TAG, "ESP_HTTPS_OTA upgrade failed 0x%x", ota_finish_err);
+            sparkle_start();
             return 0;
         }
     }

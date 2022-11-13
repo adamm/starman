@@ -1,10 +1,16 @@
 #include <esp_err.h>
 #include <esp_log.h>
+#include <esp_wifi.h>
+#include <esp_netif.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #include "buttons.h"
 #include "config.h"
 #include "display.h"
+#include "httpd.h"
 #include "music.h"
+#include "ota.h"
 #include "patterns.h"
 #include "patterns_gol.h"
 #include "random.h"
@@ -16,7 +22,7 @@
 #include "smb3.h"
 #include "smw.h"
 #include "text.h"
-#include "wifi.h"
+#include "wifi_manager.h"
 #include "util.h"
 
 static const char *TAG = "starman";
@@ -44,7 +50,16 @@ static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
- 
+
+void monitoring_task(void *pvParameter)
+{
+    for(;;){
+        ESP_LOGI(TAG, "free heap: %d",esp_get_free_heap_size());
+        vTaskDelay( pdMS_TO_TICKS(10000) );
+    }
+}
+
+
 bool step_sequence(uint32_t time) {
     patterns_step_sequence();
 
@@ -97,7 +112,7 @@ void play_game(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_random;
+        level_pattern = patterns_swipe;
         level_music = smb_overworld;
         length = sizeof(smb_overworld);
     }
@@ -244,6 +259,28 @@ void play_game(void) {
 
     sparkle_start();
 }
+    
+
+void wifi_connected(void *pvParameter) {
+    ip_event_got_ip_t* param = (ip_event_got_ip_t*)pvParameter;
+
+    // Transform IP to human readable string, preceeded by 4 spaces
+    // This makes it easier to see as it scrolls by during the sparkle routine
+    char ip_str[21] = {0};
+    memset(ip_str, ' ', 4);
+    esp_ip4addr_ntoa(&param->ip_info.ip, ip_str+4, IP4ADDR_STRLEN_MAX);
+
+    ESP_LOGI(TAG, "Our IP address is %s!", ip_str);
+
+    ota_init();
+    ota_upgrade(); // Combines checking if an upgrade exists, downloading, and installing it.
+
+    // If OTA update is successful, starman will reboot with the new firmware version.
+    // Otherwise, it will scroll the current IP, and begin the normal game process.
+
+    // Leaving a little space infront of the IP address makes it easier to read when scrolling.
+    sparkle_scroll_string(ip_str);
+}
 
 
 void app_main(void) {
@@ -256,8 +293,10 @@ void app_main(void) {
     random_init();
     // rgb_init();
 
-    // Execute the play_game() function when the play button is pressed.
+    // Execute the play_game() function when the play button is pressed or /play is accessed
     buttons_play_callback(play_game);
+    httpd_play_callback(play_game);
+
     // Loop music with lights via step_sequence();
     music_callback(step_sequence);
 
@@ -267,5 +306,9 @@ void app_main(void) {
 
     // Wifi is last as it can take a few moments -- this way the sparkle and
     // game can begin even without wifi being ready.
-    wifi_init();
+    wifi_manager_start();
+    wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &wifi_connected);
+	http_app_set_handler_hook(HTTP_GET, &httpd_handler);
+
+    xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }
