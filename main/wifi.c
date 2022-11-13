@@ -13,7 +13,11 @@
 #include <lwip/sys.h>
 #include <qrcode.h>
 #include <wifi_provisioning/manager.h>
+#ifdef USE_BLE_PROVISIONING
 #include <wifi_provisioning/scheme_ble.h>
+#else
+#include <wifi_provisioning/scheme_softap.h>
+#endif
 
 #include <nvs_flash.h>
 
@@ -41,12 +45,11 @@ static char ip_addr_str[17] = {0};
 
 static void get_device_service_name(char *service_name, size_t max)
 {
-    snprintf(service_name, max, "%s", "starman");
-    // uint8_t eth_mac[12];
-    // const char *ssid_prefix = "starman";
-    // esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
-    // snprintf(service_name, max, "%s%02X%02X%02X%02X%02X%02X",
-    //          ssid_prefix, eth_mac[0], eth_mac[1], eth_mac[2], eth_mac[3], eth_mac[4], eth_mac[5]);
+    uint8_t eth_mac[12];
+    const char *ssid_prefix = "starman";
+    esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
+    snprintf(service_name, max, "%s_%02X%02X%02X%02X%02X%02X",
+             ssid_prefix, eth_mac[0], eth_mac[1], eth_mac[2], eth_mac[3], eth_mac[4], eth_mac[5]);
 }
 
 
@@ -131,7 +134,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
                          "Wifi station authentication failed" : "Wifi access-point not found");
                 s_retry_num++;
                 if (s_retry_num >= CONFIG_ESP_MAX_RETRY) {
-                    ESP_LOGI(TAG, "Failed to connect with provisioned AP, reseting provisioned credentials");
+                    ESP_LOGI(TAG, "Failed to connect with provisioned AP, resetting credentials");
                     wifi_prov_mgr_reset_sm_state_on_failure();
                     s_retry_num = 0;
                 }
@@ -203,8 +206,13 @@ esp_err_t wifi_init(void)
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
     wifi_prov_mgr_config_t config = {
+#ifdef USE_BLE_PROVISIONING
         .scheme = wifi_prov_scheme_ble,
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM,
+#else
+        .scheme = wifi_prov_scheme_softap,
+        .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE,
+#endif
     };
     ESP_ERROR_CHECK(wifi_prov_mgr_init(config));
 
@@ -212,7 +220,7 @@ esp_err_t wifi_init(void)
     ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
 
     if (!provisioned) {
-        ESP_LOGI(TAG, "Starting provisioning");
+        ESP_LOGI(TAG, "Start provisioning");
 
         // rgb_provisioning();
 
@@ -223,6 +231,7 @@ esp_err_t wifi_init(void)
         const char *pop = "abcd1234";
         const char *service_key = NULL;
 
+#ifdef USE_BLE_PROVISIOINING
         uint8_t custom_service_uuid[] = {
             /* LSB <---------------------------------------
              * ---------------------------------------> MSB */
@@ -231,14 +240,19 @@ esp_err_t wifi_init(void)
         };
 
         wifi_prov_scheme_ble_set_service_uuid(custom_service_uuid);
+#endif
 
         wifi_prov_mgr_endpoint_create("custom-data"); 
         ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(security, pop, service_name, service_key));
         wifi_prov_mgr_endpoint_register("custom-data", custom_prov_data_handler, NULL);
+#ifdef USE_BLE_PROVISIONING
         wifi_prov_print_qr(service_name, pop, "ble");
+#else
+        wifi_prov_print_qr(service_name, pop, "softap");
+#endif
     }
     else {
-        ESP_LOGI(TAG, "Already provisioned, starting wifi STA");
+        ESP_LOGI(TAG, "Already provisioned, starting wifi in station mode");
 
         wifi_prov_mgr_deinit();
 
@@ -267,7 +281,7 @@ esp_err_t wifi_init(void)
         err = ESP_ERR_WIFI_NOT_CONNECT;
     }
 
-    /* The event will not be processed after unregister */
+    /* The event will not be processed after unregistration */
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, instance_provisioned));
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
