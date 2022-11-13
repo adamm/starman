@@ -41,11 +41,12 @@ static char ip_addr_str[17] = {0};
 
 static void get_device_service_name(char *service_name, size_t max)
 {
-    uint8_t eth_mac[12];
-    const char *ssid_prefix = "starman_";
-    esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
-    snprintf(service_name, max, "%s%02X%02X%02X%02X%02X%02X",
-             ssid_prefix, eth_mac[0], eth_mac[1], eth_mac[2], eth_mac[3], eth_mac[4], eth_mac[5]);
+    snprintf(service_name, max, "%s", "starman");
+    // uint8_t eth_mac[12];
+    // const char *ssid_prefix = "starman";
+    // esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
+    // snprintf(service_name, max, "%s%02X%02X%02X%02X%02X%02X",
+    //          ssid_prefix, eth_mac[0], eth_mac[1], eth_mac[2], eth_mac[3], eth_mac[4], eth_mac[5]);
 }
 
 
@@ -152,7 +153,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         }
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        rgb_connecting();
+        // rgb_connecting();
         esp_wifi_connect();
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
@@ -253,7 +254,7 @@ esp_err_t wifi_init(void)
     if (bits & WIFI_CONNECTED_BIT) {
         // ESP_LOGI(TAG, "Connected to SSID:%s password:%s",
         //          wifi_config.sta.ssid, wifi_config.sta.password);
-        rgb_connected();
+        // rgb_connected();
         err = ESP_OK;
     } else if (bits & WIFI_FAIL_BIT) {
         // ESP_LOGW(TAG, "Failed to connect to SSID:%s, password:%s",
