@@ -15,5 +15,4 @@ idf_component_register(SRCS
                     "storage.c"
                     "text.c"
                     "util.c"
-                    "wifi.c"
                     INCLUDE_DIRS ".")

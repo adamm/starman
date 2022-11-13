@@ -1,5 +1,9 @@
 #include <esp_err.h>
 #include <esp_log.h>
+#include <esp_wifi.h>
+#include <esp_netif.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #include "buttons.h"
 #include "config.h"
@@ -17,7 +21,7 @@
 #include "smb3.h"
 #include "smw.h"
 #include "text.h"
-#include "wifi.h"
+#include "wifi_manager.h"
 #include "util.h"
 
 static const char *TAG = "starman";
@@ -45,7 +49,16 @@ static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
- 
+
+void monitoring_task(void *pvParameter)
+{
+    for(;;){
+        ESP_LOGI(TAG, "free heap: %d",esp_get_free_heap_size());
+        vTaskDelay( pdMS_TO_TICKS(10000) );
+    }
+}
+
+
 bool step_sequence(uint32_t time) {
     patterns_step_sequence();
 
@@ -245,6 +258,29 @@ void play_game(void) {
 
     sparkle_start();
 }
+    
+
+void wifi_connected(void *pvParameter) {
+    ip_event_got_ip_t* param = (ip_event_got_ip_t*)pvParameter;
+
+    /* transform IP to human readable string */
+    char ip_str[20] = {0};
+    ip_str[0] = ' ';
+    ip_str[1] = ' ';
+    ip_str[2] = ' ';
+    esp_ip4addr_ntoa(&param->ip_info.ip, ip_str+3, IP4ADDR_STRLEN_MAX);
+
+    ESP_LOGI(TAG, "I have a connection and my IP is %s!", ip_str);
+
+    ota_init();
+    ota_upgrade(); // Combines checking if an upgrade exists, downloading, and installing it.
+
+    // If OTA update is successful, the device reboots.  Otherwise, continue
+    // to show the current IP and start the normal game process.
+
+    // Leaving a little space infront of the IP address makes it easier to read when scrolling.
+    sparkle_scroll_string(ip_str);
+}
 
 
 void app_main(void) {
@@ -268,16 +304,8 @@ void app_main(void) {
 
     // Wifi is last as it can take a few moments -- this way the sparkle and
     // game can begin even without wifi being ready.
-    if (wifi_init() == ESP_OK) {
-        ota_init();
-        ota_upgrade(); // Combines checking if an upgrade exists, downloading, and installing it.
+    wifi_manager_start();
+    wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &wifi_connected);
 
-        // If OTA update is successful, the device reboots.  Otherwise, continue
-        // to show the current IP and start the normal game process.
-
-        char ip_str[20] = {0};
-        // Leaving a little space infront of the IP address makes it easier to read when scrolling.
-        sprintf(ip_str, "    %s", wifi_get_ip_str());
-        sparkle_scroll_string(ip_str);
-    }
+    xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }
