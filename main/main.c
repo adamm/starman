@@ -8,6 +8,7 @@
 #include "buttons.h"
 #include "config.h"
 #include "display.h"
+#include "httpd.h"
 #include "music.h"
 #include "ota.h"
 #include "patterns.h"
@@ -293,8 +294,10 @@ void app_main(void) {
     random_init();
     // rgb_init();
 
-    // Execute the play_game() function when the play button is pressed.
+    // Execute the play_game() function when the play button is pressed or /play is accessed
     buttons_play_callback(play_game);
+    httpd_play_callback(play_game);
+
     // Loop music with lights via step_sequence();
     music_callback(step_sequence);
 
@@ -306,6 +309,7 @@ void app_main(void) {
     // game can begin even without wifi being ready.
     wifi_manager_start();
     wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &wifi_connected);
+	http_app_set_handler_hook(HTTP_GET, &httpd_handler);
 
     xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }
