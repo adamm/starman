@@ -16,4 +16,8 @@ idf_component_register(SRCS
                     "storage.c"
                     "text.c"
                     "util.c"
+                    EMBED_FILES
+                    "assets/starman.html"
+                    "assets/starman.css"
+                    "assets/starman.js"
                     INCLUDE_DIRS ".")
