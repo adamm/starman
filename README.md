@@ -57,9 +57,11 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] GPIO play button
 - [X] Show simple text messages
 - [X] WiFi onboarding process
-- [ ] Over-the-air firmware updates
+- [X] Over-the-air firmware updates
 - [ ] WiFi play button
-- [ ] Bluetooth play button/app?
+- [ ] HTTP REST API to push text, play sound
+- [ ] Brightness control
+- [ ] Selectable themes
 
 ## Milestones
 
