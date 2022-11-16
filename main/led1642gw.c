@@ -335,8 +335,8 @@ void led1642gw_init(void) {
         memset(&config_register[ic], 0, sizeof(config_register_t));
     }
 
-    if (DISPLAY_LIGHTS_GAIN <= 50) {
-        led1642gw_set_gain(DISPLAY_LIGHTS_GAIN);
+    if (DISPLAY_LIGHTS_DEFAULT_GAIN <= DISPLAY_LIGHTS_MAX_GAIN) {
+        led1642gw_set_gain(DISPLAY_LIGHTS_DEFAULT_GAIN);
     }
     led1642gw_flush_config();
     led1642gw_activate();

@@ -7,13 +7,15 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "adc.h"
 #include "config.h"
 #include "display.h"
 #include "led1642gw.h"
 
 static const char *TAG = "starman-display";
 
-static SemaphoreHandle_t xSemaphore = NULL;
+static SemaphoreHandle_t led1642gw_lock = NULL;
+static TaskHandle_t brightness_task = NULL;
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
@@ -50,11 +52,11 @@ void display_update_leds(display_t* display) {
         }
     }
 
-    if (xSemaphoreTake(xSemaphore, (TickType_t) 1000) == pdTRUE) {
+    if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
         led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
         led1642gw_flush_buffer();
 
-        xSemaphoreGive(xSemaphore);
+        xSemaphoreGive(led1642gw_lock);
     }
     else {
         // We should never be blocked for more than 1000 ticks unless something went very wrong.
@@ -71,8 +73,11 @@ void display_update_leds_raw(uint8_t* active) {
         display_out[i] = active[i] * 256;
     }
 
-    led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
-    led1642gw_flush_buffer();
+    if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
+        led1642gw_set_buffer(display_out, DISPLAY_LIGHTS_TOTAL);
+        led1642gw_flush_buffer();
+        xSemaphoreGive(led1642gw_lock);
+    }
 }
 
 
@@ -88,9 +93,30 @@ void display_reset(display_t* display) {
 }
 
 
+static void set_brightness() {
+    // Every 5 seconds measure the ambient brightness and update the display gain
+    for(;;) {
+        uint16_t brightness = adc_get_ambient_light_level();
+        uint16_t gain = brightness / DISPLAY_LIGHTS_MAX_GAIN * ADC_MAX_AMBIENT_LIGHT_LEVEL;
+
+        ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", gain, DISPLAY_LIGHTS_MAX_GAIN);
+
+        if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
+            led1642gw_set_gain((uint8_t) gain);
+            led1642gw_flush_config();
+
+            xSemaphoreGive(led1642gw_lock);
+        }
+        vTaskDelay(5000 / portTICK_RATE_MS);
+    }
+}
+
+
 void display_init(void) {
     led1642gw_init();
-    xSemaphore = xSemaphoreCreateMutex();
+    led1642gw_lock = xSemaphoreCreateMutex();
+
+    xTaskCreate(set_brightness, "brightness", 8192, NULL, 0, &brightness_task);
 
     ESP_LOGI(TAG, "Init sucessful");
 }
