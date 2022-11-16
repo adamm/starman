@@ -38,28 +38,12 @@
 #define GAME_DIE_PERCENT     50
 #define GAME_FANFARE_PERCENT 25
 
+#if (CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3)
 
 // GPIO pin ports
 #define PLAY_GAME_GPIO        1
 
-#ifdef CONFIG_IDF_TARGET_ESP32C3
-
-#define MUSIC_CHANNEL_1_GPIO  2
-#define MUSIC_CHANNEL_2_GPIO  3
-#define MUSIC_CHANNEL_3_GPIO  4
-#define MUSIC_CHANNEL_4_GPIO  5
-#define MUSIC_AMP_MUTE_GPIO   6
-
-#define STATUS_LED_GPIO       8
-
-#define LIGHTS_LE_GPIO        9
-#define LIGHTS_MISO_GPIO     10
-#define LIGHTS_MOSI_GPIO     11
-#define LIGHTS_SCLK_GPIO     12
-
-#define ADC_LIGHT_CHANNEL    ADC1_CHANNEL_3 // GPIO 3
-
-#else
+#define ADC_LIGHT_CHANNEL    ADC1_CHANNEL_3 // GPIO 4
 
 #define MUSIC_CHANNEL_1_GPIO 17
 #define MUSIC_CHANNEL_2_GPIO 18
@@ -74,8 +58,9 @@
 #define LIGHTS_MOSI_GPIO     35
 #define LIGHTS_SCLK_GPIO     36
 
-#define ADC_LIGHT_CHANNEL    ADC1_CHANNEL_3 // GPIO 4
+#else
 
+#error Only ESP32S2 and ESP32S3 configuration supported
 
 #endif
 
