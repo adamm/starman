@@ -57,6 +57,8 @@
 #define LIGHTS_MOSI_GPIO     11
 #define LIGHTS_SCLK_GPIO     12
 
+#define ADC_LIGHT_CHANNEL    ADC1_CHANNEL_3 // GPIO 3
+
 #else
 
 #define MUSIC_CHANNEL_1_GPIO 17
@@ -71,6 +73,9 @@
 #define LIGHTS_MISO_GPIO     34
 #define LIGHTS_MOSI_GPIO     35
 #define LIGHTS_SCLK_GPIO     36
+
+#define ADC_LIGHT_CHANNEL    ADC1_CHANNEL_3 // GPIO 4
+
 
 #endif
 

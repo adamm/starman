@@ -5,6 +5,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "adc.h"
 #include "buttons.h"
 #include "config.h"
 #include "display.h"
@@ -287,6 +288,7 @@ void app_main(void) {
     ESP_LOGI(TAG, "Main startup");
     config_init();
     storage_init();
+    adc_init();
     buttons_init();
     display_init();
     music_init();
@@ -303,6 +305,8 @@ void app_main(void) {
     // Sparkle runs continiously in another thread while we wait for the user
     // to press Play
     sparkle_start();
+
+    ESP_LOGI(TAG, "ambient light: %d", adc_get_ambient_light_level());
 
     // Wifi is last as it can take a few moments -- this way the sparkle and
     // game can begin even without wifi being ready.

@@ -1,5 +1,6 @@
 idf_component_register(SRCS
                     "main.c"
+                    "adc.c"
                     "buttons.c"
                     "config.c"
                     "display.c"
