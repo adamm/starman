@@ -12,7 +12,7 @@
 
 // Gain must be 50 or less -- turning on all LEDs will overdraw power/overheat components!
 #define DISPLAY_LIGHTS_MAX_GAIN      50
-#define DISPLAY_LIGHTS_DEFAULT_GAIN   0
+#define DISPLAY_LIGHTS_DEFAULT_GAIN  25
 
 // Game of Life has a playgrid larger than the display area.  This allows for more
 // complex designs that aren't constrainted to the 16x16 display framebuffer

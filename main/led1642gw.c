@@ -209,8 +209,8 @@ void led1642gw_flush_config()
         write_no_command(data);
     }
     memcpy(&data, &config_register[ic], sizeof(uint16_t));
-    ESP_LOGI(TAG, "Sending config:");
-    ESP_LOG_BUFFER_HEX(TAG, config_register, sizeof(config_register_t)*NUM_LED1642GW_ICs);
+    ESP_LOGD(TAG, "Sending config:");
+    ESP_LOG_BUFFER_HEX_LEVEL(TAG, config_register, sizeof(config_register_t)*NUM_LED1642GW_ICs, ESP_LOG_DEBUG);
     write_data(data, LED1642GW_WRITE_CONFIG_LATCH);
 }
 

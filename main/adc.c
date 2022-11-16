@@ -23,11 +23,11 @@ static esp_adc_cal_characteristics_t adc1_chars = {0};
 uint16_t adc_get_ambient_light_level() {
     uint32_t voltage = 0;
     int adc_raw = adc1_get_raw(ADC_LIGHT_CHANNEL);
-    ESP_LOGI(TAG, "adc_raw  = %d", adc_raw);
+    ESP_LOGD(TAG, "adc_raw  = %d", adc_raw);
 
     if (calibration_enabled) {
         voltage = esp_adc_cal_raw_to_voltage(adc_raw, &adc1_chars);
-        ESP_LOGI(TAG, "adc_volt = %d mV", voltage);
+        ESP_LOGD(TAG, "adc_volt = %d mV", voltage);
     }
 
     // The lower the ADC raw value is, the brighter the reading.
