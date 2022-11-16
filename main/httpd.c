@@ -1,9 +1,13 @@
 #include <esp_log.h>
+#include <esp_ota_ops.h>
+#include <esp_partition.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 #include <http_app.h>
 #include <string.h>
+
+#include "game.h"
 
 #include "httpd.h"
 
@@ -61,8 +65,29 @@ esp_err_t httpd_handler(httpd_req_t *req) {
 		httpd_resp_set_type(req, "text/css");
 		httpd_resp_send(req, starman_css_start, starman_css_len);
 	}
+	if(strcmp(req->uri, "/status.json") == 0) {
+		ESP_LOGI(TAG, "Serving page /status.json");
+
+		char* json = malloc(100);
+		memset(json, 0, 100);
+
+	    const esp_partition_t *running = esp_ota_get_running_partition();
+		esp_app_desc_t running_app_info;
+		if (esp_ota_get_partition_description(running, &running_app_info) != ESP_OK)
+			strcpy(running_app_info.version, "unknown");
+
+		sprintf(json, "{level:%d,lives:%d,state:\"%s\",firmware:\"%s\"}",
+			game_get_level(), game_get_lives(), game_get_playing_state() ? "playing" : "idle",
+			running_app_info.version);
+
+		httpd_resp_set_status(req, "200 OK");
+		httpd_resp_set_type(req, "application/json");
+		httpd_resp_send(req, json, strlen(json));
+
+		free(json);
+	}
     else if (strcmp(req->uri, "/play") == 0) {
-		xTaskCreate(play_task, "play", 8192, NULL, 0, &http_task);
+		xTaskCreate(play_task, "play", 8192, NULL, 5, &http_task);
 
 		const char* response = "OK";
 

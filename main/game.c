@@ -25,6 +25,21 @@ static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
 
 
+uint8_t game_get_level() {
+    return level;
+}
+
+
+uint8_t game_get_lives() {
+    return lives;
+}
+
+
+uint8_t game_get_playing_state() {
+    return playing;
+}
+
+
 bool game_step_sequence(uint32_t time) {
     patterns_step_sequence();
 
