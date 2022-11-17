@@ -7,6 +7,7 @@
 #include <http_app.h>
 #include <string.h>
 
+#include "display.h"
 #include "game.h"
 
 #include "httpd.h"
@@ -76,15 +77,23 @@ esp_err_t httpd_handler(httpd_req_t *req) {
 		if (esp_ota_get_partition_description(running, &running_app_info) != ESP_OK)
 			strcpy(running_app_info.version, "unknown");
 
-		sprintf(json, "{level:%d,lives:%d,state:\"%s\",firmware:\"%s\"}",
+		sprintf(json, "{level:%d,lives:%d,state:\"%s\",brightness:%d,firmware:\"%s\"}",
 			game_get_level(), game_get_lives(), game_get_playing_state() ? "playing" : "idle",
-			running_app_info.version);
+			display_get_brightness(), running_app_info.version);
 
 		httpd_resp_set_status(req, "200 OK");
 		httpd_resp_set_type(req, "application/json");
 		httpd_resp_send(req, json, strlen(json));
 
 		free(json);
+	}
+    else if (strcmp(req->uri, "/brightness") == 0) {
+		uint8_t gain;
+
+		// TODO: Get the value from the HTTP POST
+		gain = 25;
+
+		display_set_brightness(gain);
 	}
     else if (strcmp(req->uri, "/play") == 0) {
 		xTaskCreate(play_task, "play", 8192, NULL, 5, &http_task);

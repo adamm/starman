@@ -16,6 +16,8 @@ static const char *TAG = "starman-display";
 
 static SemaphoreHandle_t led1642gw_lock = NULL;
 static TaskHandle_t brightness_task = NULL;
+static uint8_t display_gain = DISPLAY_LIGHTS_DEFAULT_GAIN;
+static bool display_gain_automatic = true;
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
@@ -99,14 +101,14 @@ static void set_brightness() {
     // Every 5 seconds measure the ambient brightness and update the display gain
     for(;;) {
         uint16_t brightness = adc_get_ambient_light_level();
-        uint8_t gain = (uint8_t)((double)brightness * (double)DISPLAY_LIGHTS_MAX_GAIN / (double)ADC_MAX_AMBIENT_LIGHT_LEVEL);
+        display_gain = (uint8_t)((double)brightness * (double)DISPLAY_LIGHTS_MAX_GAIN / (double)ADC_MAX_AMBIENT_LIGHT_LEVEL);
 
-        if (gain != current_gain) {
-            current_gain = gain;
-            ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", gain, DISPLAY_LIGHTS_MAX_GAIN);
+        if (display_gain != current_gain) {
+            current_gain = display_gain;
+            ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", display_gain, DISPLAY_LIGHTS_MAX_GAIN);
 
             if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
-                led1642gw_set_gain((uint8_t) gain);
+                led1642gw_set_gain((uint8_t) display_gain);
                 led1642gw_flush_config();
 
                 xSemaphoreGive(led1642gw_lock);
@@ -115,6 +117,33 @@ static void set_brightness() {
         vTaskDelay(5000 / portTICK_RATE_MS);
     }
 }
+
+
+uint8_t display_get_brightness() {
+    return display_gain;
+}
+
+
+
+void display_set_brightness(uint8_t gain) {
+    display_gain = gain;
+
+    ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", display_gain, DISPLAY_LIGHTS_MAX_GAIN);
+    display_gain_automatic = false;
+    if (brightness_task != NULL) {
+        vTaskSuspend(brightness_task);
+        brightness_task = NULL;
+    }
+
+    if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
+        led1642gw_set_gain((uint8_t) display_gain);
+        led1642gw_flush_config();
+
+        xSemaphoreGive(led1642gw_lock);
+    }
+}
+
+
 
 
 void display_init(void) {
