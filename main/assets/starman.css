@@ -1,3 +1,7 @@
+div#play {
+    margin: 20px 5px;
+}
+
 input#play-button {
     font-size: 30pt;
 }

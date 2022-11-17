@@ -69,15 +69,15 @@ esp_err_t httpd_handler(httpd_req_t *req) {
     if(strcmp(req->uri, "/status.json") == 0) {
         ESP_LOGI(TAG, "Serving page /status.json");
 
-        char* json = malloc(100);
-        memset(json, 0, 100);
+        char* json = malloc(130);
+        memset(json, 0, 130);
 
         const esp_partition_t *running = esp_ota_get_running_partition();
         esp_app_desc_t running_app_info;
         if (esp_ota_get_partition_description(running, &running_app_info) != ESP_OK)
             strcpy(running_app_info.version, "unknown");
 
-        sprintf(json, "{level:%d,lives:%d,state:\"%s\",brightness:%d,firmware:\"%s\"}",
+        sprintf(json, "{\"level\":%d,\"lives\":%d,\"state\":\"%s\",\"brightness\":%d,\"firmware\":\"%s\"}",
             game_get_level(), game_get_lives(), game_get_playing_state() ? "playing" : "idle",
             display_get_brightness(), running_app_info.version);
 
