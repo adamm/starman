@@ -101,7 +101,7 @@ void app_main(void) {
     // game can begin even without wifi being ready.
     wifi_manager_start();
     wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &wifi_connected);
-	http_app_set_handler_hook(HTTP_GET, &httpd_handler);
+    http_app_set_handler_hook(HTTP_GET, &httpd_handler);
 
     xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }
