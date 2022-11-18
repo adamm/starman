@@ -338,9 +338,15 @@ void patterns_gol_sprinkles() {
 }
 
 
+static uint8_t lines_direction = 0;
+static uint16_t lines_time = 0;
+
+
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
+    lines_direction = 0;
+    lines_time = 0;
     display_reset(&display);
     display.pattern = &lines;
     memcpy(display.background, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
@@ -349,7 +355,29 @@ void patterns_lines() {
 
 
 static void patterns_lines_step() {
-    scroll(0, 1, true, 0);
+    // After every 22 steps, rotate the pattern and change scroll direction
+    if (lines_time++ >= 22) {
+        rotate(90);
+        lines_direction++;
+        lines_time = 0;
+    }
+
+    if (lines_direction == 0) {
+        scroll(0, 1, true, 0);
+    }
+    else if (lines_direction == 1) {
+        scroll(1, 0, true, 0);
+    }
+    else if (lines_direction == 2) {
+        scroll(0, -1, true, 0);
+    }
+    else if (lines_direction == 3) {
+        scroll(-1, 0, true, 0);
+    }
+    else {
+        lines_direction = 0;
+        scroll(0, 1, true, 0);
+    }
 }
 
 
