@@ -33,6 +33,15 @@ tree_cone_z = -0.01;
 tree_cone_r = 7;
 tree_cone_h = 60;
 
+notch_size = 5;
+
+notch_x = body_w/2 - notch_size;
+notch_y = body_l/2 - notch_size;
+notch_z = body_h - notch_size;
+notch_w = notch_size + 0.1;
+notch_l = notch_size + 0.1;
+notch_h = notch_size + 0.1;
+
 $fn = 100;
 
 module mount_3d() {
@@ -52,11 +61,15 @@ module mount_3d() {
         translate([socket_right_x, socket_right_y, socket_right_z])
             cube([socket_w, socket_l, socket_h]);
 
+        translate([notch_x, notch_y, notch_z])
+            cube([notch_w, notch_l, notch_h]);
+
         translate([tree_cylinder_x, tree_cylinder_y, tree_cylinder_z-2])
             cylinder(r=tree_cylinder_r, h=tree_cylinder_h);
 
         translate([tree_cone_x, tree_cone_y, tree_cone_z-2])
             cylinder(r=tree_cone_r, h=tree_cone_h, d1=30);
+
     }
 }
 
