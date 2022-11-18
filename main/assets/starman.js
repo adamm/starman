@@ -1,5 +1,6 @@
 $(function() {
     // XXX: Switch to websockets!  Polling status.json is dumb.
+    get_status();
     setInterval(get_status, 5000);
 });
 
@@ -11,6 +12,10 @@ function get_status() {
         $("#state").html(status.state);
         $("#brightness").val(status.brightness);
         $("#firmware").html(status.firmware);
+        if (status.state == "idle")
+            $("#play-button").prop("disabled", "");
+        else
+            $("#play-button").prop("disabled", "true");
     });
 }
 
