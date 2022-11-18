@@ -15,7 +15,7 @@
 static const char *TAG = "starman-game";
 
 
-static uint8_t level = 0;
+static uint8_t level = 1;
 static uint8_t lives = 3;
 static bool playing  = false;
 static uint32_t player_gets_star    = 0;
@@ -76,7 +76,6 @@ void game_start(void) {
 
     music_amp_unmute();
 
-    level++;
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
     player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
@@ -114,7 +113,7 @@ void game_start(void) {
     }
     else {
         // We shouldn't get here.  Reset!
-        level = 0;
+        level = 1;
         lives = GAME_START_LIVES;
         playing = false;
         game_start();
@@ -199,8 +198,6 @@ void game_start(void) {
 
     if (player_dies) {
         lives--;
-        level--; // level gets incremented when starting play --
-                 //d ecrementing means user needs to replay the same level again
         player_dies = 0;
         patterns_spiral();
         music_playscore(smb_death);
@@ -214,7 +211,7 @@ void game_start(void) {
             patterns_diamonds();
             music_playscore(smb_ending);
         }
-        level = 0;
+        level = 1;
         lives = GAME_START_LIVES;
     }
     else {
@@ -222,6 +219,7 @@ void game_start(void) {
         music_playscore(smb_flagpole);
         patterns_radar();
         music_playscore(smb_course_clear);
+        level++;
     }
 
     if (lives == 0) {
@@ -229,7 +227,7 @@ void game_start(void) {
         music_playscore(smb_gameover);
         patterns_gameover_stop();
 
-        level = 0;
+        level = 1;
         lives = GAME_START_LIVES;
     }
 
