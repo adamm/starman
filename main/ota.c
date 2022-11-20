@@ -27,7 +27,6 @@
 
 #include "config.h"
 #include "display.h"
-#include "rgb.h"
 #include "sparkle.h"
 #include "text.h"
 #include "ota.h"
@@ -202,7 +201,6 @@ uint8_t ota_upgrade(void) {
     memset(display, 0, sizeof(display_t));
 
     while (1) {
-        // status_downloading();
         err = esp_https_ota_perform(https_ota_handle);
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
@@ -216,9 +214,7 @@ uint8_t ota_upgrade(void) {
         sprintf(progress_text, "%d%%", image_download_percent_rounded);
         text_write_string(display, progress_text);
         display_update_leds(display);
-        // status_waiting();
     }
-    // status_resetting();
     free(display);
 
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
