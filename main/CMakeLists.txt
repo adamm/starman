@@ -13,6 +13,7 @@ idf_component_register(SRCS
                     "ota.c"
                     "patterns.c"
                     "random.c"
+                    "rgb.c"
                     "sparkle.c"
                     "storage.c"
                     "text.c"

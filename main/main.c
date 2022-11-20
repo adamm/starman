@@ -32,6 +32,7 @@
 #include "patterns.h"
 #include "patterns_gol.h"
 #include "random.h"
+#include "rgb.h"
 #include "sparkle.h"
 #include "storage.h"
 #include "wifi_manager.h"
@@ -97,6 +98,7 @@ void app_main(void) {
     display_init();
     music_init();
     random_init();
+    // rgb_init();
 
     // Execute the play_game() function when the play button is pressed or /play is accessed
     buttons_play_callback(game_start);
