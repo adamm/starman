@@ -1,7 +1,34 @@
+@font-face {
+    font-family: PressStart;
+    src: url(PressStart2P-vaV7.ttf);
+}
+
+body {
+    /* font-family: PressStart; */
+}
+
+h1 {
+    display: inline-block;
+    margin: 0 10px 10px 0;
+}
+
+div.pages {
+    display: inline-block;
+}
+
+div.pages a {
+    margin: 5px 0;
+    display: inline-block;
+}
+
 div#play {
     margin: 20px 5px;
 }
 
 input#play-button {
     font-size: 30pt;
+}
+
+ul li {
+    margin: 20px 0;
 }
