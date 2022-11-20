@@ -18,12 +18,9 @@
 
 #include "config.h"
 #include "music.h"
+#include "music/smb.h"
 #include "patterns.h"
 #include "random.h"
-#include "smb.h"
-#include "smb2.h"
-#include "smb3.h"
-#include "smw.h"
 #include "sparkle.h"
 
 #include "game.h"
