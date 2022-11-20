@@ -32,6 +32,8 @@ static const char *TAG = "starman-httpd";
 static void (*play_callback_func)(void) = NULL;
 static TaskHandle_t http_task;
 
+extern const char about_html_start[] asm("_binary_about_html_start");
+extern const char about_html_end[] asm("_binary_about_html_end");
 extern const char index_html_start[] asm("_binary_index_html_start");
 extern const char index_html_end[] asm("_binary_index_html_end");
 extern const char starman_js_start[] asm("_binary_starman_js_start");
@@ -64,6 +66,15 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/html");
         httpd_resp_send(req, index_html_start, index_html_len);
+    }
+    if(strcmp(req->uri, "/about.html") == 0) {
+        ESP_LOGI(TAG, "Serving page /about.html");
+
+        const uint32_t about_html_len = about_html_end - about_html_start;
+
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "text/html");
+        httpd_resp_send(req, about_html_start, about_html_len);
     }
     if(strcmp(req->uri, "/starman.js") == 0) {
         ESP_LOGI(TAG, "Serving page /starman.js");

@@ -18,6 +18,7 @@ idf_component_register(SRCS
                     "text.c"
                     "util.c"
                     EMBED_FILES
+                    "assets/about.html"
                     "assets/index.html"
                     "assets/style.css"
                     "assets/starman.js"
