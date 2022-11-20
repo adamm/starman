@@ -23,6 +23,8 @@
     ((((x)&0xff000000) >> 24) | (((x)&0x00ff0000) >>  8) | \
      (((x)&0x0000ff00) <<  8) | (((x)&0x000000ff) << 24))
 #define WORD_SWAP(x) (((x & 0xff00) >> 8) | ((x & 0x00ff) << 8))
+#define MIN(x,y) ((x)<(y)?(x):(y))
+#define MAX(x,y) ((x)>(y)?(x):(y))
 
 void delay(uint32_t);
 void littleToBigEndian(uint32_t*, uint32_t);

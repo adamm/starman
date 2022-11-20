@@ -20,6 +20,14 @@ function get_status() {
 }
 
 
+function set_brightness() {
+    let value = $("#brightness").val();
+    $.post("/brightness", value, () => {
+        console.log("Setting brightness to:", value);
+    });
+}
+
+
 function play_button() {
     $.get("/play", response => {
         get_status();

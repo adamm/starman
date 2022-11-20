@@ -90,8 +90,8 @@ void wifi_connected(void *pvParameter) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "Main startup");
-    config_init();
     storage_init();
+    config_init();
     adc_init();
     buttons_init();
     display_init();
@@ -115,7 +115,8 @@ void app_main(void) {
     // game can begin even without wifi being ready.
     wifi_manager_start();
     wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &wifi_connected);
-    http_app_set_handler_hook(HTTP_GET, &httpd_handler);
+    http_app_set_handler_hook(HTTP_GET, &httpd_get_handler);
+    http_app_set_handler_hook(HTTP_POST, &httpd_post_handler);
 
     xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }

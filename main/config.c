@@ -15,31 +15,49 @@
 */
 
 #include <esp_log.h>
-#include "storage.h"
+#include <string.h>
 
 #define CONFIG_IMPORT
+
+#include "storage.h"
+#include "util.h"
 
 #include "config.h"
 
 static const char *TAG = "starman-config";
 
-void config_init() {
-    esp_err_t err;
-    size_t len;
 
-    // Note: if image-service or firmware-service URLs are undefined in
-    // NVS storage, the defaults in config.h are used.
+void config_set_firmware_track(char* value) {
+    strncpy(config_firmware_track, value, MIN(strlen(value), CONFIG_FIRMWARE_TRACK_MAXLEN));
+    storage_set_str(STORAGE_FIRMWARE_TRACK_KEY, value);
+}
 
-    err = storage_get_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, &len);
-    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, len, err);
 
-    err = storage_get_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track, &len);
-    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_TRACK_KEY, config_firmware_service_url, len, err);
+void config_set_brightness(int8_t value) {
+    config_brightness = value;
+    storage_set_int8(STORAGE_BRIGHTNESS_KEY, value);
 }
 
 
 void config_save() {
     storage_set_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url);
     storage_set_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track);
+    storage_set_int8(STORAGE_BRIGHTNESS_KEY, config_brightness);
 }
 
+
+void config_init() {
+    esp_err_t err;
+    size_t len;
+
+    // Note: if any config values are undefined in NVS storage, the defaults in config.h are used.
+
+    err = storage_get_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, &len);
+    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, len, err);
+
+    err = storage_get_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track, &len);
+    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_TRACK_KEY, config_firmware_service_url, len, err);
+
+    err = storage_get_int8(STORAGE_BRIGHTNESS_KEY, &config_brightness);
+    ESP_LOGW(TAG, "%s: %d (%d err)", STORAGE_BRIGHTNESS_KEY, config_brightness, err);
+}

@@ -115,20 +115,20 @@ static void set_brightness() {
     uint8_t current_gain = DISPLAY_LIGHTS_DEFAULT_GAIN;
 
     // Every 5 seconds measure the ambient brightness and update the display gain
+    // when config_brightness is set to auto (-1).  Otherwise, set display gain to
+    // config_brightness directly.
     for(;;) {
-        uint16_t brightness = adc_get_ambient_light_level();
-        display_gain = (uint8_t)((double)brightness * (double)DISPLAY_LIGHTS_MAX_GAIN / (double)ADC_MAX_AMBIENT_LIGHT_LEVEL);
+        if (config_brightness == -1) {
+            uint16_t brightness = adc_get_ambient_light_level();
+            display_gain = (uint8_t)((double)brightness * (double)DISPLAY_LIGHTS_MAX_GAIN / (double)ADC_MAX_AMBIENT_LIGHT_LEVEL);
+        }
+        else {
+            display_gain = config_brightness;
+        }
 
         if (display_gain != current_gain) {
             current_gain = display_gain;
-            ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", display_gain, DISPLAY_LIGHTS_MAX_GAIN);
-
-            if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
-                led1642gw_set_gain((uint8_t) display_gain);
-                led1642gw_flush_config();
-
-                xSemaphoreGive(led1642gw_lock);
-            }
+            display_set_brightness(display_gain);
         }
         vTaskDelay(5000 / portTICK_RATE_MS);
     }
@@ -145,11 +145,6 @@ void display_set_brightness(uint8_t gain) {
     display_gain = gain;
 
     ESP_LOGI(TAG, "Setting brightness to %d (max is %d)", display_gain, DISPLAY_LIGHTS_MAX_GAIN);
-    display_gain_automatic = false;
-    if (brightness_task != NULL) {
-        vTaskSuspend(brightness_task);
-        brightness_task = NULL;
-    }
 
     if (xSemaphoreTake(led1642gw_lock, (TickType_t) 1000) == pdTRUE) {
         led1642gw_set_gain((uint8_t) display_gain);

@@ -99,25 +99,31 @@
 #define CONFIG_ESP32_WIFI_TX_BUFFER_TYPE 1
 #endif
 
-#define CONFIG_DEFAULT_FIRMWARE_URL "https://starman.array.org"
-#define CONFIG_DEFAULT_FIRMWARE_TRACK "stable"
-
+#define CONFIG_FIRMWARE_URL_DEFAULT "https://starman.array.org"
 #define CONFIG_FIRMWARE_URL_MAXLEN 50
-#define CONFIG_FIRMWARE_TRACK_MAXLEN 10
-
 CONFIG_EXTERN char config_firmware_service_url[CONFIG_FIRMWARE_URL_MAXLEN]
 #ifdef CONFIG_IMPORT
-= CONFIG_DEFAULT_FIRMWARE_URL
+= CONFIG_FIRMWARE_URL_DEFAULT
 #endif
 ;
 
+#define CONFIG_FIRMWARE_TRACK_DEFAULT "stable"
+#define CONFIG_FIRMWARE_TRACK_MAXLEN 10
 CONFIG_EXTERN char config_firmware_track[CONFIG_FIRMWARE_TRACK_MAXLEN]
 #ifdef CONFIG_IMPORT
-= CONFIG_DEFAULT_FIRMWARE_TRACK
+= CONFIG_FIRMWARE_TRACK_DEFAULT
 #endif
 ;
 
-void config_init(void);
+CONFIG_EXTERN int8_t config_brightness
+#ifdef CONFIG_IMPORT
+= DISPLAY_LIGHTS_DEFAULT_GAIN
+#endif
+;
+
+void config_set_firmware_track(char*);
+void config_set_brightness(int8_t);
 void config_save(void);
+void config_init(void);
 
 #endif

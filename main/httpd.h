@@ -21,4 +21,5 @@
 
 
 void httpd_play_callback(void (*callback)(void));
-esp_err_t httpd_handler(httpd_req_t *req);
+esp_err_t httpd_get_handler(httpd_req_t *req);
+esp_err_t httpd_post_handler(httpd_req_t *req);

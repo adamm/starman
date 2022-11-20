@@ -53,10 +53,6 @@ void storage_init() {
 }
 
 
-void storage_stop() {
-}
-
-
 esp_err_t storage_get_str(const char* key, char* value, size_t* len) {
     nvs_handle_t handle;
     esp_err_t err;
@@ -86,14 +82,65 @@ esp_err_t storage_set_str(const char* key, const char* value) {
     nvs_handle_t handle;
     esp_err_t err;
 
-    ESP_LOGI(TAG, "Setting %s = %s", key, value);
+    ESP_LOGI(TAG, "Setting %s = %s (str)", key, value);
 
     nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &handle);
     err = nvs_set_str(handle, key, value);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "nvs_set_str returned err: %d", err);
+    }
+    else {
+        err = nvs_commit(handle);
+        if (err != ESP_OK)
+            ESP_LOGW(TAG, "nvs_commit returned err: %d", err);
+    }
+    nvs_close(handle);
+
+    return err;
+}
+
+
+esp_err_t storage_get_int8(const char* key, int8_t* value) {
+    nvs_handle_t handle;
+    esp_err_t err;
+
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "nvs_open returned err: %d", err);
+        return err;
+    }
+    err = nvs_get_i8(handle, key, value);
+    // ESP_LOGI(TAG, "Loading %s = %d", key, *value);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "nvs_get_i8 returned err: %d", err);
+    }
+    nvs_close(handle);
+
+    return err;
+}
+
+
+esp_err_t storage_set_int8(const char* key, int8_t value) {
+    nvs_handle_t handle;
+    esp_err_t err;
+
+    ESP_LOGI(TAG, "Setting %s = %d (int8)", key, value);
+
+    nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &handle);
+    err = nvs_set_i8(handle, key, value);
+
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "nvs_set_i8 returned err: %d", err);
+    }
+    else {
+        err = nvs_commit(handle);
+        if (err != ESP_OK)
+            ESP_LOGW(TAG, "nvs_commit returned err: %d", err);
+    }
     nvs_close(handle);
 
     if (err != ESP_OK)
-        ESP_LOGW(TAG, "nvs_set_str returned err: %d", err);
+        ESP_LOGW(TAG, "nvs_set_i8 returned err: %d", err);
 
     return err;
 }

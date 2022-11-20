@@ -25,6 +25,8 @@
 
 #include "display.h"
 #include "game.h"
+#include "storage.h"
+#include "util.h"
 
 #include "httpd.h"
 
@@ -55,11 +57,24 @@ static void play_task() {
 }
 
 
-esp_err_t httpd_handler(httpd_req_t *req) {
-    /* our custom page sits at /helloworld in this example */
+static esp_err_t post_handler(httpd_req_t *req, char* content, size_t len) {
+    size_t recv_size = MIN(req->content_len, len);
+
+    ESP_LOGI(TAG, "recv_size: %d", recv_size);
+
+    int ret = httpd_req_recv(req, content, recv_size);
+    if (ret <= 0) {  /* 0 return value indicates connection closed */
+        return ESP_FAIL;
+    }
+    ESP_LOGI(TAG, "bytes read: %d", ret);
+    return ESP_OK;
+}
+
+
+esp_err_t httpd_get_handler(httpd_req_t *req) {
+    ESP_LOGI(TAG, "GET %s", req->uri);
     if(strcmp(req->uri, "/") == 0 ||
        strcmp(req->uri, "/index.html") == 0) {
-        ESP_LOGI(TAG, "Serving page /");
 
         const uint32_t index_html_len = index_html_end - index_html_start;
 
@@ -68,8 +83,6 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_send(req, index_html_start, index_html_len);
     }
     if(strcmp(req->uri, "/about.html") == 0) {
-        ESP_LOGI(TAG, "Serving page /about.html");
-
         const uint32_t about_html_len = about_html_end - about_html_start;
 
         httpd_resp_set_status(req, "200 OK");
@@ -77,8 +90,6 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_send(req, about_html_start, about_html_len);
     }
     if(strcmp(req->uri, "/starman.js") == 0) {
-        ESP_LOGI(TAG, "Serving page /starman.js");
-
         const uint32_t starman_js_len = starman_js_end - starman_js_start;
 
         httpd_resp_set_status(req, "200 OK");
@@ -86,8 +97,6 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_send(req, starman_js_start, starman_js_len);
     }
     if(strcmp(req->uri, "/style.css") == 0) {
-        ESP_LOGI(TAG, "Serving page /style.css");
-
         const uint32_t style_css_len = style_css_end - style_css_start;
 
         httpd_resp_set_status(req, "200 OK");
@@ -95,10 +104,7 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_send(req, style_css_start, style_css_len);
     }
     if(strcmp(req->uri, "/status.json") == 0) {
-        ESP_LOGI(TAG, "Serving page /status.json");
-
-        char* json = malloc(130);
-        memset(json, 0, 130);
+        char* json = calloc(130, sizeof(char));
 
         const esp_partition_t *running = esp_ota_get_running_partition();
         esp_app_desc_t running_app_info;
@@ -116,12 +122,16 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         free(json);
     }
     else if (strcmp(req->uri, "/brightness") == 0) {
-        uint8_t gain;
+        char* json = calloc(50, sizeof(char));
 
-        // TODO: Get the value from the HTTP POST
-        gain = 25;
+        sprintf(json, "{\"config\":%d,\"actual\":%d}",
+            config_brightness, display_get_brightness());
 
-        display_set_brightness(gain);
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "application/json");
+        httpd_resp_send(req, json, strlen(json));
+
+        free(json);
     }
     else if (strcmp(req->uri, "/play") == 0) {
         xTaskCreate(play_task, "play", 8192, NULL, 5, &http_task);
@@ -133,9 +143,51 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_send(req, response, strlen(response));
     }
     else {
-        /* send a 404 otherwise */
         httpd_resp_send_404(req);
     }
 
+    return ESP_OK;
+}
+
+
+esp_err_t httpd_post_handler(httpd_req_t *req) {
+    ESP_LOGI(TAG, "POST %s", req->uri);
+    if (strcmp(req->uri, "/brightness") == 0) {
+        char* value_str = calloc(10, sizeof(char));
+        esp_err_t err;
+
+        err = post_handler(req, value_str, 10);
+        ESP_LOGI(TAG, "Got value /brightness: %s", value_str);
+        if (err == ESP_OK) {
+            int base = 10;
+            intmax_t value = 0;
+
+            value = strtoimax(value_str, NULL, base);
+
+            if (value == -1) {
+                config_set_brightness((int8_t)value);
+                // Begin automatic brightness setting procedure
+            }
+            else if (0 <= value && value <= DISPLAY_LIGHTS_MAX_GAIN) {
+                config_set_brightness((int8_t)value);
+                display_set_brightness((int8_t)value);
+            }
+            else {
+                // TODO: Return an HTTP error response that brightness must be between -1 and 50
+                ESP_LOGE(TAG, "Brightness must be between -1 and %d", DISPLAY_LIGHTS_MAX_GAIN);
+            }
+            httpd_resp_set_status(req, "200 OK");
+            httpd_resp_send(req, NULL, 0);
+        }
+        else {
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_send(req, NULL, 0);
+        }
+        free(value_str);
+    }
+    else {
+        ESP_LOGW(TAG, "Cannot find %s (%d)", req->uri, req->method);
+        httpd_resp_send_404(req);
+    }
     return ESP_OK;
 }
