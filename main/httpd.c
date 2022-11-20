@@ -32,12 +32,12 @@ static const char *TAG = "starman-httpd";
 static void (*play_callback_func)(void) = NULL;
 static TaskHandle_t http_task;
 
-extern const char starman_html_start[] asm("_binary_starman_html_start");
-extern const char starman_html_end[] asm("_binary_starman_html_end");
+extern const char index_html_start[] asm("_binary_index_html_start");
+extern const char index_html_end[] asm("_binary_index_html_end");
 extern const char starman_js_start[] asm("_binary_starman_js_start");
 extern const char starman_js_end[] asm("_binary_starman_js_end");
-extern const char starman_css_start[] asm("_binary_starman_css_start");
-extern const char starman_css_end[] asm("_binary_starman_css_end");
+extern const char style_css_start[] asm("_binary_style_css_start");
+extern const char style_css_end[] asm("_binary_style_css_end");
 
 
 void httpd_play_callback(void (*callback)(void)) {
@@ -55,14 +55,15 @@ static void play_task() {
 
 esp_err_t httpd_handler(httpd_req_t *req) {
     /* our custom page sits at /helloworld in this example */
-    if(strcmp(req->uri, "/") == 0) {
+    if(strcmp(req->uri, "/") == 0 ||
+       strcmp(req->uri, "/index.html") == 0) {
         ESP_LOGI(TAG, "Serving page /");
 
-        const uint32_t starman_html_len = starman_html_end - starman_html_start;
+        const uint32_t index_html_len = index_html_end - index_html_start;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/html");
-        httpd_resp_send(req, starman_html_start, starman_html_len);
+        httpd_resp_send(req, index_html_start, index_html_len);
     }
     if(strcmp(req->uri, "/starman.js") == 0) {
         ESP_LOGI(TAG, "Serving page /starman.js");
@@ -73,14 +74,14 @@ esp_err_t httpd_handler(httpd_req_t *req) {
         httpd_resp_set_type(req, "text/javascript");
         httpd_resp_send(req, starman_js_start, starman_js_len);
     }
-    if(strcmp(req->uri, "/starman.css") == 0) {
-        ESP_LOGI(TAG, "Serving page /starman.css");
+    if(strcmp(req->uri, "/style.css") == 0) {
+        ESP_LOGI(TAG, "Serving page /style.css");
 
-        const uint32_t starman_css_len = starman_css_end - starman_css_start;
+        const uint32_t style_css_len = style_css_end - style_css_start;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/css");
-        httpd_resp_send(req, starman_css_start, starman_css_len);
+        httpd_resp_send(req, style_css_start, style_css_len);
     }
     if(strcmp(req->uri, "/status.json") == 0) {
         ESP_LOGI(TAG, "Serving page /status.json");
