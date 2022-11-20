@@ -1,3 +1,19 @@
+/*
+   Copyright 2022 Adam McDaniel
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 #include <esp_log.h>
 #include <esp_random.h>
 #include <freertos/FreeRTOS.h>
@@ -338,9 +354,15 @@ void patterns_gol_sprinkles() {
 }
 
 
+static uint8_t lines_direction = 0;
+static uint16_t lines_time = 0;
+
+
 void patterns_lines() {
     ESP_LOGI(TAG, "Begin LINES pattern");
 
+    lines_direction = 0;
+    lines_time = 0;
     display_reset(&display);
     display.pattern = &lines;
     memcpy(display.background, lines.data, DISPLAY_LIGHTS_TOTAL_AREA);
@@ -349,7 +371,29 @@ void patterns_lines() {
 
 
 static void patterns_lines_step() {
-    scroll(0, 1, true, 0);
+    // After every 22 steps, rotate the pattern and change scroll direction
+    if (lines_time++ >= 22) {
+        rotate(90);
+        lines_direction++;
+        lines_time = 0;
+    }
+
+    if (lines_direction == 0) {
+        scroll(0, 1, true, 0);
+    }
+    else if (lines_direction == 1) {
+        scroll(1, 0, true, 0);
+    }
+    else if (lines_direction == 2) {
+        scroll(0, -1, true, 0);
+    }
+    else if (lines_direction == 3) {
+        scroll(-1, 0, true, 0);
+    }
+    else {
+        lines_direction = 0;
+        scroll(0, 1, true, 0);
+    }
 }
 
 

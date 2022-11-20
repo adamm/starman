@@ -1,3 +1,19 @@
+/*
+   Copyright 2022 Adam McDaniel
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 #include <esp_crt_bundle.h>
 #include <esp_http_client.h>
 #include <esp_https_ota.h>
@@ -11,7 +27,6 @@
 
 #include "config.h"
 #include "display.h"
-#include "rgb.h"
 #include "sparkle.h"
 #include "text.h"
 #include "ota.h"
@@ -186,7 +201,6 @@ uint8_t ota_upgrade(void) {
     memset(display, 0, sizeof(display_t));
 
     while (1) {
-        // status_downloading();
         err = esp_https_ota_perform(https_ota_handle);
         if (err != ESP_ERR_HTTPS_OTA_IN_PROGRESS) {
             break;
@@ -200,9 +214,7 @@ uint8_t ota_upgrade(void) {
         sprintf(progress_text, "%d%%", image_download_percent_rounded);
         text_write_string(display, progress_text);
         display_update_leds(display);
-        // status_waiting();
     }
-    // status_resetting();
     free(display);
 
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {

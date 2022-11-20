@@ -14,10 +14,13 @@
    limitations under the License.
 */
 
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef ADC_H
+#define ADC_H
 
-void buttons_play_callback(void (*callback)(void));
-void buttons_init(void);
+#define ADC_MAX_AMBIENT_LIGHT_LEVEL 4096
+
+uint16_t adc_get_ambient_light_level();
+void adc_init();
+
 
 #endif

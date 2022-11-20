@@ -1,3 +1,19 @@
+/*
+   Copyright 2022 Adam McDaniel
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <string.h>
@@ -209,8 +225,8 @@ void led1642gw_flush_config()
         write_no_command(data);
     }
     memcpy(&data, &config_register[ic], sizeof(uint16_t));
-    ESP_LOGI(TAG, "Sending config:");
-    ESP_LOG_BUFFER_HEX(TAG, config_register, sizeof(config_register_t)*NUM_LED1642GW_ICs);
+    ESP_LOGD(TAG, "Sending config:");
+    ESP_LOG_BUFFER_HEX_LEVEL(TAG, config_register, sizeof(config_register_t)*NUM_LED1642GW_ICs, ESP_LOG_DEBUG);
     write_data(data, LED1642GW_WRITE_CONFIG_LATCH);
 }
 
@@ -335,8 +351,8 @@ void led1642gw_init(void) {
         memset(&config_register[ic], 0, sizeof(config_register_t));
     }
 
-    if (DISPLAY_LIGHTS_GAIN <= 50) {
-        led1642gw_set_gain(DISPLAY_LIGHTS_GAIN);
+    if (DISPLAY_LIGHTS_DEFAULT_GAIN <= DISPLAY_LIGHTS_MAX_GAIN) {
+        led1642gw_set_gain(DISPLAY_LIGHTS_DEFAULT_GAIN);
     }
     led1642gw_flush_config();
     led1642gw_activate();

@@ -1,8 +1,10 @@
 idf_component_register(SRCS
                     "main.c"
+                    "adc.c"
                     "buttons.c"
                     "config.c"
                     "display.c"
+                    "game.c"
                     "gol.c"
                     "httpd.c"
                     "led1642gw.c"
@@ -11,9 +13,12 @@ idf_component_register(SRCS
                     "ota.c"
                     "patterns.c"
                     "random.c"
-                    "rgb.c"
                     "sparkle.c"
                     "storage.c"
                     "text.c"
                     "util.c"
+                    EMBED_FILES
+                    "assets/starman.html"
+                    "assets/starman.css"
+                    "assets/starman.js"
                     INCLUDE_DIRS ".")

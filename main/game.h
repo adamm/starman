@@ -14,10 +14,13 @@
    limitations under the License.
 */
 
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef GAME_H
+#define GAME_H
 
-void buttons_play_callback(void (*callback)(void));
-void buttons_init(void);
+uint8_t game_get_level();
+uint8_t game_get_lives();
+uint8_t game_get_playing_state();
+bool game_step_sequence(uint32_t time);
+void game_start(void);
 
 #endif

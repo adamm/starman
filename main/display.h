@@ -1,3 +1,19 @@
+/*
+   Copyright 2022 Adam McDaniel
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
@@ -36,6 +52,8 @@ static const uint8_t LED_LUT[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {
 void display_update_leds(display_t*);
 void display_update_leds_raw(uint8_t*);
 void display_reset(display_t*);
+uint8_t display_get_brightness();
+void display_set_brightness(uint8_t);
 void display_init(void);
 
 #endif

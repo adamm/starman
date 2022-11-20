@@ -1,3 +1,19 @@
+/*
+   Copyright 2022 Adam McDaniel
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
@@ -20,6 +36,8 @@ static int16_t sparkle_delay[SPARKLE_MAX_LEDS];
 static TaskHandle_t sparkle_task;
 static TaskHandle_t scroller_task;
 static display_t display;
+
+#define TASK_SHUTDOWN_SIGNAL 1
 
 // static const uint8_t sparkle_1[3][3] = {
 //     {  25,  92,  25 },
@@ -58,7 +76,16 @@ static const uint8_t sparkle_ball[9][9] = {
 };
 
 void sparkle_step() {
+    uint32_t task_signal = 0;
+
     while(1) {
+        // Only stop sparkling when we get a signal to stop -- see "IMPORTANT" note below
+        xTaskNotifyWait(0, ULONG_MAX, &task_signal, 0);
+        if (task_signal & TASK_SHUTDOWN_SIGNAL) {
+            vTaskDelete(NULL);
+            return; // ...probably redundant but looks proper
+        }
+
         memset(display.background, 25, DISPLAY_LIGHTS_TOTAL_AREA);
         for (uint8_t i = 0; i < SPARKLE_MAX_LEDS; i++) {
             // Go through each of the active sparkle LEDs, and use 
@@ -145,6 +172,7 @@ void debug_step() {
     i++;
 }
 
+
 display_t* sparkle_get_display(void) {
     return &display;
 }
@@ -173,8 +201,12 @@ void sparkle_start(void) {
 void sparkle_stop(void) {
     ESP_LOGI(TAG, "Stop sparkle thread");
 
+    // IMPORTANT: We cannot kill the sparkle_task if it's in the process of
+    // running display_update_leds(&display).  This results in a deadlock
+    // becuase the thread could be stopped before it has a chance to free the
+    // semaphore led1642gw_lock in display.c.
     if (sparkle_task != NULL) {
-        vTaskDelete(sparkle_task);
+        xTaskNotify(sparkle_task, TASK_SHUTDOWN_SIGNAL, eSetValueWithOverwrite);
         sparkle_task = NULL;
     }
 
