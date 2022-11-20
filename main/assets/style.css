@@ -12,6 +12,14 @@ h1 {
     margin: 0 10px 10px 0;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:visited {
+    color: blue;
+}
+
 div.pages {
     display: inline-block;
 }
@@ -19,6 +27,10 @@ div.pages {
 div.pages a {
     margin: 5px 0;
     display: inline-block;
+}
+
+div.pages a.selected {
+    font-weight: bold;
 }
 
 div#play {
