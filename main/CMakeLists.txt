@@ -4,6 +4,7 @@ idf_component_register(SRCS
                     "buttons.c"
                     "config.c"
                     "display.c"
+                    "draw.c"
                     "game.c"
                     "gol.c"
                     "httpd.c"
