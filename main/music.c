@@ -87,7 +87,7 @@ static bool (*callback_func)(uint32_t) = NULL;
 static void music_stepscore(void);
 static void music_stopscore(void);
 
-static void music_test_chords(void) {
+static inline void music_test_chords(void) {
     
     int total = sizeof(freqs) / sizeof(uint32_t);
 

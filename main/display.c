@@ -33,7 +33,6 @@ static const char *TAG = "starman-display";
 static SemaphoreHandle_t led1642gw_lock = NULL;
 static TaskHandle_t brightness_task = NULL;
 static uint8_t display_gain = DISPLAY_LIGHTS_DEFAULT_GAIN;
-static bool display_gain_automatic = true;
 
 
 // Funcion called on each pattern refresh cycle. It will map each active pattern pixel to the physical LED output array.
