@@ -27,7 +27,7 @@
 #define DISPLAY_LIGHTS_TOTAL_AREA (DISPLAY_LIGHTS_WIDTH * DISPLAY_LIGHTS_HEIGHT)
 
 // Gain must be 50 or less -- turning on all LEDs will overdraw power/overheat components!
-#define DISPLAY_LIGHTS_MAX_GAIN      50
+#define DISPLAY_LIGHTS_MAX_GAIN      100
 #define DISPLAY_LIGHTS_DEFAULT_GAIN  25
 
 // Game of Life has a playgrid larger than the display area.  This allows for more

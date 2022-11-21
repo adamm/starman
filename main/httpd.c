@@ -173,7 +173,7 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
                 display_set_brightness((int8_t)value);
             }
             else {
-                // TODO: Return an HTTP error response that brightness must be between -1 and 50
+                // TODO: Return an HTTP error response that brightness must be between -1 and configured max gain
                 ESP_LOGE(TAG, "Brightness must be between -1 and %d", DISPLAY_LIGHTS_MAX_GAIN);
             }
             httpd_resp_set_status(req, "200 OK");
