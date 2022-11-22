@@ -219,23 +219,18 @@ void sparkle_stop(void) {
 
 void sparkle_scroll_step() {
     TickType_t delay = 75;
-    TickType_t stopAt = 500;
-    TickType_t start_ticks = xTaskGetTickCount();
-    TickType_t now_ticks = xTaskGetTickCount();
+    uint32_t total_steps = display.text_width + 100;
+    uint32_t steps = 0;
 
-    while(1) {
-        now_ticks = xTaskGetTickCount();
+    while(steps++ < total_steps) {
         text_scroll(&display);
-        if (now_ticks - start_ticks > stopAt) {
-            // Keep the display object intact; only clear the text portion.
-            text_clear_string(&display);
-            scroller_task = NULL;
-            vTaskDelete(NULL);
-        }
-        else {
-            vTaskDelay(delay / portTICK_RATE_MS);
-        }
+        vTaskDelay(delay / portTICK_RATE_MS);
     }
+
+    // Keep the display object intact; only clear the text portion.
+    text_clear_string(&display);
+    scroller_task = NULL;
+    vTaskDelete(NULL);
 }
 
 

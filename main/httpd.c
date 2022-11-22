@@ -26,6 +26,7 @@
 #include "display.h"
 #include "game.h"
 #include "storage.h"
+#include "sparkle.h"
 #include "util.h"
 
 #include "httpd.h"
@@ -153,11 +154,12 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
 esp_err_t httpd_post_handler(httpd_req_t *req) {
     ESP_LOGI(TAG, "POST %s", req->uri);
     if (strcmp(req->uri, "/brightness") == 0) {
-        char* value_str = calloc(10, sizeof(char));
+        uint16_t const value_maxlen = 10;
+        char* value_str = calloc(value_maxlen, sizeof(char));
         esp_err_t err;
 
-        err = post_handler(req, value_str, 10);
-        ESP_LOGI(TAG, "Got value /brightness: %s", value_str);
+        err = post_handler(req, value_str, value_maxlen);
+        ESP_LOGI(TAG, "Got value for /brightness: %s", value_str);
         if (err == ESP_OK) {
             int base = 10;
             intmax_t value = 0;
@@ -184,6 +186,25 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
             httpd_resp_send(req, NULL, 0);
         }
         free(value_str);
+    }
+    if (strcmp(req->uri, "/text") == 0) {
+        uint16_t const text_maxlen = 255;
+        char* text_str = calloc(text_maxlen, sizeof(char));
+        esp_err_t err;
+
+        // XXX: Only allow pushed text to display during the sparkle routine.
+
+        err = post_handler(req, text_str, text_maxlen);
+        ESP_LOGI(TAG, "Got value for /text: %s", text_str);
+        if (err == ESP_OK) {
+            sparkle_scroll_string(text_str);
+            httpd_resp_set_status(req, "200 OK");
+            httpd_resp_send(req, NULL, 0);
+        }
+        else {
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_send(req, NULL, 0);
+        }
     }
     else {
         ESP_LOGW(TAG, "Cannot find %s (%d)", req->uri, req->method);
