@@ -23,6 +23,7 @@
 #include <http_app.h>
 #include <string.h>
 
+#include "config.h"
 #include "display.h"
 #include "game.h"
 #include "storage.h"
@@ -105,16 +106,16 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_send(req, style_css_start, style_css_len);
     }
     if(strcmp(req->uri, "/status.json") == 0) {
-        char* json = calloc(130, sizeof(char));
+        char* json = calloc(140, sizeof(char));
 
         const esp_partition_t *running = esp_ota_get_running_partition();
         esp_app_desc_t running_app_info;
         if (esp_ota_get_partition_description(running, &running_app_info) != ESP_OK)
             strcpy(running_app_info.version, "unknown");
 
-        sprintf(json, "{\"level\":%d,\"lives\":%d,\"state\":\"%s\",\"brightness\":%d,\"firmware\":\"%s\"}",
+        sprintf(json, "{\"level\":%d,\"lives\":%d,\"state\":\"%s\",\"brightness\":%d,\"fw_version\":\"%s\",\"fw_track\":\"%s\"}",
             game_get_level(), game_get_lives(), game_get_playing_state() ? "playing" : "idle",
-            display_get_brightness(), running_app_info.version);
+            display_get_brightness(), running_app_info.version, config_firmware_track);
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "application/json");
@@ -138,6 +139,13 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         xTaskCreate(play_task, "play", 8192, NULL, 5, &http_task);
 
         const char* response = "OK";
+
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "text/plain");
+        httpd_resp_send(req, response, strlen(response));
+    }
+    else if (strcmp(req->uri, "/track") == 0) {
+        const char* response = config_firmware_track;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/plain");
@@ -198,6 +206,26 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
         ESP_LOGI(TAG, "Got value for /text: %s", text_str);
         if (err == ESP_OK) {
             sparkle_scroll_string(text_str);
+            httpd_resp_set_status(req, "200 OK");
+            httpd_resp_send(req, NULL, 0);
+        }
+        else {
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_send(req, NULL, 0);
+        }
+    }
+    else if (strcmp(req->uri, "/track") == 0) {
+        uint16_t const text_maxlen = CONFIG_FIRMWARE_TRACK_MAXLEN;
+        char* text_str = calloc(text_maxlen, sizeof(char));
+        esp_err_t err;
+
+        err = post_handler(req, text_str, text_maxlen);
+        ESP_LOGI(TAG, "Got value for /track: %s", text_str);
+        if (err == ESP_OK &&
+           (strcmp(text_str, CONFIG_FIRMWARE_TRACK_STABLE) == 0 ||
+            strcmp(text_str, CONFIG_FIRMWARE_TRACK_TESTING) == 0 ||
+            strcmp(text_str, CONFIG_FIRMWARE_TRACK_UNSTABLE) == 0)) {
+            config_set_firmware_track(text_str);
             httpd_resp_set_status(req, "200 OK");
             httpd_resp_send(req, NULL, 0);
         }

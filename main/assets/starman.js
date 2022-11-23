@@ -11,7 +11,8 @@ function get_status() {
         $("#level").html(status.level);
         $("#state").html(status.state);
         $("#brightness").val(status.brightness);
-        $("#firmware").html(status.firmware);
+        $("#fw-version").html(status.fw_version);
+        $("#fw-track").html(status.fw_track);
         if (status.state == "idle")
             $("#play-button").prop("disabled", "");
         else
