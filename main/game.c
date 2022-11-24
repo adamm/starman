@@ -36,6 +36,7 @@ static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
+static uint32_t player_finishes     = 0;
 
 
 uint8_t game_get_level() {
@@ -71,6 +72,10 @@ bool game_step_sequence(uint32_t time) {
     }
     else if (player_dies && player_dies < time) {
         ESP_LOGW(TAG, "Pause level: Player died");
+        return true;
+    }
+    else if (player_finishes && player_finishes < time) {
+        ESP_LOGW(TAG, "Pause level: Player finished the level");
         return true;
     }
 
@@ -147,6 +152,8 @@ void game_start(void) {
         player_gets_warning = random_value_within_int(900) + length - 900;
     if (player_dies)
         player_dies = random_value_within_int(length);
+    else
+        player_finishes = random_value_within_int(length/2) + length/2;
 
 
     ESP_LOGI(TAG, "Player level:  %d", level);
@@ -166,6 +173,9 @@ void game_start(void) {
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
     if (player_dies)
         ESP_LOGI(TAG, " ... at %d", player_dies);
+    ESP_LOGI(TAG, "Player finishes?  %s", player_finishes ? "Yes" : "No");
+    if (player_finishes)
+        ESP_LOGI(TAG, " ... at %d", player_finishes);
 
     uint32_t stopped_music_time = 0;
     music_settempo(100);
@@ -204,6 +214,10 @@ void game_start(void) {
 
         // If the user is destined to die, the level music will not resume
         if (player_dies && player_dies <= stopped_music_time)
+            break;
+
+        // The player could finish the level before the music is done
+        if (player_finishes && player_finishes <= stopped_music_time)
             break;
     }
 
