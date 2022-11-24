@@ -62,7 +62,7 @@ static void patterns_siren_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
 static void patterns_swipe_step();
-static void patterns_swoosh_step();
+static void patterns_starman_step();
 static void patterns_swoop_step();
 static void patterns_thump_step();
 static void patterns_waves_step();
@@ -514,13 +514,13 @@ static void patterns_swipe_step() {
 }
 
 
-void patterns_swoosh() {
-    ESP_LOGI(TAG, "Begin SWOOP pattern");
+void patterns_starman() {
+    ESP_LOGI(TAG, "Begin STARMAN pattern");
 
     display_reset(&display);
     display.pattern = &swoosh;
     memcpy(display.background, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
-    callback_func = patterns_swoosh_step;
+    callback_func = patterns_starman_step;
 
     size_t border_length = sizeof(star_border)/3;
     uint8_t intensity = 0xF0;
@@ -532,7 +532,7 @@ void patterns_swoosh() {
 }
     
 
-static void patterns_swoosh_step() {
+static void patterns_starman_step() {
     size_t border_length = sizeof(star_border)/3;
     uint8_t i, x, y;
 

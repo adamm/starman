@@ -264,6 +264,25 @@ static void music_stepscore(void) {
 }
 
 
+size_t music_get_score_length(const byte* score) {
+    size_t len = 0;
+    const byte* ptr = score;
+    size_t max = 0xffff;
+
+    while (*ptr != CMD_STOP && len < max) {
+        len++;
+        ptr++;
+    }
+
+    return len;
+}
+
+
+uint8_t music_gettempo(void) {
+    return _tune_speed;
+}
+
+
 void music_settempo(uint8_t new_tempo) {
     _tune_speed = new_tempo;
 }

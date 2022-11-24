@@ -40,8 +40,10 @@ typedef struct {  // the optional bytestream file header
 typedef unsigned char byte;
 
 void music_callback(bool (*callback)(uint32_t));
+size_t music_get_score_length(const byte* score);
 uint32_t music_playscore(const byte* score);
 uint32_t music_playscore_at_time(const byte*, uint32_t);
+uint8_t music_gettempo(void);
 void music_settempo(uint8_t);
 void music_amp_unmute(void);
 void music_amp_mute(void);

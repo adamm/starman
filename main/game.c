@@ -22,6 +22,7 @@
 #include "patterns.h"
 #include "random.h"
 #include "sparkle.h"
+#include "themes.h"
 
 #include "game.h"
 
@@ -37,6 +38,7 @@ static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
 static uint32_t player_finishes     = 0;
+static const theme_t* active_theme = themes[0].theme;
 
 
 uint8_t game_get_level() {
@@ -110,24 +112,24 @@ void game_start(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = patterns_swipe;
-        level_music = smb_overworld;
-        length = sizeof(smb_overworld);
+        level_pattern = active_theme[THEME_STAGE_level_1].pattern;
+        level_music = active_theme[THEME_STAGE_level_1].score;
+        length = music_get_score_length(active_theme[THEME_STAGE_level_1].score);
     }
     else if (level == 2) {
-        level_pattern = patterns_lines;
-        level_music = smb_underworld;
-        length = sizeof(smb_underworld);
+        level_pattern = active_theme[THEME_STAGE_level_2].pattern;
+        level_music = active_theme[THEME_STAGE_level_2].score;
+        length = music_get_score_length(active_theme[THEME_STAGE_level_2].score);
     }
     else if (level == 3) {
-        level_pattern = patterns_waves;
-        level_music = smb_underwater;
-        length = sizeof(smb_underwater);
+        level_pattern = active_theme[THEME_STAGE_level_3].pattern;
+        level_music = active_theme[THEME_STAGE_level_3].score;
+        length = music_get_score_length(active_theme[THEME_STAGE_level_3].score);
     }
     else if (level == 4) {
-        level_pattern = patterns_castle;
-        level_music = smb_castle;
-        length = sizeof(smb_castle);
+        level_pattern = active_theme[THEME_STAGE_level_4].pattern;
+        level_music = active_theme[THEME_STAGE_level_4].score;
+        length = music_get_score_length(active_theme[THEME_STAGE_level_4].score);
     }
     else {
         // We shouldn't get here.  Reset!
@@ -187,28 +189,40 @@ void game_start(void) {
         stopped_music_time = music_playscore_at_time(level_music, stopped_music_time);
 
         if (player_gets_star && player_gets_star <= stopped_music_time) {
+            uint8_t prev_tempo = music_gettempo();
             player_gets_star = 0;
-            patterns_question();
-            music_playscore(smb_block);
-            patterns_flash();
-            music_playscore(smb_powerup);
-            patterns_swoosh();
-            music_playscore(smb_starman);
+
+            active_theme[THEME_STAGE_block].pattern();
+            music_playscore(active_theme[THEME_STAGE_block].score);
+
+            active_theme[THEME_STAGE_powerup].pattern();
+            music_playscore(active_theme[THEME_STAGE_powerup].score);
+
+            active_theme[THEME_STAGE_starman].pattern();
+            music_playscore(active_theme[THEME_STAGE_starman].score);
+
+            music_settempo(prev_tempo);
         }
 
         if (player_gets_1up && player_gets_1up <= stopped_music_time) {
             lives++;
+            uint8_t prev_tempo = music_gettempo();
             player_gets_1up = 0;
-            patterns_question();
-            music_playscore(smb_block);
-            patterns_checkered();
-            music_playscore(smb_1up);
+
+            active_theme[THEME_STAGE_block].pattern();
+            music_playscore(active_theme[THEME_STAGE_block].score);
+
+            active_theme[THEME_STAGE_1up].pattern();
+            music_playscore(active_theme[THEME_STAGE_1up].score);
+
+            music_settempo(prev_tempo);
         }
 
         if (player_gets_warning && player_gets_warning <= stopped_music_time) {
             player_gets_warning = 0;
-            patterns_siren();
-            music_playscore(smb_warning);
+
+            active_theme[THEME_STAGE_warning].pattern();
+            music_playscore(active_theme[THEME_STAGE_warning].score);
             music_settempo(150);
         }
 
@@ -226,32 +240,36 @@ void game_start(void) {
     if (player_dies) {
         lives--;
         player_dies = 0;
-        patterns_spiral();
-        music_playscore(smb_death);
+
+        active_theme[THEME_STAGE_death].pattern();
+        music_playscore(active_theme[THEME_STAGE_death].score);
     }
     else if (level == 4) {
-        patterns_checkered();
-        music_playscore(smb_fanfare);
+        active_theme[THEME_STAGE_fanfare].pattern();
+        music_playscore(active_theme[THEME_STAGE_fanfare].score);
 
         if (player_gets_ending) {
             player_gets_ending = 0;
-            patterns_diamonds();
-            music_playscore(smb_ending);
+
+            active_theme[THEME_STAGE_ending].pattern();
+            music_playscore(active_theme[THEME_STAGE_ending].score);
         }
         level = 1;
         lives = GAME_START_LIVES;
     }
     else {
-        patterns_sweep();
-        music_playscore(smb_flagpole);
-        patterns_radar();
-        music_playscore(smb_course_clear);
+        active_theme[THEME_STAGE_success].pattern();
+        music_playscore(active_theme[THEME_STAGE_success].score);
+
+        active_theme[THEME_STAGE_clear].pattern();
+        music_playscore(active_theme[THEME_STAGE_clear].score);
+
         level++;
     }
 
     if (lives == 0) {
-        patterns_gameover();
-        music_playscore(smb_gameover);
+        active_theme[THEME_STAGE_gameover].pattern();
+        music_playscore(active_theme[THEME_STAGE_gameover].score);
         patterns_gameover_stop();
 
         level = 1;
