@@ -27,7 +27,9 @@ struct display {
     uint16_t text_height;
     uint16_t text_width;
     uint8_t grid[GOL_GRID_HEIGHT][GOL_GRID_WIDTH];
-    const pattern_t* pattern;
+    pattern_t const * pattern;
+    uint16_t pattern_x;
+    uint16_t pattern_y;
 } typedef display_t;
 
 static const uint8_t LED_LUT[DISPLAY_LIGHTS_HEIGHT][DISPLAY_LIGHTS_WIDTH] = {

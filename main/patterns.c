@@ -68,7 +68,7 @@ static void patterns_thump_step();
 static void patterns_waves_step();
 
 
-static void invert() {
+static void invert_background() {
     for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             display.background[y][x] = 255 - display.background[y][x];
@@ -77,7 +77,7 @@ static void invert() {
 }
 
 
-static void scroll(int8_t rows, int8_t cols, bool copy, uint8_t fill) {
+static void scroll_background(int8_t rows, int8_t cols, bool copy, uint8_t fill) {
     if (rows > 0) {
         uint8_t temp[DISPLAY_LIGHTS_WIDTH] = {0};
         memcpy(temp, display.background[0], DISPLAY_LIGHTS_WIDTH);
@@ -132,7 +132,7 @@ static void swap(uint8_t *x, uint8_t *y) {
 }
 
 
-static void rotate(int8_t degrees) {
+static void rotate_background(int8_t degrees) {
     // TODO: For rotations not 90˚, implement https://en.wikipedia.org/wiki/Rotation_matrix
     if (degrees == 90) {
         // Transpose x,y then reverse columns
@@ -191,7 +191,7 @@ void patterns_castle() {
 
 static void patterns_castle_step() {
     // Scroll the checkered display up and to the left every frame
-    scroll(0, 1, true, 0);
+    scroll_background(0, 1, true, 0);
 }
 
 
@@ -207,7 +207,7 @@ void patterns_checkered() {
 
 static void patterns_checkered_step() {
     // Scroll the checkered display up and to the left every frame
-    scroll(-1, 0, true, 0);
+    scroll_background(-1, 0, true, 0);
 }
 
 
@@ -223,7 +223,7 @@ void patterns_curtains() {
 
 static void patterns_curtains_step() {
     // Scroll the curtains display down, add a row of 255 on top.
-    scroll(-1, 0, false, 255);
+    scroll_background(-1, 0, false, 255);
 }
 
 
@@ -238,7 +238,7 @@ void patterns_diamonds() {
 
 
 static void patterns_diamonds_step() {
-    invert();
+    invert_background();
 }
 
 
@@ -268,7 +268,7 @@ void patterns_flash() {
 
 
 static void patterns_flash_step() {
-    invert();
+    invert_background();
 }
 
 
@@ -284,7 +284,7 @@ void patterns_gameover() {
 
 
 static void patterns_gameover_step() {
-    scroll(-1, 0, true, 0);
+    scroll_background(-1, 0, true, 0);
 }
 
 
@@ -373,26 +373,26 @@ void patterns_lines() {
 static void patterns_lines_step() {
     // After every 22 steps, rotate the pattern and change scroll direction
     if (lines_time++ >= 22) {
-        rotate(90);
+        rotate_background(90);
         lines_direction++;
         lines_time = 0;
     }
 
     if (lines_direction == 0) {
-        scroll(0, 1, true, 0);
+        scroll_background(0, 1, true, 0);
     }
     else if (lines_direction == 1) {
-        scroll(1, 0, true, 0);
+        scroll_background(1, 0, true, 0);
     }
     else if (lines_direction == 2) {
-        scroll(0, -1, true, 0);
+        scroll_background(0, -1, true, 0);
     }
     else if (lines_direction == 3) {
-        scroll(-1, 0, true, 0);
+        scroll_background(-1, 0, true, 0);
     }
     else {
         lines_direction = 0;
-        scroll(0, 1, true, 0);
+        scroll_background(0, 1, true, 0);
     }
 }
 
@@ -408,7 +408,7 @@ void patterns_question() {
 
 
 static void patterns_question_step() {
-    invert();
+    invert_background();
 }
 
 
@@ -425,7 +425,7 @@ void patterns_radar() {
 static void patterns_radar_step() {
     // TODO: Actually only rotate 15˚ every frame. Alternatively, draw the
     // lines dynamically and fill.
-    rotate(-90);
+    rotate_background(-90);
 }
 
 
@@ -462,8 +462,7 @@ void patterns_siren() {
     
 
 static void patterns_siren_step() {
-    // Flip vertically, then horizontally, then vertically, then horizontally (effectively rotate 90˚ each frame)
-    rotate(90);
+    rotate_background(90);
 }
 
 
@@ -478,7 +477,7 @@ void patterns_spiral() {
 
 
 static void patterns_spiral_step() {
-    rotate(90);
+    rotate_background(90);
 }
 
 
@@ -494,7 +493,7 @@ void patterns_sweep() {
 
 static void patterns_sweep_step() {
     // Sweep from right to left
-    scroll(1, 0, true, 0);
+    scroll_background(1, 0, true, 0);
 }
 
 
@@ -503,6 +502,7 @@ void patterns_swipe() {
 
     display_reset(&display);
     display.pattern = &swipe;
+    // pattern_set_background(&display, 0, 0);
     memcpy(display.background, swipe.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_swipe_step;
 }
@@ -510,7 +510,7 @@ void patterns_swipe() {
 
 static void patterns_swipe_step() {
     // Sweep from right to left
-    scroll(0, 1, true, 0);
+    scroll_background(0, 1, true, 0);
 }
 
 
@@ -548,7 +548,7 @@ static void patterns_swoosh_step() {
         display.overlay[y][x] = star_border[i][2];
     }
 
-    scroll(0, 1, true, 0);
+    scroll_background(0, 1, true, 0);
 }
 
 
@@ -564,7 +564,7 @@ void patterns_swoop() {
 
 
 static void patterns_swoop_step() {
-    scroll(0, 1, true, 0);
+    scroll_background(0, 1, true, 0);
 }
 
 
@@ -608,13 +608,13 @@ static void patterns_waves_step() {
         waves_down = !waves_down;
 
     if (waves_down) {
-        scroll(-1, 0, false, 4);
-        scroll(0, -1, true, 4);
+        scroll_background(-1, 0, false, 4);
+        scroll_background(0, -1, true, 4);
         waves_height++;
     }
     else {
-        scroll(1, 0, false, 64);
-        scroll(0, -1, true, 64);
+        scroll_background(1, 0, false, 64);
+        scroll_background(0, -1, true, 64);
         waves_height--;
     }
 }
