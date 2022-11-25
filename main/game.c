@@ -230,9 +230,11 @@ void game_start(void) {
         if (player_dies && player_dies <= stopped_music_time)
             break;
 
-        // The player could finish the level before the music is done
-        if (player_finishes && player_finishes <= stopped_music_time)
+        // The player could finish the level before the music is done, and death is averted
+        if (player_finishes && player_finishes <= stopped_music_time) {
+            player_dies = 0;
             break;
+        }
     }
 
     music_settempo(100);

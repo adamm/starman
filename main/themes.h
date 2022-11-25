@@ -54,24 +54,26 @@ static const theme_t theme_smb[] = {
 };
 
 static const theme_t theme_smb3[] = {
-    { THEME_STAGE_level_1,  smb3_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  NULL,              patterns_lines },     // Null pointer bad!
-    { THEME_STAGE_level_3,  smb3_underwater,   patterns_waves },
-    { THEME_STAGE_level_4,  smb3_castle,       patterns_castle },
-    { THEME_STAGE_block,    smb_block,         patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      smb_1up,           patterns_checkered }, // Fallback to SMB
-    { THEME_STAGE_powerup,  smb_powerup,       patterns_flash },     // Fallback to SMB       
-    { THEME_STAGE_starman,  smb_starman,       patterns_starman },   // Fallback to SMB
-    { THEME_STAGE_warning,  smb_warning,       patterns_siren },     // Fallback to SMB
-    { THEME_STAGE_success,  NULL,              patterns_sweep },     // NULL pointer bad!
-    { THEME_STAGE_clear,    smb3_course_clear, patterns_radar },
-    { THEME_STAGE_death,    NULL,              patterns_spiral },    // NULL pointer bad!
-    { THEME_STAGE_gameover, smb3_gameover,     patterns_gameover },
+    { THEME_STAGE_level_1,  smb3_overworld,   patterns_swipe },
+    { THEME_STAGE_level_2,  smb3_hammerbros,  patterns_lines },
+    { THEME_STAGE_level_3,  smb3_underwater,  patterns_waves },
+    { THEME_STAGE_level_4,  smb3_castle,      patterns_castle },
+    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { THEME_STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
+    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB       
+    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { THEME_STAGE_success,  smb_block,        patterns_sweep },     // No real "success" sound, so instead just bump the block
+    { THEME_STAGE_clear,    smb3_course_clear,patterns_radar },
+    { THEME_STAGE_death,    smb_death,        patterns_spiral },    // Fallback to SMB
+    { THEME_STAGE_gameover, smb3_gameover,    patterns_gameover },
+    { THEME_STAGE_fanfare,  smb3_fanfare,     patterns_checkered }, // Fallback to SMB
+    { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },  // Fallback to SMB
 };
 
 static const theme_t theme_smw[] = {
     { THEME_STAGE_level_1,  smw_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  smw_donut,        NULL },               // Null pointer bad!
+    { THEME_STAGE_level_2,  smw_donut,        patterns_lines },     // Get better pattern
     { THEME_STAGE_level_3,  smw_underwater,   patterns_waves },
     { THEME_STAGE_level_4,  smw_castle,       patterns_castle },
     { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
@@ -79,10 +81,12 @@ static const theme_t theme_smw[] = {
     { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
     { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
     { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
-    { THEME_STAGE_success,  NULL,             patterns_sweep },     // Null pointer bad!
-    { THEME_STAGE_clear,    smw_course_clear, patterns_radar },
+    { THEME_STAGE_success,  smb_block,        patterns_sweep },     // Fallback to SMB
+    { THEME_STAGE_clear,    smw_course_clear, patterns_radar },     // FIXME: BAD TRACK
     { THEME_STAGE_death,    smw_death,        patterns_spiral },
     { THEME_STAGE_gameover, smw_gameover,     patterns_gameover },
+    { THEME_STAGE_fanfare,  smb_fanfare,      patterns_checkered }, // Fallback to SMB
+    { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },  // Fallback to SMB
 };
 
 // XXX: The null pointers above will cause a crash.  For now leave the theme
@@ -90,6 +94,6 @@ static const theme_t theme_smw[] = {
 
 static const themes_t themes[] = {
     { "SMB",  theme_smb },
-//  { "SMB3", theme_smb3 },
-//  { "SMW",  theme_smw },
+    { "SMB3", theme_smb3 },
+    { "SMW",  theme_smw },
 };
