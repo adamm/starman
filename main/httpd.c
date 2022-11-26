@@ -28,6 +28,7 @@
 #include "game.h"
 #include "storage.h"
 #include "sparkle.h"
+#include "themes.h"
 #include "util.h"
 
 #include "httpd.h"
@@ -144,6 +145,28 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_set_type(req, "text/plain");
         httpd_resp_send(req, response, strlen(response));
     }
+    else if (strcmp(req->uri, "/theme") == 0) {
+        char* json = calloc(140, sizeof(char));
+        char* themes_str = calloc(20, sizeof(char));
+
+        for (uint8_t i = 0; i < TOTAL_THEMES_AVAILABLE; i++) {
+            strcat(themes_str, "\"");
+            strcat(themes_str, themes[i].title);
+            strcat(themes_str, "\",");
+        }
+        // Chop off the trailing comma
+        themes_str[strlen(themes_str)-1] = 0;
+
+        sprintf(json, "{\"current\":%d,\"available\":[%s]}",
+            config_theme, themes_str);
+
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "application/json");
+        httpd_resp_send(req, json, strlen(json));
+
+        free(json);
+        free(themes_str);
+    }
     else if (strcmp(req->uri, "/track") == 0) {
         const char* response = config_firmware_track;
 
@@ -213,6 +236,36 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
             httpd_resp_set_status(req, "400 Bad Request");
             httpd_resp_send(req, NULL, 0);
         }
+        free(text_str);
+    }
+    else if (strcmp(req->uri, "/theme") == 0) {
+        uint16_t const value_maxlen = 10;
+        char* value_str = calloc(value_maxlen, sizeof(char));
+        esp_err_t err;
+
+        err = post_handler(req, value_str, value_maxlen);
+        ESP_LOGI(TAG, "Got value for /theme: %s", value_str);
+        if (err == ESP_OK) {
+            int base = 10;
+            intmax_t value = 0;
+
+            value = strtoimax(value_str, NULL, base);
+
+            if (value < TOTAL_THEMES_AVAILABLE) {
+                config_set_theme((uint8_t)value);
+            }
+            else {
+                // TODO: Return an HTTP error response that theme must be between 0 and TOTAL_THEMES_AVAILABLE-1
+                ESP_LOGE(TAG, "Theme must be between 0 and %d", TOTAL_THEMES_AVAILABLE-1);
+            }
+            httpd_resp_set_status(req, "200 OK");
+            httpd_resp_send(req, NULL, 0);
+        }
+        else {
+            httpd_resp_set_status(req, "400 Bad Request");
+            httpd_resp_send(req, NULL, 0);
+        }
+        free(value_str);
     }
     else if (strcmp(req->uri, "/track") == 0) {
         uint16_t const text_maxlen = CONFIG_FIRMWARE_TRACK_MAXLEN;
@@ -233,6 +286,7 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
             httpd_resp_set_status(req, "400 Bad Request");
             httpd_resp_send(req, NULL, 0);
         }
+        free(text_str);
     }
     else {
         ESP_LOGW(TAG, "Cannot find %s (%d)", req->uri, req->method);

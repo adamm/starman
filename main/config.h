@@ -125,8 +125,15 @@ CONFIG_EXTERN int8_t config_brightness
 #endif
 ;
 
+CONFIG_EXTERN uint8_t config_theme
+#ifdef CONFIG_IMPORT
+= 0
+#endif
+;
+
 void config_set_firmware_track(char*);
 void config_set_brightness(int8_t);
+void config_set_theme(uint8_t);
 void config_save(void);
 void config_init(void);
 

@@ -39,10 +39,17 @@ void config_set_brightness(int8_t value) {
 }
 
 
+void config_set_theme(uint8_t value) {
+    config_theme = value;
+    storage_set_uint8(STORAGE_THEME_KEY, value);
+}
+
+
 void config_save() {
     storage_set_str(STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url);
     storage_set_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track);
     storage_set_int8(STORAGE_BRIGHTNESS_KEY, config_brightness);
+    storage_set_int8(STORAGE_THEME_KEY, config_theme);
 }
 
 
@@ -60,4 +67,7 @@ void config_init() {
 
     err = storage_get_int8(STORAGE_BRIGHTNESS_KEY, &config_brightness);
     ESP_LOGW(TAG, "%s: %d (%d err)", STORAGE_BRIGHTNESS_KEY, config_brightness, err);
+
+    err = storage_get_uint8(STORAGE_THEME_KEY, &config_theme);
+    ESP_LOGW(TAG, "%s: %d (%d err)", STORAGE_THEME_KEY, config_theme, err);
 }

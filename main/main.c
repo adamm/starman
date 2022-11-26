@@ -118,5 +118,5 @@ void app_main(void) {
     http_app_set_handler_hook(HTTP_GET, &httpd_get_handler);
     http_app_set_handler_hook(HTTP_POST, &httpd_post_handler);
 
-    xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
+    // xTaskCreatePinnedToCore(&monitoring_task, "monitoring_task", 2048, NULL, 1, NULL, 1);
 }

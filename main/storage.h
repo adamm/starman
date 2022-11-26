@@ -23,11 +23,14 @@
 #define STORAGE_FIRMWARE_URL_KEY "firmware-url"
 #define STORAGE_FIRMWARE_TRACK_KEY "firmware-track"
 #define STORAGE_BRIGHTNESS_KEY "brightness"
+#define STORAGE_THEME_KEY "theme"
 
 void storage_init();
 esp_err_t storage_get_str(const char* key, char* value, size_t* len);
 esp_err_t storage_set_str(const char* key, const char* value);
 esp_err_t storage_get_int8(const char* key, int8_t* value);
 esp_err_t storage_set_int8(const char* key, int8_t value);
+esp_err_t storage_get_uint8(const char* key, uint8_t* value);
+esp_err_t storage_set_uint8(const char* key, uint8_t value);
 
 #endif

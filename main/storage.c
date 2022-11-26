@@ -145,3 +145,51 @@ esp_err_t storage_set_int8(const char* key, int8_t value) {
     return err;
 }
 
+
+esp_err_t storage_get_uint8(const char* key, uint8_t* value) {
+    nvs_handle_t handle;
+    esp_err_t err;
+
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READONLY, &handle);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "nvs_open returned err: %d", err);
+        return err;
+    }
+    err = nvs_get_u8(handle, key, value);
+    // ESP_LOGI(TAG, "Loading %s = %d", key, *value);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "nvs_get_u8 returned err: %d", err);
+    }
+    nvs_close(handle);
+
+    return err;
+}
+
+
+
+
+esp_err_t storage_set_uint8(const char* key, uint8_t value) {
+    nvs_handle_t handle;
+    esp_err_t err;
+
+    ESP_LOGI(TAG, "Setting %s = %d (uint8)", key, value);
+
+    nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &handle);
+    err = nvs_set_u8(handle, key, value);
+
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "nvs_set_u8 returned err: %d", err);
+    }
+    else {
+        err = nvs_commit(handle);
+        if (err != ESP_OK)
+            ESP_LOGW(TAG, "nvs_commit returned err: %d", err);
+    }
+    nvs_close(handle);
+
+    if (err != ESP_OK)
+        ESP_LOGW(TAG, "nvs_set_u8 returned err: %d", err);
+
+    return err;
+}
+

@@ -1,9 +1,5 @@
-#pragma once
-
-#include "music/smb.h"
-#include "music/smb3.h"
-#include "music/smw.h"
-#include "patterns.h"
+#ifndef THEMES_H
+#define THEMES_H
 
 enum THEME_STAGE {
     THEME_STAGE_level_1,
@@ -26,7 +22,7 @@ enum THEME_STAGE {
 
 typedef struct theme {
     enum THEME_STAGE stage;
-    const byte* score;
+    const unsigned char* score;
     void (*pattern)(void);
 } theme_t;
 
@@ -34,6 +30,18 @@ typedef struct themes {
     const char*    title;
     const theme_t* theme;
 } themes_t;
+
+// Music only should be included by game.c, not by other files that are only
+// interested in the theme struct and total themes available
+//
+// One solution would be to move the below block to a new themes.c, but
+// it's bad practice to call "#include <theme.c>" from game.c.
+#ifdef INCLUDE_THEME_MUSIC_AND_PATTERNS
+
+#include "music/smb.h"
+#include "music/smb3.h"
+#include "music/smw.h"
+#include "patterns.h"
 
 static const theme_t theme_smb[] = {
     { THEME_STAGE_level_1,  smb_overworld,    patterns_swipe },
@@ -89,11 +97,20 @@ static const theme_t theme_smw[] = {
     { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },  // Fallback to SMB
 };
 
-// XXX: The null pointers above will cause a crash.  For now leave the theme
-// commented out and disabled below until the music/pattern can be populated
+#else
+
+#define theme_smb NULL
+#define theme_smb3 NULL
+#define theme_smw NULL
+
+#endif
 
 static const themes_t themes[] = {
     { "SMB",  theme_smb },
     { "SMB3", theme_smb3 },
     { "SMW",  theme_smw },
 };
+
+#define TOTAL_THEMES_AVAILABLE 3
+
+#endif

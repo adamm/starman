@@ -18,10 +18,9 @@
 
 #include "config.h"
 #include "music.h"
-#include "music/smb.h"
-#include "patterns.h"
 #include "random.h"
 #include "sparkle.h"
+#define INCLUDE_THEME_MUSIC_AND_PATTERNS
 #include "themes.h"
 
 #include "game.h"
@@ -38,7 +37,6 @@ static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
 static uint32_t player_dies         = 0;
 static uint32_t player_finishes     = 0;
-static const theme_t* active_theme = themes[0].theme;
 
 
 uint8_t game_get_level() {
@@ -93,6 +91,8 @@ void game_start(void) {
         playing = true;
     else
         return;
+
+    theme_t* active_theme = themes[config_theme].theme;
 
     music_amp_unmute();
 
