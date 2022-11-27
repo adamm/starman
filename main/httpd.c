@@ -60,6 +60,13 @@ static void play_task() {
 }
 
 
+static void reset_task() {
+    // Delay the reset to allow the HTTP response to complete
+    vTaskDelay(500 / portTICK_RATE_MS);
+    esp_restart();
+}
+
+
 static esp_err_t post_handler(httpd_req_t *req, char* content, size_t len) {
     size_t recv_size = MIN(req->content_len, len);
 
@@ -144,6 +151,16 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/plain");
         httpd_resp_send(req, response, strlen(response));
+    }
+    else if (strcmp(req->uri, "/reset") == 0) {
+        const char* response = "OK";
+
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "text/plain");
+        httpd_resp_send(req, response, strlen(response));
+
+        // Delay the reset to allow the HTTP response to complete
+        xTaskCreate(reset_task, "reset", 2048, NULL, 5, &http_task);
     }
     else if (strcmp(req->uri, "/theme") == 0) {
         char* json = calloc(140, sizeof(char));
