@@ -92,7 +92,7 @@ void game_start(void) {
     else
         return;
 
-    theme_t* active_theme = themes[config_theme].theme;
+    const theme_t* active_theme = themes[config_theme].theme;
 
     music_amp_unmute();
 
