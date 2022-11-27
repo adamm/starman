@@ -28,6 +28,7 @@
 #include "config.h"
 #include "display.h"
 #include "sparkle.h"
+#include "storage.h"
 #include "text.h"
 #include "ota.h"
 
@@ -37,12 +38,9 @@
 static const char *TAG = "starman-ota";
 
 
-static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_track)
+static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* server_track, char* device_track)
 {
     int compVersion = 0;
-    char* device_track = config_firmware_track;
-    // FIXME: Retrieve the device OTA track from NVS, if it's there.
-    // FIXME: Remember to set it after a sucessful OTA upgrade!
 
     if (new_app_info == NULL) {
         return ESP_ERR_INVALID_ARG;
@@ -149,12 +147,27 @@ uint8_t ota_init(void) {
 
 uint8_t ota_upgrade(void) {
     char firmware_url[50] = {0};
-    char* track = config_firmware_track;
+    char* firmware_track = config_firmware_track;
+    char* device_track = calloc(10, sizeof(char));
+    size_t device_track_len;
+    esp_err_t err;
+
+    err = storage_get_str(STORAGE_DEVICE_TRACK_KEY, device_track, &device_track_len);
+    if (err != 0 || device_track_len == 0 ||
+        !(strcmp(device_track, CONFIG_FIRMWARE_TRACK_STABLE) == 0 ||
+          strcmp(device_track, CONFIG_FIRMWARE_TRACK_TESTING) == 0 ||
+          strcmp(device_track, CONFIG_FIRMWARE_TRACK_UNSTABLE) == 0)
+       ) {
+        strcpy(device_track, config_firmware_track);
+        storage_set_str(STORAGE_DEVICE_TRACK_KEY, config_firmware_track);
+    }
+    ESP_LOGI(TAG, "Device current firmware track is %s", device_track);
+    ESP_LOGI(TAG, "User Configured firmware track is %s", firmware_track);
 
     bzero(firmware_url, sizeof(firmware_url));
     strlcpy(firmware_url, config_firmware_service_url, strlen(config_firmware_service_url) + 1);
     strlcat(firmware_url, "/", strlen(firmware_url) + 2);
-    strlcat(firmware_url, track, strlen(firmware_url) + strlen(track) + 1);
+    strlcat(firmware_url, firmware_track, strlen(firmware_url) + strlen(firmware_track) + 1);
     ESP_LOGI(TAG, "Starting OTA: %s", firmware_url);
 
     esp_err_t ota_finish_err = ESP_OK;
@@ -171,7 +184,7 @@ uint8_t ota_upgrade(void) {
     };
 
     esp_https_ota_handle_t https_ota_handle = NULL;
-    esp_err_t err = esp_https_ota_begin(&ota_config, &https_ota_handle);
+    err = esp_https_ota_begin(&ota_config, &https_ota_handle);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "ESP_HTTPS_OTA failed");
         return 0;
@@ -183,7 +196,7 @@ uint8_t ota_upgrade(void) {
         ESP_LOGE(TAG, "esp_https_ota_read_img_desc failed");
         goto ota_end;
     }
-    err = validate_image_header(&app_desc, track);
+    err = validate_image_header(&app_desc, firmware_track, device_track);
     if (err != ESP_OK) {
         // ESP_LOGE(TAG, "image header verification failed");
         goto ota_end;
@@ -224,6 +237,7 @@ uint8_t ota_upgrade(void) {
     } else {
         ota_finish_err = esp_https_ota_finish(https_ota_handle);
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
+            storage_set_str(STORAGE_DEVICE_TRACK_KEY, firmware_track);
             ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             esp_restart();

@@ -22,6 +22,7 @@
 #define STORAGE_NAMESPACE "starman"
 #define STORAGE_FIRMWARE_URL_KEY "firmware-url"
 #define STORAGE_FIRMWARE_TRACK_KEY "firmware-track"
+#define STORAGE_DEVICE_TRACK_KEY "device-track"
 #define STORAGE_BRIGHTNESS_KEY "brightness"
 #define STORAGE_THEME_KEY "theme"
 
