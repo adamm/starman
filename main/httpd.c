@@ -92,28 +92,28 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_set_type(req, "text/html");
         httpd_resp_send(req, index_html_start, index_html_len);
     }
-    if(strcmp(req->uri, "/about.html") == 0) {
+    else if(strcmp(req->uri, "/about.html") == 0) {
         const uint32_t about_html_len = about_html_end - about_html_start;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/html");
         httpd_resp_send(req, about_html_start, about_html_len);
     }
-    if(strcmp(req->uri, "/starman.js") == 0) {
+    else if(strcmp(req->uri, "/starman.js") == 0) {
         const uint32_t starman_js_len = starman_js_end - starman_js_start;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/javascript");
         httpd_resp_send(req, starman_js_start, starman_js_len);
     }
-    if(strcmp(req->uri, "/style.css") == 0) {
+    else if(strcmp(req->uri, "/style.css") == 0) {
         const uint32_t style_css_len = style_css_end - style_css_start;
 
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/css");
         httpd_resp_send(req, style_css_start, style_css_len);
     }
-    if(strcmp(req->uri, "/status.json") == 0) {
+    else if(strcmp(req->uri, "/status.json") == 0) {
         char* json = calloc(140, sizeof(char));
 
         const esp_partition_t *running = esp_ota_get_running_partition();
@@ -235,7 +235,7 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
         }
         free(value_str);
     }
-    if (strcmp(req->uri, "/text") == 0) {
+    else if (strcmp(req->uri, "/text") == 0) {
         uint16_t const text_maxlen = 255;
         char* text_str = calloc(text_maxlen, sizeof(char));
         esp_err_t err;

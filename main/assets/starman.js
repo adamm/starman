@@ -33,6 +33,8 @@ function get_status() {
             $("#play-button").prop("disabled", "");
         else
             $("#play-button").prop("disabled", "true");
+    }).fail((err) => {
+        console.log("Could not download /status.json: ", err);
     });
 }
 
