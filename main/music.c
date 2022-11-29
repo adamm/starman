@@ -207,12 +207,16 @@ uint32_t music_playscore_at_time(const byte* score, uint32_t start_time) {
 
 static void music_stepscore(void) {
     byte cmd, opcode, chan, note;
+    uint32_t pos = (uint32_t)(score_cursor - score_start);
     unsigned duration;
 
     /* if CMD < 0x80, then the other 7 bits and the next byte are a 15-bit big-endian number of msec to wait */
     while (1) {
         cmd = *score_cursor++;
         ESP_LOGD(TAG, "cmd: %x", cmd);
+        if (++pos % 200 == 0)
+            ESP_LOGI(TAG, "Playing score at byte: %d", pos);
+
         if (cmd < 0x80) { /* wait count in msec. */
             duration = ((unsigned)cmd << 8) | (*score_cursor++);
             if (_tune_speed != 100)

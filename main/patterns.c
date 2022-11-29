@@ -62,6 +62,7 @@ static void patterns_siren_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
 static void patterns_swipe_step();
+static void patterns_swoosh_step();
 static void patterns_starman_step();
 static void patterns_swoop_step();
 static void patterns_thump_step();
@@ -510,6 +511,21 @@ void patterns_swipe() {
 
 static void patterns_swipe_step() {
     // Sweep from right to left
+    scroll_background(0, 1, true, 0);
+}
+
+
+void patterns_swoosh() {
+    ESP_LOGI(TAG, "Begin SWOOSH pattern");
+
+    display_reset(&display);
+    display.pattern = &swoosh;
+    memcpy(display.background, swoosh.data, DISPLAY_LIGHTS_TOTAL_AREA);
+    callback_func = patterns_swoosh_step;
+}
+    
+
+static void patterns_swoosh_step() {
     scroll_background(0, 1, true, 0);
 }
 

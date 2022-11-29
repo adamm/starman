@@ -39,6 +39,7 @@ typedef struct themes {
 #ifdef INCLUDE_THEME_MUSIC_AND_PATTERNS
 
 #include "music/smb.h"
+#include "music/smb2.h"
 #include "music/smb3.h"
 #include "music/smw.h"
 #include "patterns.h"
@@ -61,9 +62,27 @@ static const theme_t theme_smb[] = {
     { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },
 };
 
+static const theme_t theme_smb2[] = {
+    { THEME_STAGE_level_1,  smb2_intro,       patterns_sweep },
+    { THEME_STAGE_level_2,  smb2_overworld,   patterns_swipe },
+    { THEME_STAGE_level_3,  smb2_underworld,  patterns_lines },
+    { THEME_STAGE_level_4,  smb2_boss,        patterns_castle },
+    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { THEME_STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
+    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
+    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { THEME_STAGE_success,  smb_flagpole,     patterns_sweep },     // Fallback to SMB
+    { THEME_STAGE_clear,    smb2_clear,       patterns_radar },
+    { THEME_STAGE_death,    smb2_death,       patterns_spiral },
+    { THEME_STAGE_gameover, smb2_gameover,    patterns_gameover },
+    { THEME_STAGE_fanfare,  smb2_fanfare,     patterns_checkered },
+    { THEME_STAGE_ending,   smb2_ending,      patterns_diamonds },
+};
+
 static const theme_t theme_smb3[] = {
     { THEME_STAGE_level_1,  smb3_overworld,   patterns_swipe },
-    { THEME_STAGE_level_2,  smb3_hammerbros,  patterns_lines },
+    { THEME_STAGE_level_2,  smb3_athletic,    patterns_swoosh },
     { THEME_STAGE_level_3,  smb3_underwater,  patterns_waves },
     { THEME_STAGE_level_4,  smb3_castle,      patterns_castle },
     { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
@@ -81,7 +100,7 @@ static const theme_t theme_smb3[] = {
 
 static const theme_t theme_smw[] = {
     { THEME_STAGE_level_1,  smw_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  smw_donut,        patterns_lines },     // Get better pattern
+    { THEME_STAGE_level_2,  smw_athletic,     patterns_swoosh },    // Get better pattern
     { THEME_STAGE_level_3,  smw_underwater,   patterns_waves },
     { THEME_STAGE_level_4,  smw_castle,       patterns_castle },
     { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
@@ -100,6 +119,7 @@ static const theme_t theme_smw[] = {
 #else
 
 #define theme_smb NULL
+#define theme_smb2 NULL
 #define theme_smb3 NULL
 #define theme_smw NULL
 
@@ -107,10 +127,11 @@ static const theme_t theme_smw[] = {
 
 static const themes_t themes[] = {
     { "SMB",  theme_smb },
+    { "SMB2", theme_smb2 },
     { "SMB3", theme_smb3 },
     { "SMW",  theme_smw },
 };
 
-#define TOTAL_THEMES_AVAILABLE 3
+#define TOTAL_THEMES_AVAILABLE 4
 
 #endif
