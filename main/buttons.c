@@ -36,15 +36,21 @@ static void IRAM_ATTR gpio_isr_handler(void* arg) {
 
 
 static void gpio_play_task() {
+    callback_func();
+    vTaskDelete(NULL);
+}
+
+
+static void gpio_button_task() {
     uint32_t io_num;
 
     for(;;) {
         if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
             int state = gpio_get_level(io_num);
             printf("GPIO[%d] intr, val: %d\n", io_num, state);
-            // The play button GPIO is active-low
-            if (callback_func != NULL && state == 0)
-                callback_func();
+            // The play button GPIO is active-low, but start playing on release.
+            if (callback_func != NULL && state == 1)
+                xTaskCreate(gpio_play_task, "gpio_play", 8196, NULL, 10, NULL);
         }
     }
 }
@@ -66,7 +72,7 @@ void buttons_init(void) {
     gpio_config(&io_conf);
 
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-    xTaskCreate(gpio_play_task, "gpio_play_task", 8196, NULL, 10, NULL);
+    xTaskCreate(gpio_button_task, "gpio_button", 2048, NULL, 0, NULL);
 
     gpio_install_isr_service(ESP_INTR_FLAG_LOWMED);
     gpio_isr_handler_add(PLAY_GAME_GPIO, gpio_isr_handler, (void*) PLAY_GAME_GPIO);
