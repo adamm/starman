@@ -30,9 +30,9 @@ tree's top branch via the risers:
 
 ![3D-printed mount](images/mount.png)
 
-I plan on producing 10 units for friends and family, but if you are
-interested please reach out.  Build cost is currently estimated at
-CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
+I plan on producing 10 units for friends and family for Christmas 2022.
+Right now the costs are too high to mass produce, so perhaps sometime in
+2023 I can simplify the design and cut costs for general orders.
 
 ## HOW TO PLAY
 
@@ -58,10 +58,24 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 - [X] Show simple text messages
 - [X] WiFi onboarding process
 - [X] Over-the-air firmware updates
-- [ ] WiFi play button
-- [ ] HTTP REST API to push text, play sound
-- [ ] Brightness control
-- [ ] Selectable themes
+- [X] WiFi play button
+- [X] HTTP REST API to push text, play sound
+- [X] Brightness control
+- [X] Selectable themes
+- [ ] Document the REST API
+
+## Known Issues
+
+- Only 2.4Gz WPA2 wifi is supported   (Cannot connect to 5Gz or WPA Enterprise)
+- Sound gets distorted at high volume levels.
+- It can take a long time after startup to get an IP address and start
+  the web service
+- Even though wifi and the web service are online and functioning, the
+  index.html sometimes takes a long time to load
+- Sometimes the device spontaneously resets if wifi connection is not
+  stable or strong enough
+- Some songs are way too long. (>60s)
+- Some songs end way too early (<3s) with a "course completed" event.
 
 ## Milestones
 
@@ -85,6 +99,9 @@ CAD$200.  (I'll post a means to contact closer to Dec 1, 2022:)
 
 2022-11-02
 - Framework for showing basic text messages, like "Game Over", "Connect to Wifi", "Firmware Update in progress", etc
+
+2022-11-27
+- Manufacturing is complete for 10 units for friends and family.
 
 ## Key Components
 
