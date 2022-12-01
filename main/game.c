@@ -150,8 +150,8 @@ void game_start(void) {
     if (player_gets_star)
         player_gets_star = random_value_within_int(length);
     if (player_gets_warning)
-        // The warning music should be within 900 notes from the end of the level
-        player_gets_warning = random_value_within_int(900) + length - 900;
+        // The warning music should be at the last third of the level
+        player_gets_warning = (length/3*2);
     if (player_dies)
         player_dies = random_value_within_int(length);
     else
