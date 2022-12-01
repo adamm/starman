@@ -273,6 +273,8 @@ size_t music_get_score_length(const byte* score) {
     const byte* ptr = score;
     size_t max = 0xffff;
 
+    // XXX: Be careful!  When scanning for the end, if a play-note byte in the
+    // song 0xF0 or 240 ms, it'll cause premature ending of the song!
     while (*ptr != CMD_STOP && len < max) {
         len++;
         ptr++;
