@@ -252,6 +252,8 @@ void game_start(void) {
 
         if (player_gets_ending) {
             player_gets_ending = 0;
+            player_finishes = 0;
+            player_dies = 0;
 
             active_theme[THEME_STAGE_ending].pattern();
             music_playscore(active_theme[THEME_STAGE_ending].score);

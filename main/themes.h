@@ -94,8 +94,8 @@ static const theme_t theme_smb3[] = {
     { THEME_STAGE_clear,    smb3_course_clear,patterns_radar },
     { THEME_STAGE_death,    smb_death,        patterns_spiral },    // Fallback to SMB
     { THEME_STAGE_gameover, smb3_gameover,    patterns_gameover },
-    { THEME_STAGE_fanfare,  smb3_fanfare,     patterns_checkered }, // Fallback to SMB
-    { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },  // Fallback to SMB
+    { THEME_STAGE_fanfare,  smb3_fanfare,     patterns_checkered },
+    { THEME_STAGE_ending,   smb3_ending,       patterns_diamonds },
 };
 
 static const theme_t theme_smw[] = {
@@ -112,8 +112,8 @@ static const theme_t theme_smw[] = {
     { THEME_STAGE_clear,    smw_course_clear, patterns_radar },     // FIXME: BAD TRACK
     { THEME_STAGE_death,    smw_death,        patterns_spiral },
     { THEME_STAGE_gameover, smw_gameover,     patterns_gameover },
-    { THEME_STAGE_fanfare,  smb_fanfare,      patterns_checkered }, // Fallback to SMB
-    { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },  // Fallback to SMB
+    { THEME_STAGE_fanfare,  smw_world_clear,  patterns_checkered },
+    { THEME_STAGE_ending,   smw_ending,       patterns_diamonds },
 };
 
 #else
