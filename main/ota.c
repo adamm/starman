@@ -22,6 +22,7 @@
 #include <esp_system.h>
 #include <esp_flash_partitions.h>
 #include <esp_partition.h>
+#include <esp_wifi.h>
 #include <math.h>
 #include <string.h>
 
@@ -87,8 +88,17 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
 static esp_err_t _http_client_init_cb(esp_http_client_handle_t http_client)
 {
     esp_err_t err = ESP_OK;
-    /* Uncomment to add custom headers to HTTP request */
-    // err = esp_http_client_set_header(http_client, "Custom-Header", "Value");
+    uint8_t mac[6];
+    char macStr[20] = {0};
+
+    // Send the MAC address as a custom HTTP header
+    esp_wifi_get_mac(WIFI_IF_STA, mac);
+    sprintf(macStr, "%02X%02X%02X%02X%02X%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+    ESP_LOGI(TAG, "Device MAC address: %s", macStr);
+
+    err = esp_http_client_set_header(http_client, "x-mac-address", macStr);
     return err;
 }
 
@@ -166,8 +176,9 @@ uint8_t ota_upgrade(void) {
 
     bzero(firmware_url, sizeof(firmware_url));
     strlcpy(firmware_url, config_firmware_service_url, strlen(config_firmware_service_url) + 1);
-    strlcat(firmware_url, "/", strlen(firmware_url) + 2);
+    strlcat(firmware_url, "/firmware/", strlen(firmware_url) + 11);
     strlcat(firmware_url, firmware_track, strlen(firmware_url) + strlen(firmware_track) + 1);
+    strlcat(firmware_url, ".bin", strlen(firmware_url) + 5);
     ESP_LOGI(TAG, "Starting OTA: %s", firmware_url);
 
     esp_err_t ota_finish_err = ESP_OK;
