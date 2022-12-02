@@ -87,11 +87,17 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info, char* serve
 
 static esp_err_t _http_client_init_cb(esp_http_client_handle_t http_client)
 {
+    const esp_partition_t *running = esp_ota_get_running_partition();
+    esp_app_desc_t running_app_info;
     esp_err_t err = ESP_OK;
     uint8_t mac[6];
     char macStr[20] = {0};
 
-    // Send the MAC address as a custom HTTP header
+    // Send the MAC address and current firmware version as HTTP headers
+
+    if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK)
+        err = esp_http_client_set_header(http_client, "x-firmware", running_app_info.version);
+
     esp_wifi_get_mac(WIFI_IF_STA, mac);
     sprintf(macStr, "%02X%02X%02X%02X%02X%02X",
              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);

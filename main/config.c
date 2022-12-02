@@ -63,7 +63,7 @@ void config_init() {
     ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_URL_KEY, config_firmware_service_url, len, err);
 
     err = storage_get_str(STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track, &len);
-    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_TRACK_KEY, config_firmware_service_url, len, err);
+    ESP_LOGW(TAG, "%s: %s (%d bytes) (%d err)", STORAGE_FIRMWARE_TRACK_KEY, config_firmware_track, len, err);
 
     err = storage_get_int8(STORAGE_BRIGHTNESS_KEY, &config_brightness);
     ESP_LOGW(TAG, "%s: %d (%d err)", STORAGE_BRIGHTNESS_KEY, config_brightness, err);
