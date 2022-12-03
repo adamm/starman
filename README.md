@@ -47,6 +47,30 @@ Right now the costs are too high to mass produce, so perhaps sometime in
 - There is a 25% chance you'll get a 1-up, resulting in an extra life.
 - If you make it to level 4 (castle) and complete it, there is a 25% chance the princess will be there and the game is over.
 
+## Installation
+
+1. Install Starman at the top of your tree, or on your desk, shelf, or wall.
+2. Connect the play button remote cable to the play button port.  Hide the play button in your tree, desk, shelf, or wall.
+3. Power it on.
+4. (Optiona) Connect to your wifi network (see below) to configure the brightness and theme.
+5. Press the physical play button, or press Play on the Starman web app
+
+### Wifi Setup
+
+1. Power on the Starman
+2. Watch for a "starman_######" access point, and connect to it.
+3. Search for your home Wifi, and enter the credentials
+  - Starman can only connect to 2.4Ghz/WPA2 endpoints
+4. Once connected, wait for your IP address to scroll past the screen
+5. Open the IP address in your web browser
+  - You can now use this site to play Starman directly, and to access the internal API.
+
+If you ever want to factory reset Starman, follow this procedure:
+1. Press and hold *Play* button
+2. Press and release *Reset* button
+3. Release *Play* button
+Starman will forget about its current wifi configuration, theme, and configuration. Follow the Wifi Setup instructions above to set it back up again.
+
 ## TODO
 
 - [X] Finalize PCB design
@@ -66,6 +90,7 @@ Right now the costs are too high to mass produce, so perhaps sometime in
 
 ## Known Issues
 
+- v2.1 PCB has a label that says it supports 7 to 12 volts power.  *WARNING: only 6-7V is actually supported in v2.1 hardware. __Do not connect more than 7 volts!__*
 - Only 2.4Gz WPA2 wifi is supported   (Cannot connect to 5Gz or WPA Enterprise)
 - Sound gets distorted at high volume levels.
 - It can take a long time after startup to get an IP address and start
