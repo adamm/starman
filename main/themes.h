@@ -18,7 +18,7 @@ enum THEME_STAGE {
     THEME_STAGE_fanfare,
     THEME_STAGE_ending,
 };
-#define NUM_THEME_STAGES 13
+#define NUM_THEME_STAGES 15
 
 typedef struct theme {
     enum THEME_STAGE stage;
@@ -29,6 +29,7 @@ typedef struct theme {
 typedef struct themes {
     const char*    title;
     const theme_t* theme;
+    const uint8_t  total_stages;
 } themes_t;
 
 // Music only should be included by game.c, not by other files that are only
@@ -42,6 +43,7 @@ typedef struct themes {
 #include "music/smb2.h"
 #include "music/smb3.h"
 #include "music/smw.h"
+#include "music/loz.h"
 #include "patterns.h"
 
 static const theme_t theme_smb[] = {
@@ -116,22 +118,42 @@ static const theme_t theme_smw[] = {
     { THEME_STAGE_ending,   smw_ending,       patterns_diamonds },
 };
 
+static const theme_t theme_loz[] = {
+    { THEME_STAGE_level_1,  loz_overworld,    patterns_swipe },
+    { THEME_STAGE_level_2,  loz_kariko,       patterns_sweep },
+    { THEME_STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
+    { THEME_STAGE_level_4,  loz_castle,       patterns_castle },
+    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { THEME_STAGE_1up,      loz_secret,       patterns_checkered },
+    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
+    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { THEME_STAGE_success,  loz_treasure_chest, patterns_sweep },
+    { THEME_STAGE_clear,    loz_course_clear, patterns_radar },
+    { THEME_STAGE_death,    loz_death,        patterns_spiral },
+    { THEME_STAGE_gameover, loz_gameover,     patterns_gameover },
+    { THEME_STAGE_fanfare,  loz_get_triforce, patterns_checkered },
+    { THEME_STAGE_ending,   loz_ending,       patterns_diamonds },
+};
+
 #else
 
 #define theme_smb NULL
 #define theme_smb2 NULL
 #define theme_smb3 NULL
 #define theme_smw NULL
+#define theme_loz NULL
 
 #endif
 
 static const themes_t themes[] = {
-    { "SMB",  theme_smb },
-    { "SMB2", theme_smb2 },
-    { "SMB3", theme_smb3 },
-    { "SMW",  theme_smw },
+    { "SMB",  theme_smb,  15 },
+    { "SMB2", theme_smb2, 15 },
+    { "SMB3", theme_smb3, 15 },
+    { "SMW",  theme_smw,  15 },
+    { "LOZ",  theme_loz,  15 },
 };
 
-#define TOTAL_THEMES_AVAILABLE 4
+#define TOTAL_THEMES_AVAILABLE 5
 
 #endif

@@ -16,6 +16,7 @@ idf_component_register(SRCS
                     "random.c"
                     "sparkle.c"
                     "storage.c"
+                    "themes.c"
                     "text.c"
                     "util.c"
                     EMBED_FILES
