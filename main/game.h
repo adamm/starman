@@ -20,7 +20,12 @@
 uint8_t game_get_level();
 uint8_t game_get_lives();
 uint8_t game_get_playing_state();
-bool game_step_sequence(uint32_t time);
+bool game_smb_step_sequence(uint32_t time);
+void game_smb_start(void);
+
+bool game_loz_step_sequence(uint32_t time);
+void game_loz_start(void);
+
 void game_start(void);
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef THEMES_H
 #define THEMES_H
 
+#include "game.h"
+
 enum THEME_STAGE {
     THEME_STAGE_level_1,
     THEME_STAGE_level_2,
@@ -30,6 +32,8 @@ typedef struct themes {
     const char*    title;
     const theme_t* theme;
     const uint8_t  total_stages;
+    void (*game_start)(void);
+    bool (*game_step)(uint32_t);
 } themes_t;
 
 // Music only should be included by game.c, not by other files that are only
@@ -123,11 +127,6 @@ static const theme_t theme_loz[] = {
     { THEME_STAGE_level_2,  loz_kariko,       patterns_sweep },
     { THEME_STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
     { THEME_STAGE_level_4,  loz_castle,       patterns_castle },
-    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      loz_secret,       patterns_checkered },
-    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
-    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
-    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
     { THEME_STAGE_success,  loz_treasure_chest, patterns_sweep },
     { THEME_STAGE_clear,    loz_course_clear, patterns_radar },
     { THEME_STAGE_death,    loz_death,        patterns_spiral },
@@ -147,11 +146,11 @@ static const theme_t theme_loz[] = {
 #endif
 
 static const themes_t themes[] = {
-    { "SMB",  theme_smb,  15 },
-    { "SMB2", theme_smb2, 15 },
-    { "SMB3", theme_smb3, 15 },
-    { "SMW",  theme_smw,  15 },
-    { "LOZ",  theme_loz,  15 },
+    { "SMB",  theme_smb,  15, game_smb_start, game_smb_step_sequence },
+    { "SMB2", theme_smb2, 15, game_smb_start, game_smb_step_sequence },
+    { "SMB3", theme_smb3, 15, game_smb_start, game_smb_step_sequence },
+    { "SMW",  theme_smw,  15, game_smb_start, game_smb_step_sequence },
+    { "LOZ",  theme_loz,  10, game_loz_start, game_loz_step_sequence },
 };
 
 #define TOTAL_THEMES_AVAILABLE 5

@@ -98,12 +98,9 @@ void app_main(void) {
     music_init();
     random_init();
 
-    // Execute the play_game() function when the play button is pressed or /play is accessed
+    // Execute the start game function when the play button is pressed or /play is accessed
     buttons_play_callback(game_start);
     httpd_play_callback(game_start);
-
-    // Loop music with lights via step_sequence();
-    music_callback(game_step_sequence);
 
     // Sparkle runs continiously in another thread while we wait for the user
     // to press Play
