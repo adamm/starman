@@ -1,6 +1,6 @@
 [submodule "kicad/espressif"]
-	path = kicad/espressif
+	path = pcb/espressif
 	url = https://github.com/espressif/kicad-libraries.git
 [submodule "components/esp32-wifi-manager"]
-	path = components/esp32-wifi-manager
+	path = firmware/components/esp32-wifi-manager
 	url = https://github.com/adamm/esp32-wifi-manager.git
