@@ -94,6 +94,8 @@ void game_smb_start(void) {
 
     const theme_t* active_theme = themes[config_theme].theme;
 
+    ESP_LOGI(TAG, "game_smb_start() started");
+
     music_amp_unmute();
 
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
@@ -316,6 +318,8 @@ void game_loz_start(void) {
         return;
 
     const theme_t* active_theme = themes[config_theme].theme;
+
+    ESP_LOGI(TAG, "game_loz_start() started");
 
     music_amp_unmute();
 
