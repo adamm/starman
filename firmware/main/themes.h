@@ -124,7 +124,7 @@ static const theme_t theme_smw[] = {
 
 static const theme_t theme_loz[] = {
     { THEME_STAGE_level_1,  loz_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  loz_kariko,       patterns_sweep },
+    { THEME_STAGE_level_2,  loz_kariki,       patterns_sweep },
     { THEME_STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
     { THEME_STAGE_level_4,  loz_castle,       patterns_castle },
     { THEME_STAGE_success,  loz_treasure_chest, patterns_sweep },
