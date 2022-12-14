@@ -317,8 +317,6 @@ void game_loz_start(void) {
     else
         return;
 
-    const theme_t* active_theme = themes[config_theme].theme;
-
     ESP_LOGI(TAG, "game_loz_start() started");
 
     music_amp_unmute();
@@ -329,31 +327,19 @@ void game_loz_start(void) {
     // Stop sparkling becuase we're about to play some music/lights!
     sparkle_stop();
 
-    // If the user gets a 1up, star, interrupt the music at random point and contunue when sound effect is done
-    // If the user dies, interrupt the music at a random point and stop when sound effect is done
-    uint32_t length = 0;
-    const byte* level_music;
-    void (*level_pattern)(void);
+    const theme_t* level_stage = themes_load_stage(THEME_STAGE_death, "LOZ");
 
     if (level == 1) {
-        level_pattern = active_theme[THEME_STAGE_level_1].pattern;
-        level_music = active_theme[THEME_STAGE_level_1].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_1].score);
+        level_stage = themes_load_stage(THEME_STAGE_level_1, "LOZ");
     }
     else if (level == 2) {
-        level_pattern = active_theme[THEME_STAGE_level_2].pattern;
-        level_music = active_theme[THEME_STAGE_level_2].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_2].score);
+        level_stage = themes_load_stage(THEME_STAGE_level_2, "LOZ");
     }
     else if (level == 3) {
-        level_pattern = active_theme[THEME_STAGE_level_3].pattern;
-        level_music = active_theme[THEME_STAGE_level_3].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_3].score);
+        level_stage = themes_load_stage(THEME_STAGE_level_3, "LOZ");
     }
     else if (level == 4) {
-        level_pattern = active_theme[THEME_STAGE_level_4].pattern;
-        level_music = active_theme[THEME_STAGE_level_4].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_4].score);
+        level_stage = themes_load_stage(THEME_STAGE_level_4, "LOZ");
     }
     else {
         // We shouldn't get here.  Reset!
@@ -363,6 +349,8 @@ void game_loz_start(void) {
         game_loz_start();
         return;
     }
+
+    uint32_t length = music_get_score_length(level_stage->score);
 
     // Ignore the song header when calculating the song length
     length -= 6;
@@ -384,15 +372,15 @@ void game_loz_start(void) {
     ESP_LOGI(TAG, "Player finishes?  %s", player_finishes ? "Yes" : "No");
     if (player_finishes)
         ESP_LOGI(TAG, " ... at %d", player_finishes);
+    if (level == 4)
+        ESP_LOGI(TAG, "Player gets ending?  %s", player_gets_ending ? "Yes" : "No");
 
     uint32_t stopped_music_time = 0;
     music_settempo(100);
 
-    // If the user is destined to get a star, 1up, or time warning, play the
-    // sound effect queue, then resume the normal level music.
     while (stopped_music_time < length) {
-        level_pattern();
-        stopped_music_time = music_playscore_at_time(level_music, stopped_music_time);
+        level_stage->pattern();
+        stopped_music_time = music_playscore_at_time(level_stage->score, stopped_music_time);
 
         // If the user is destined to die, the level music will not resume
         if (player_dies && player_dies <= stopped_music_time)
@@ -406,40 +394,50 @@ void game_loz_start(void) {
     }
 
     if (player_dies) {
+        const theme_t* death = themes_load_stage(THEME_STAGE_death, "LOZ");
         lives--;
         player_dies = 0;
 
-        active_theme[THEME_STAGE_death].pattern();
-        music_playscore(active_theme[THEME_STAGE_death].score);
+        death->pattern();
+        music_playscore(death->score);
     }
     else if (level == 4) {
-        active_theme[THEME_STAGE_fanfare].pattern();
-        music_playscore(active_theme[THEME_STAGE_fanfare].score);
+        const theme_t* fanfare = themes_load_stage(THEME_STAGE_fanfare, "LOZ");
+
+        fanfare->pattern();
+        music_playscore(fanfare->score);
 
         if (player_gets_ending) {
+            const theme_t* ending = themes_load_stage(THEME_STAGE_ending, "LOZ");
+
             player_gets_ending = 0;
             player_finishes = 0;
             player_dies = 0;
 
-            active_theme[THEME_STAGE_ending].pattern();
-            music_playscore(active_theme[THEME_STAGE_ending].score);
+            ending->pattern();
+            music_playscore(ending->score);
         }
         level = 1;
         lives = GAME_START_LIVES;
     }
     else {
-        active_theme[THEME_STAGE_success].pattern();
-        music_playscore(active_theme[THEME_STAGE_success].score);
+        const theme_t* success = themes_load_stage(THEME_STAGE_success, "LOZ");
+        const theme_t* clear = themes_load_stage(THEME_STAGE_clear, "LOZ");
 
-        active_theme[THEME_STAGE_clear].pattern();
-        music_playscore(active_theme[THEME_STAGE_clear].score);
+        success->pattern();
+        music_playscore(success->score);
+
+        clear->pattern();
+        music_playscore(clear->score);
 
         level++;
     }
 
     if (lives == 0) {
-        active_theme[THEME_STAGE_gameover].pattern();
-        music_playscore(active_theme[THEME_STAGE_gameover].score);
+        const theme_t* gameover = themes_load_stage(THEME_STAGE_gameover, "LOZ");
+
+        gameover->pattern();
+        music_playscore(gameover->score);
         patterns_gameover_stop();
 
         level = 1;

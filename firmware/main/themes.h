@@ -50,7 +50,7 @@ typedef struct themes {
 #include "music/loz.h"
 #include "patterns.h"
 
-static const theme_t theme_smb[] = {
+const theme_t theme_smb[] = {
     { THEME_STAGE_level_1,  smb_overworld,    patterns_swipe },
     { THEME_STAGE_level_2,  smb_underworld,   patterns_lines },
     { THEME_STAGE_level_3,  smb_underwater,   patterns_waves },
@@ -68,7 +68,7 @@ static const theme_t theme_smb[] = {
     { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },
 };
 
-static const theme_t theme_smb2[] = {
+const theme_t theme_smb2[] = {
     { THEME_STAGE_level_1,  smb2_intro,       patterns_sweep },
     { THEME_STAGE_level_2,  smb2_overworld,   patterns_swipe },
     { THEME_STAGE_level_3,  smb2_underworld,  patterns_lines },
@@ -86,7 +86,7 @@ static const theme_t theme_smb2[] = {
     { THEME_STAGE_ending,   smb2_ending,      patterns_diamonds },
 };
 
-static const theme_t theme_smb3[] = {
+const theme_t theme_smb3[] = {
     { THEME_STAGE_level_1,  smb3_overworld,   patterns_swipe },
     { THEME_STAGE_level_2,  smb3_athletic,    patterns_swoosh },
     { THEME_STAGE_level_3,  smb3_underwater,  patterns_waves },
@@ -104,7 +104,7 @@ static const theme_t theme_smb3[] = {
     { THEME_STAGE_ending,   smb3_ending,       patterns_diamonds },
 };
 
-static const theme_t theme_smw[] = {
+const theme_t theme_smw[] = {
     { THEME_STAGE_level_1,  smw_overworld,    patterns_swipe },
     { THEME_STAGE_level_2,  smw_athletic,     patterns_swoosh },    // Get better pattern
     { THEME_STAGE_level_3,  smw_underwater,   patterns_waves },
@@ -122,14 +122,14 @@ static const theme_t theme_smw[] = {
     { THEME_STAGE_ending,   smw_ending,       patterns_diamonds },
 };
 
-static const theme_t theme_loz[] = {
+const theme_t theme_loz[] = {
     { THEME_STAGE_level_1,  loz_overworld,    patterns_swipe },
     { THEME_STAGE_level_2,  loz_kariki,       patterns_sweep },
     { THEME_STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
     { THEME_STAGE_level_4,  loz_castle,       patterns_castle },
     { THEME_STAGE_success,  loz_treasure_chest, patterns_sweep },
-    { THEME_STAGE_clear,    loz_course_clear, patterns_radar },
-    { THEME_STAGE_death,    loz_death,        patterns_spiral },
+    { THEME_STAGE_clear,    loz_course_clear, patterns_radar }, // TODO: Split loz_treasure_chest to two sounds, put second half here in place of course clear.  Move loz_course_clear music to loz_fanfare
+    { THEME_STAGE_death,    smb_block,        patterns_spiral }, // TODO: Get a better death sound: wowowowowowwo
     { THEME_STAGE_gameover, loz_gameover,     patterns_gameover },
     { THEME_STAGE_fanfare,  loz_get_triforce, patterns_checkered },
     { THEME_STAGE_ending,   loz_ending,       patterns_diamonds },
@@ -137,11 +137,11 @@ static const theme_t theme_loz[] = {
 
 #else
 
-#define theme_smb NULL
-#define theme_smb2 NULL
-#define theme_smb3 NULL
-#define theme_smw NULL
-#define theme_loz NULL
+extern const theme_t theme_smb[];
+extern const theme_t theme_smb2[];
+extern const theme_t theme_smb3[];
+extern const theme_t theme_smw[];
+extern const theme_t theme_loz[];
 
 #endif
 
@@ -154,5 +154,7 @@ static const themes_t themes[] = {
 };
 
 #define TOTAL_THEMES_AVAILABLE 5
+
+const theme_t* themes_load_stage(enum THEME_STAGE stage, const char* title);
 
 #endif
