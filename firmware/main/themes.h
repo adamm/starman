@@ -126,12 +126,12 @@ const theme_t theme_smw[] = {
     { THEME_STAGE_level_3,  smw_underwater,   patterns_waves },
     { THEME_STAGE_level_4,  smw_castle,       patterns_castle },
     { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
+    { THEME_STAGE_1up,      smb_1up,          patterns_checkered },
     { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
-    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { THEME_STAGE_starman,  smw_bonus,        patterns_starman },
     { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
     { THEME_STAGE_success,  smb_block,        patterns_sweep },     // Fallback to SMB
-    { THEME_STAGE_clear,    smw_course_clear, patterns_radar },     // FIXME: BAD TRACK
+    { THEME_STAGE_clear,    smw_course_clear, patterns_radar },
     { THEME_STAGE_death,    smw_death,        patterns_spiral },
     { THEME_STAGE_gameover, smw_gameover,     patterns_gameover },
     { THEME_STAGE_fanfare,  smw_world_clear,  patterns_checkered },
