@@ -26,9 +26,7 @@
 #define MIN(x,y) ((x)<(y)?(x):(y))
 #define MAX(x,y) ((x)>(y)?(x):(y))
 
-void delay(uint32_t);
-void littleToBigEndian(uint32_t*, uint32_t);
-int bigToLittleEndian(uint8_t*);
-void wordSwap(uint16_t*, size_t);
+void util_delay(uint32_t);
+char* util_get_mac_addr(void);
 
 #endif

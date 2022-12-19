@@ -21,43 +21,23 @@
 #include "util.h"
 
 
-void delay(uint32_t ms) {
+void util_delay(uint32_t ms) {
     vTaskDelay(ms / portTICK_RATE_MS);
 }
 
 
-void littleToBigEndian(uint32_t* buf, uint32_t size)
-{
-    for (int i = 0; i < size / sizeof(unsigned int); i++) {
-        buf[i] = SWAP_32(buf[i]);
-    }
+char* util_get_mac_addr(void) {
+    if (mac_str != NULL)
+        return mac_str;
+
+    uint8_t mac[6];
+
+    esp_wifi_get_mac(WIFI_IF_STA, mac);
+    sprintf(mac_str, "%02X%02X%02X%02X%02X%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+    ESP_LOGI(TAG, "Device MAC address: %s", mac_str);
+
+    return mac_str;
 }
 
-
-int bigToLittleEndian(uint8_t* buf)
-{
-    return (((int)buf[0] << 24) | ((int)buf[1] << 16) | ((int)buf[2] << 8) |
-            ((int)buf[3]) << 0);
-}
-
-
-void wordSwap(uint16_t* pWord, size_t wordCount)
-{
-    for (int i = 0; i < wordCount; i++) {
-        pWord[i] = WORD_SWAP(pWord[i]);
-    }
-}
-
-
-void PrintHex8(const char* TAG, uint8_t* data,
-               size_t length) // prints 8-bit data in hex with leading zeroes
-{
-    ESP_LOG_BUFFER_HEX(TAG, data, length);
-}
-
-
-void PrintHex16(const char* TAG, uint16_t* data,
-                size_t length) // prints 16-bit data in hex with leading zeroes
-{
-    ESP_LOG_BUFFER_HEX(TAG, data, length * 2);
-}
