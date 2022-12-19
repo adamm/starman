@@ -235,6 +235,24 @@ esp_err_t httpd_post_handler(httpd_req_t *req) {
         }
         free(value_str);
     }
+    else if (strcmp(req->uri, "/genie") == 0) {
+        uint16_t const value_maxlen = 20;
+        char* value_str = calloc(value_maxlen, sizeof(char));
+        esp_err_t err;
+
+        err = post_handler(req, value_str, value_maxlen);
+        ESP_LOGI(TAG, "Got value for /genie: %s", value_str);
+        if (err == ESP_OK) {
+            if (strcmp(value_str, util_get_mac_addr()) == 0)
+                player_invincible = true;
+            else
+                player_invincible = false;
+
+            httpd_resp_set_status(req, "200 OK");
+            httpd_resp_send(req, NULL, 0);
+        }
+        free(value_str);
+    }
     else if (strcmp(req->uri, "/text") == 0) {
         uint16_t const text_maxlen = 255;
         char* text_str = calloc(text_maxlen, sizeof(char));

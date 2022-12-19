@@ -16,6 +16,8 @@
 
 #include <esp_log.h>
 
+#define INCLUDE_GAME_SETTINGS
+
 #include "config.h"
 #include "music.h"
 #include "random.h"
@@ -141,6 +143,9 @@ void game_smb_start(void) {
         game_smb_start();
         return;
     }
+
+    if (player_invincible)
+        player_dies = 0;
 
     // Ignore the song header when calculating the song length
     length -= 6;
@@ -349,6 +354,9 @@ void game_loz_start(void) {
         game_loz_start();
         return;
     }
+
+    if (player_invincible)
+        player_dies = 0;
 
     uint32_t length = music_get_score_length(level_stage->score);
 

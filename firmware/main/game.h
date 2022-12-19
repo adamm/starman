@@ -17,15 +17,19 @@
 #ifndef GAME_H
 #define GAME_H
 
+#ifdef INCLUDE_GAME_SETTINGS
+bool player_invincible = false;
+#else
+extern bool player_invincible;
+#endif
+
 uint8_t game_get_level();
 uint8_t game_get_lives();
 uint8_t game_get_playing_state();
 bool game_smb_step_sequence(uint32_t time);
 void game_smb_start(void);
-
 bool game_loz_step_sequence(uint32_t time);
 void game_loz_start(void);
-
 void game_start(void);
 
 #endif

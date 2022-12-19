@@ -15,10 +15,14 @@
 */
 
 #include <esp_log.h>
+#include <esp_wifi.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 #include "util.h"
+
+static const char *TAG = "starman-util";
+static char mac_str[20] = {0};
 
 
 void util_delay(uint32_t ms) {
@@ -40,4 +44,3 @@ char* util_get_mac_addr(void) {
 
     return mac_str;
 }
-
