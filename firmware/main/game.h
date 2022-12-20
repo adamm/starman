@@ -17,6 +17,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "stage.h"
+
 #ifdef INCLUDE_GAME_SETTINGS
 bool player_invincible = false;
 #else

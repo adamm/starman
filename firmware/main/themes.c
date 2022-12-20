@@ -17,11 +17,13 @@
 #include <esp_log.h>
 #include <string.h>
 
+#include "stage.h"
+
 #include "themes.h"
 
 static const char *TAG = "starman-themes";
 
-const theme_t* themes_load_stage(enum THEME_STAGE stage, const char* title) {
+const theme_t* themes_load_stage(const char* title, enum STAGE stage) {
     const theme_t* active_theme = NULL;
     uint8_t total_stages = 0;
 

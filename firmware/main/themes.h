@@ -18,28 +18,10 @@
 #define THEMES_H
 
 #include "game.h"
-
-enum THEME_STAGE {
-    THEME_STAGE_level_1,
-    THEME_STAGE_level_2,
-    THEME_STAGE_level_3,
-    THEME_STAGE_level_4,
-    THEME_STAGE_block,
-    THEME_STAGE_1up,
-    THEME_STAGE_powerup,
-    THEME_STAGE_starman,
-    THEME_STAGE_warning,
-    THEME_STAGE_success,
-    THEME_STAGE_clear,
-    THEME_STAGE_death,
-    THEME_STAGE_gameover,
-    THEME_STAGE_fanfare,
-    THEME_STAGE_ending,
-};
-#define NUM_THEME_STAGES 15
+#include "stage.h"
 
 typedef struct theme {
-    enum THEME_STAGE stage;
+    enum STAGE stage;
     const unsigned char* score;
     void (*pattern)(void);
 } theme_t;
@@ -67,88 +49,88 @@ typedef struct themes {
 #include "patterns.h"
 
 const theme_t theme_smb[] = {
-    { THEME_STAGE_level_1,  smb_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  smb_underworld,   patterns_lines },
-    { THEME_STAGE_level_3,  smb_underwater,   patterns_waves },
-    { THEME_STAGE_level_4,  smb_castle,       patterns_castle },
-    { THEME_STAGE_block,    smb_block,        patterns_question },
-    { THEME_STAGE_1up,      smb_1up,          patterns_checkered },
-    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },
-    { THEME_STAGE_starman,  smb_starman,      patterns_starman },
-    { THEME_STAGE_warning,  smb_warning,      patterns_siren },
-    { THEME_STAGE_success,  smb_flagpole,     patterns_sweep },
-    { THEME_STAGE_clear,    smb_course_clear, patterns_radar },
-    { THEME_STAGE_death,    smb_death,        patterns_spiral },
-    { THEME_STAGE_gameover, smb_gameover,     patterns_gameover },
-    { THEME_STAGE_fanfare,  smb_fanfare,      patterns_checkered },
-    { THEME_STAGE_ending,   smb_ending,       patterns_diamonds },
+    { STAGE_level_1,  smb_overworld,    patterns_swipe },
+    { STAGE_level_2,  smb_underworld,   patterns_lines },
+    { STAGE_level_3,  smb_underwater,   patterns_waves },
+    { STAGE_level_4,  smb_castle,       patterns_castle },
+    { STAGE_block,    smb_block,        patterns_question },
+    { STAGE_1up,      smb_1up,          patterns_checkered },
+    { STAGE_powerup,  smb_powerup,      patterns_flash },
+    { STAGE_starman,  smb_starman,      patterns_starman },
+    { STAGE_warning,  smb_warning,      patterns_siren },
+    { STAGE_success,  smb_flagpole,     patterns_sweep },
+    { STAGE_clear,    smb_course_clear, patterns_radar },
+    { STAGE_death,    smb_death,        patterns_spiral },
+    { STAGE_gameover, smb_gameover,     patterns_gameover },
+    { STAGE_fanfare,  smb_fanfare,      patterns_checkered },
+    { STAGE_ending,   smb_ending,       patterns_diamonds },
 };
 
 const theme_t theme_smb2[] = {
-    { THEME_STAGE_level_1,  smb2_intro,       patterns_sweep },
-    { THEME_STAGE_level_2,  smb2_overworld,   patterns_swipe },
-    { THEME_STAGE_level_3,  smb2_underworld,  patterns_lines },
-    { THEME_STAGE_level_4,  smb2_boss,        patterns_castle },
-    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
-    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
-    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
-    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
-    { THEME_STAGE_success,  smb_flagpole,     patterns_sweep },     // Fallback to SMB
-    { THEME_STAGE_clear,    smb2_clear,       patterns_radar },
-    { THEME_STAGE_death,    smb2_death,       patterns_spiral },
-    { THEME_STAGE_gameover, smb2_gameover,    patterns_gameover },
-    { THEME_STAGE_fanfare,  smb2_fanfare,     patterns_checkered },
-    { THEME_STAGE_ending,   smb2_ending,      patterns_diamonds },
+    { STAGE_level_1,  smb2_intro,       patterns_sweep },
+    { STAGE_level_2,  smb2_overworld,   patterns_swipe },
+    { STAGE_level_3,  smb2_underworld,  patterns_lines },
+    { STAGE_level_4,  smb2_boss,        patterns_castle },
+    { STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
+    { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
+    { STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { STAGE_success,  smb_flagpole,     patterns_sweep },     // Fallback to SMB
+    { STAGE_clear,    smb2_clear,       patterns_radar },
+    { STAGE_death,    smb2_death,       patterns_spiral },
+    { STAGE_gameover, smb2_gameover,    patterns_gameover },
+    { STAGE_fanfare,  smb2_fanfare,     patterns_checkered },
+    { STAGE_ending,   smb2_ending,      patterns_diamonds },
 };
 
 const theme_t theme_smb3[] = {
-    { THEME_STAGE_level_1,  smb3_overworld,   patterns_swipe },
-    { THEME_STAGE_level_2,  smb3_athletic,    patterns_swoosh },
-    { THEME_STAGE_level_3,  smb3_underwater,  patterns_waves },
-    { THEME_STAGE_level_4,  smb3_castle,      patterns_castle },
-    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
-    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB       
-    { THEME_STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
-    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
-    { THEME_STAGE_success,  smb_block,        patterns_sweep },     // No real "success" sound, so instead just bump the block
-    { THEME_STAGE_clear,    smb3_course_clear,patterns_radar },
-    { THEME_STAGE_death,    smb_death,        patterns_spiral },    // Fallback to SMB
-    { THEME_STAGE_gameover, smb3_gameover,    patterns_gameover },
-    { THEME_STAGE_fanfare,  smb3_fanfare,     patterns_checkered },
-    { THEME_STAGE_ending,   smb3_ending,       patterns_diamonds },
+    { STAGE_level_1,  smb3_overworld,   patterns_swipe },
+    { STAGE_level_2,  smb3_athletic,    patterns_swoosh },
+    { STAGE_level_3,  smb3_underwater,  patterns_waves },
+    { STAGE_level_4,  smb3_castle,      patterns_castle },
+    { STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
+    { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB       
+    { STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { STAGE_success,  smb_block,        patterns_sweep },     // No real "success" sound, so instead just bump the block
+    { STAGE_clear,    smb3_course_clear,patterns_radar },
+    { STAGE_death,    smb_death,        patterns_spiral },    // Fallback to SMB
+    { STAGE_gameover, smb3_gameover,    patterns_gameover },
+    { STAGE_fanfare,  smb3_fanfare,     patterns_checkered },
+    { STAGE_ending,   smb3_ending,       patterns_diamonds },
 };
 
 const theme_t theme_smw[] = {
-    { THEME_STAGE_level_1,  smw_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  smw_athletic,     patterns_swoosh },    // Get better pattern
-    { THEME_STAGE_level_3,  smw_underwater,   patterns_waves },
-    { THEME_STAGE_level_4,  smw_castle,       patterns_castle },
-    { THEME_STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
-    { THEME_STAGE_1up,      smb_1up,          patterns_checkered },
-    { THEME_STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
-    { THEME_STAGE_starman,  smw_bonus,        patterns_starman },
-    { THEME_STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
-    { THEME_STAGE_success,  smb_block,        patterns_sweep },     // Fallback to SMB
-    { THEME_STAGE_clear,    smw_course_clear, patterns_radar },
-    { THEME_STAGE_death,    smw_death,        patterns_spiral },
-    { THEME_STAGE_gameover, smw_gameover,     patterns_gameover },
-    { THEME_STAGE_fanfare,  smw_world_clear,  patterns_checkered },
-    { THEME_STAGE_ending,   smw_ending,       patterns_diamonds },
+    { STAGE_level_1,  smw_overworld,    patterns_swipe },
+    { STAGE_level_2,  smw_athletic,     patterns_swoosh },    // Get better pattern
+    { STAGE_level_3,  smw_underwater,   patterns_waves },
+    { STAGE_level_4,  smw_castle,       patterns_castle },
+    { STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
+    { STAGE_1up,      smb_1up,          patterns_checkered },
+    { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
+    { STAGE_starman,  smw_bonus,        patterns_starman },
+    { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { STAGE_success,  smb_block,        patterns_sweep },     // Fallback to SMB
+    { STAGE_clear,    smw_course_clear, patterns_radar },
+    { STAGE_death,    smw_death,        patterns_spiral },
+    { STAGE_gameover, smw_gameover,     patterns_gameover },
+    { STAGE_fanfare,  smw_world_clear,  patterns_checkered },
+    { STAGE_ending,   smw_ending,       patterns_diamonds },
 };
 
 const theme_t theme_loz[] = {
-    { THEME_STAGE_level_1,  loz_overworld,    patterns_swipe },
-    { THEME_STAGE_level_2,  loz_kariki,       patterns_sweep },
-    { THEME_STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
-    { THEME_STAGE_level_4,  loz_castle,       patterns_castle },
-    { THEME_STAGE_success,  loz_treasure_chest, patterns_sweep },
-    { THEME_STAGE_clear,    loz_course_clear, patterns_radar }, // TODO: Split loz_treasure_chest to two sounds, put second half here in place of course clear.  Move loz_course_clear music to loz_fanfare
-    { THEME_STAGE_death,    smb_block,        patterns_spiral }, // TODO: Get a better death sound: wowowowowowwo
-    { THEME_STAGE_gameover, loz_gameover,     patterns_gameover },
-    { THEME_STAGE_fanfare,  loz_get_triforce, patterns_checkered },
-    { THEME_STAGE_ending,   loz_ending,       patterns_diamonds },
+    { STAGE_level_1,  loz_overworld,    patterns_swipe },
+    { STAGE_level_2,  loz_kariki,       patterns_sweep },
+    { STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
+    { STAGE_level_4,  loz_castle,       patterns_castle },
+    { STAGE_success,  loz_treasure_chest, patterns_sweep },
+    { STAGE_clear,    loz_course_clear, patterns_radar }, // TODO: Split loz_treasure_chest to two sounds, put second half here in place of course clear.  Move loz_course_clear music to loz_fanfare
+    { STAGE_death,    smb_block,        patterns_spiral }, // TODO: Get a better death sound: wowowowowowwo
+    { STAGE_gameover, loz_gameover,     patterns_gameover },
+    { STAGE_fanfare,  loz_get_triforce, patterns_checkered },
+    { STAGE_ending,   loz_ending,       patterns_diamonds },
 };
 
 #else
@@ -171,6 +153,6 @@ static const themes_t themes[] = {
 
 #define TOTAL_THEMES_AVAILABLE 5
 
-const theme_t* themes_load_stage(enum THEME_STAGE stage, const char* title);
+const theme_t* themes_load_stage(const char* title, enum STAGE stage);
 
 #endif

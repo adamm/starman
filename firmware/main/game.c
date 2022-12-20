@@ -116,24 +116,24 @@ void game_smb_start(void) {
     void (*level_pattern)(void);
 
     if (level == 1) {
-        level_pattern = active_theme[THEME_STAGE_level_1].pattern;
-        level_music = active_theme[THEME_STAGE_level_1].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_1].score);
+        level_pattern = active_theme[STAGE_level_1].pattern;
+        level_music = active_theme[STAGE_level_1].score;
+        length = music_get_score_length(active_theme[STAGE_level_1].score);
     }
     else if (level == 2) {
-        level_pattern = active_theme[THEME_STAGE_level_2].pattern;
-        level_music = active_theme[THEME_STAGE_level_2].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_2].score);
+        level_pattern = active_theme[STAGE_level_2].pattern;
+        level_music = active_theme[STAGE_level_2].score;
+        length = music_get_score_length(active_theme[STAGE_level_2].score);
     }
     else if (level == 3) {
-        level_pattern = active_theme[THEME_STAGE_level_3].pattern;
-        level_music = active_theme[THEME_STAGE_level_3].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_3].score);
+        level_pattern = active_theme[STAGE_level_3].pattern;
+        level_music = active_theme[STAGE_level_3].score;
+        length = music_get_score_length(active_theme[STAGE_level_3].score);
     }
     else if (level == 4) {
-        level_pattern = active_theme[THEME_STAGE_level_4].pattern;
-        level_music = active_theme[THEME_STAGE_level_4].score;
-        length = music_get_score_length(active_theme[THEME_STAGE_level_4].score);
+        level_pattern = active_theme[STAGE_level_4].pattern;
+        level_music = active_theme[STAGE_level_4].score;
+        length = music_get_score_length(active_theme[STAGE_level_4].score);
     }
     else {
         // We shouldn't get here.  Reset!
@@ -199,14 +199,14 @@ void game_smb_start(void) {
             uint8_t prev_tempo = music_gettempo();
             player_gets_star = 0;
 
-            active_theme[THEME_STAGE_block].pattern();
-            music_playscore(active_theme[THEME_STAGE_block].score);
+            active_theme[STAGE_block].pattern();
+            music_playscore(active_theme[STAGE_block].score);
 
-            active_theme[THEME_STAGE_powerup].pattern();
-            music_playscore(active_theme[THEME_STAGE_powerup].score);
+            active_theme[STAGE_powerup].pattern();
+            music_playscore(active_theme[STAGE_powerup].score);
 
-            active_theme[THEME_STAGE_starman].pattern();
-            music_playscore(active_theme[THEME_STAGE_starman].score);
+            active_theme[STAGE_starman].pattern();
+            music_playscore(active_theme[STAGE_starman].score);
 
             music_settempo(prev_tempo);
         }
@@ -216,11 +216,11 @@ void game_smb_start(void) {
             uint8_t prev_tempo = music_gettempo();
             player_gets_1up = 0;
 
-            active_theme[THEME_STAGE_block].pattern();
-            music_playscore(active_theme[THEME_STAGE_block].score);
+            active_theme[STAGE_block].pattern();
+            music_playscore(active_theme[STAGE_block].score);
 
-            active_theme[THEME_STAGE_1up].pattern();
-            music_playscore(active_theme[THEME_STAGE_1up].score);
+            active_theme[STAGE_1up].pattern();
+            music_playscore(active_theme[STAGE_1up].score);
 
             music_settempo(prev_tempo);
         }
@@ -228,8 +228,8 @@ void game_smb_start(void) {
         if (player_gets_warning && player_gets_warning <= stopped_music_time) {
             player_gets_warning = 0;
 
-            active_theme[THEME_STAGE_warning].pattern();
-            music_playscore(active_theme[THEME_STAGE_warning].score);
+            active_theme[STAGE_warning].pattern();
+            music_playscore(active_theme[STAGE_warning].score);
             music_settempo(150);
         }
 
@@ -250,37 +250,37 @@ void game_smb_start(void) {
         lives--;
         player_dies = 0;
 
-        active_theme[THEME_STAGE_death].pattern();
-        music_playscore(active_theme[THEME_STAGE_death].score);
+        active_theme[STAGE_death].pattern();
+        music_playscore(active_theme[STAGE_death].score);
     }
     else if (level == 4) {
-        active_theme[THEME_STAGE_fanfare].pattern();
-        music_playscore(active_theme[THEME_STAGE_fanfare].score);
+        active_theme[STAGE_fanfare].pattern();
+        music_playscore(active_theme[STAGE_fanfare].score);
 
         if (player_gets_ending) {
             player_gets_ending = 0;
             player_finishes = 0;
             player_dies = 0;
 
-            active_theme[THEME_STAGE_ending].pattern();
-            music_playscore(active_theme[THEME_STAGE_ending].score);
+            active_theme[STAGE_ending].pattern();
+            music_playscore(active_theme[STAGE_ending].score);
         }
         level = 1;
         lives = GAME_START_LIVES;
     }
     else {
-        active_theme[THEME_STAGE_success].pattern();
-        music_playscore(active_theme[THEME_STAGE_success].score);
+        active_theme[STAGE_success].pattern();
+        music_playscore(active_theme[STAGE_success].score);
 
-        active_theme[THEME_STAGE_clear].pattern();
-        music_playscore(active_theme[THEME_STAGE_clear].score);
+        active_theme[STAGE_clear].pattern();
+        music_playscore(active_theme[STAGE_clear].score);
 
         level++;
     }
 
     if (lives == 0) {
-        active_theme[THEME_STAGE_gameover].pattern();
-        music_playscore(active_theme[THEME_STAGE_gameover].score);
+        active_theme[STAGE_gameover].pattern();
+        music_playscore(active_theme[STAGE_gameover].score);
         patterns_gameover_stop();
 
         level = 1;
@@ -332,19 +332,19 @@ void game_loz_start(void) {
     // Stop sparkling becuase we're about to play some music/lights!
     sparkle_stop();
 
-    const theme_t* level_stage = themes_load_stage(THEME_STAGE_death, "LOZ");
+    const theme_t* level_stage = themes_load_stage("LOZ", STAGE_death);
 
     if (level == 1) {
-        level_stage = themes_load_stage(THEME_STAGE_level_1, "LOZ");
+        level_stage = themes_load_stage("LOZ", STAGE_level_1);
     }
     else if (level == 2) {
-        level_stage = themes_load_stage(THEME_STAGE_level_2, "LOZ");
+        level_stage = themes_load_stage("LOZ", STAGE_level_2);
     }
     else if (level == 3) {
-        level_stage = themes_load_stage(THEME_STAGE_level_3, "LOZ");
+        level_stage = themes_load_stage("LOZ", STAGE_level_3);
     }
     else if (level == 4) {
-        level_stage = themes_load_stage(THEME_STAGE_level_4, "LOZ");
+        level_stage = themes_load_stage("LOZ", STAGE_level_4);
     }
     else {
         // We shouldn't get here.  Reset!
@@ -402,7 +402,7 @@ void game_loz_start(void) {
     }
 
     if (player_dies) {
-        const theme_t* death = themes_load_stage(THEME_STAGE_death, "LOZ");
+        const theme_t* death = themes_load_stage("LOZ", STAGE_death);
         lives--;
         player_dies = 0;
 
@@ -410,13 +410,13 @@ void game_loz_start(void) {
         music_playscore(death->score);
     }
     else if (level == 4) {
-        const theme_t* fanfare = themes_load_stage(THEME_STAGE_fanfare, "LOZ");
+        const theme_t* fanfare = themes_load_stage("LOZ", STAGE_fanfare);
 
         fanfare->pattern();
         music_playscore(fanfare->score);
 
         if (player_gets_ending) {
-            const theme_t* ending = themes_load_stage(THEME_STAGE_ending, "LOZ");
+            const theme_t* ending = themes_load_stage("LOZ", STAGE_ending);
 
             player_gets_ending = 0;
             player_finishes = 0;
@@ -429,8 +429,8 @@ void game_loz_start(void) {
         lives = GAME_START_LIVES;
     }
     else {
-        const theme_t* success = themes_load_stage(THEME_STAGE_success, "LOZ");
-        const theme_t* clear = themes_load_stage(THEME_STAGE_clear, "LOZ");
+        const theme_t* success = themes_load_stage("LOZ", STAGE_success);
+        const theme_t* clear = themes_load_stage("LOZ", STAGE_clear);
 
         success->pattern();
         music_playscore(success->score);
@@ -442,7 +442,7 @@ void game_loz_start(void) {
     }
 
     if (lives == 0) {
-        const theme_t* gameover = themes_load_stage(THEME_STAGE_gameover, "LOZ");
+        const theme_t* gameover = themes_load_stage("LOZ", STAGE_gameover);
 
         gameover->pattern();
         music_playscore(gameover->score);
