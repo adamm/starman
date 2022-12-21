@@ -23,6 +23,7 @@ idf_component_register(SRCS
                     EMBED_FILES
                     "assets/about.html"
                     "assets/index.html"
+                    "assets/favicon.png"
                     "assets/style.css"
                     "assets/starman.js"
                     INCLUDE_DIRS ".")

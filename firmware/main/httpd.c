@@ -42,6 +42,8 @@ extern const char about_html_start[] asm("_binary_about_html_start");
 extern const char about_html_end[] asm("_binary_about_html_end");
 extern const char index_html_start[] asm("_binary_index_html_start");
 extern const char index_html_end[] asm("_binary_index_html_end");
+extern const char favicon_png_start[] asm("_binary_favicon_png_start");
+extern const char favicon_png_end[] asm("_binary_favicon_png_end");
 extern const char starman_js_start[] asm("_binary_starman_js_start");
 extern const char starman_js_end[] asm("_binary_starman_js_end");
 extern const char style_css_start[] asm("_binary_style_css_start");
@@ -99,6 +101,13 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "text/html");
         httpd_resp_send(req, about_html_start, about_html_len);
+    }
+    else if(strcmp(req->uri, "/favicon.png") == 0) {
+        const uint32_t favicon_png_len = favicon_png_end - favicon_png_start;
+
+        httpd_resp_set_status(req, "200 OK");
+        httpd_resp_set_type(req, "image/png");
+        httpd_resp_send(req, favicon_png_start, favicon_png_len);
     }
     else if(strcmp(req->uri, "/starman.js") == 0) {
         const uint32_t starman_js_len = starman_js_end - starman_js_start;
