@@ -339,7 +339,7 @@ void music_init(void) {
     gpio_set_level(MUSIC_CHANNEL_4_GPIO, 0);
     music_amp_mute();
 
-    ledc_timer   = malloc(sizeof(ledc_timer_config_t) * MAX_CHANNELS);
+    ledc_timer = calloc(sizeof(ledc_timer_config_t), MAX_CHANNELS);
 
     ledc_timer[0].duty_resolution = LEDC_TIMER_13_BIT;
     ledc_timer[0].freq_hz = 2000;
@@ -370,7 +370,7 @@ void music_init(void) {
         ESP_LOGE(TAG, "ledc_timer_config[%d]: %d", i, err);
     }
 
-    ledc_channel = malloc(sizeof(ledc_channel_config_t) * MAX_CHANNELS);
+    ledc_channel = calloc(sizeof(ledc_channel_config_t), MAX_CHANNELS);
 
     ledc_channel[0].channel = LEDC_CHANNEL_0;
     ledc_channel[0].duty = 0;

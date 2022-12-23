@@ -66,7 +66,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
             ESP_LOGD(TAG, "HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
             if (!esp_http_client_is_chunked_response(evt->client)) {
                 if (output_buffer == NULL) {
-                    output_buffer = (char*) malloc(esp_http_client_get_content_length(evt->client));
+                    output_buffer = (char*) calloc(1, esp_http_client_get_content_length(evt->client));
                     output_len = 0;
                     if (output_buffer == NULL) {
                         ESP_LOGE(TAG, "Failed to allocate memory for the output buffer");
@@ -170,9 +170,9 @@ void network_download_finished(void) {
 
 
 esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size_t), unsigned char* digest) {
-    char *buffer = malloc(MAX_HTTP_RECV_BUFFER + 1);
+    char *buffer = calloc(1, MAX_HTTP_RECV_BUFFER + 1);
     if (buffer == NULL) {
-        ESP_LOGE(TAG, "Cannot malloc http receive buffer");
+        ESP_LOGE(TAG, "Cannot calloc http receive buffer");
         return ESP_ERR_NO_MEM;
     }
     esp_http_client_config_t config = {

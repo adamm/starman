@@ -92,9 +92,9 @@ void text_write_string(display_t* display, char* string) {
     // Only one line of text is supported.
     display->text_height = FONT.char_height;
     display->text_width = x + (strlen(string) * FONT.char_width);
-    display->text = malloc(display->text_height * sizeof(uint8_t*));
+    display->text = calloc(display->text_height, sizeof(uint8_t*));
     for (uint8_t i = 0; i < display->text_height; i++) {
-        display->text[i] = malloc(display->text_width * sizeof(uint8_t));
+        display->text[i] = calloc(display->text_width, sizeof(uint8_t));
         memset(display->text[i], 0, display->text_width);
     }
 

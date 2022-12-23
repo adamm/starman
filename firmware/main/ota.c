@@ -220,7 +220,7 @@ uint8_t ota_upgrade(void) {
     display_t* display = NULL;
 
     sparkle_stop();
-    display = malloc(sizeof(display_t));
+    display = calloc(1, sizeof(display_t));
     memset(display, 0, sizeof(display_t));
 
     while (1) {
