@@ -18,9 +18,11 @@
 #include <esp_random.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <math.h>
 #include <string.h>
 
 #include "config.h"
+#include "draw.h"
 #include "display.h"
 #include "gol.h"
 #include "patterns.h"
@@ -58,6 +60,7 @@ static void patterns_lines_step();
 static void patterns_question_step();
 static void patterns_radar_step();
 static void patterns_random_step();
+static void patterns_sand_step();
 static void patterns_siren_step();
 static void patterns_spiral_step();
 static void patterns_sweep_step();
@@ -452,6 +455,38 @@ static void patterns_random_step() {
 }
 
 
+static double sand_time = 0;
+static const uint8_t sand_color[] = { 0, 64, 128, 192, 255, 192, 128, 64 };
+static const uint8_t sand_z[] = { 0, 1, 2, 3, 4, 3, 2, 1 };
+
+
+void patterns_sand() {
+    ESP_LOGI(TAG, "Begin SIREN pattern");
+
+    display_reset(&display);
+    display.pattern = NULL;
+    memset(display.background, 0, DISPLAY_LIGHTS_TOTAL_AREA);
+    sand_time = 0;
+
+    callback_func = patterns_sand_step;
+}
+
+
+static void patterns_sand_step() {
+    float c, v;
+
+    for(int8_t i = -8; i < 8; i++) {
+        for(int8_t j = -8; j < 8; j++) {
+            c = i / (1 + abs(j)) + sin(j/8);
+            v = j * sand_z[(int16_t)(c-sand_time)%8]/16;
+            draw_line(&display, 8+i, 8+j-v, 8+i, 8+j,
+                    sand_color[(int16_t)(c-sand_time)%8]);
+        }
+    }
+    sand_time = sand_time - 1/10;
+}
+
+
 void patterns_siren() {
     ESP_LOGI(TAG, "Begin SIREN pattern");
 
@@ -460,7 +495,7 @@ void patterns_siren() {
     memcpy(display.background, siren.data, DISPLAY_LIGHTS_TOTAL_AREA);
     callback_func = patterns_siren_step;
 }
-    
+
 
 static void patterns_siren_step() {
     rotate_background(90);
