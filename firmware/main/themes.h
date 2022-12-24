@@ -125,8 +125,10 @@ const theme_t theme_loz[] = {
     { STAGE_level_2,  loz_kariki,       patterns_sweep },
     { STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
     { STAGE_level_4,  loz_castle,       patterns_castle },
+    { STAGE_block,    smb_block,        patterns_sweep },
+    { STAGE_1up,      loz_secret,       patterns_checkered },
     { STAGE_success,  loz_treasure_chest, patterns_sweep },
-    { STAGE_clear,    loz_course_clear, patterns_radar }, // TODO: Split loz_treasure_chest to two sounds, put second half here in place of course clear.  Move loz_course_clear music to loz_fanfare
+    { STAGE_clear,    loz_item,         patterns_radar },
     { STAGE_death,    smb_block,        patterns_spiral }, // TODO: Get a better death sound: wowowowowowwo
     { STAGE_gameover, loz_gameover,     patterns_gameover },
     { STAGE_fanfare,  loz_get_triforce, patterns_checkered },
@@ -148,7 +150,7 @@ static const themes_t themes[] = {
     { "SMB2", theme_smb2, 15, game_smb_start, game_smb_step_sequence },
     { "SMB3", theme_smb3, 15, game_smb_start, game_smb_step_sequence },
     { "SMW",  theme_smw,  15, game_smb_start, game_smb_step_sequence },
-    { "LOZ",  theme_loz,  10, game_loz_start, game_loz_step_sequence },
+    { "LOZ",  theme_loz,  12, game_loz_start, game_loz_step_sequence },
 };
 
 #define TOTAL_THEMES_AVAILABLE 5
