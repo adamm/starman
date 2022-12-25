@@ -129,9 +129,9 @@ const theme_t theme_loz[] = {
     { STAGE_1up,      loz_secret,       patterns_checkered },
     { STAGE_success,  loz_treasure_chest, patterns_sweep },
     { STAGE_clear,    loz_item,         patterns_radar },
-    { STAGE_death,    smb_block,        patterns_spiral }, // TODO: Get a better death sound: wowowowowowwo
+    { STAGE_death,    loz_death,        patterns_spiral },
     { STAGE_gameover, loz_gameover,     patterns_gameover },
-    { STAGE_fanfare,  loz_get_triforce, patterns_checkered },
+    { STAGE_fanfare,  loz_get_master_sword, patterns_checkered },
     { STAGE_ending,   loz_ending,       patterns_diamonds },
 };
 

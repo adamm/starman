@@ -430,6 +430,10 @@ void game_loz_start(void) {
         music_playscore(death->score);
     }
     else if (level == 4) {
+        player_gets_1up = 0;
+        player_finishes = 0;
+        player_dies = 0;
+
         const theme_t* fanfare = themes_load_stage("LOZ", STAGE_fanfare);
 
         fanfare->pattern();
@@ -449,6 +453,10 @@ void game_loz_start(void) {
         lives = GAME_START_LIVES;
     }
     else {
+        player_gets_1up = 0;
+        player_finishes = 0;
+        player_dies = 0;
+
         const theme_t* success = themes_load_stage("LOZ", STAGE_success);
         const theme_t* clear = themes_load_stage("LOZ", STAGE_clear);
 
