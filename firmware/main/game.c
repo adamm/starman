@@ -34,6 +34,7 @@ static uint8_t level = 1;
 static uint8_t lives = 3;
 static bool playing  = false;
 static uint32_t player_gets_star    = 0;
+static uint32_t player_finds_secret = 0;
 static uint32_t player_gets_1up     = 0;
 static uint32_t player_gets_warning = 0;
 static uint32_t player_gets_ending  = 0;
@@ -103,7 +104,7 @@ void game_smb_start(void) {
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
     player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
-    player_gets_ending = random_bool_under_percent(GAME_FANFARE_PERCENT);
+    player_gets_ending = random_bool_under_percent(GAME_ENDING_PERCENT);
     player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
     // Stop sparkling becuase we're about to play some music/lights!
@@ -299,9 +300,13 @@ void game_smb_start(void) {
 bool game_loz_step_sequence(uint32_t time) {
     patterns_step_sequence();
 
-    // Stop the current track if the random time has passed to get a star, 1up, warning, or die
+    // Stop the current track if the random time has passed to find a secret, finish, or die
     if (player_dies && player_dies < time) {
         ESP_LOGW(TAG, "Pause level: Player died");
+        return true;
+    }
+    else if (player_finds_secret && player_finds_secret < time) {
+        ESP_LOGW(TAG, "Pause level: Player found a secret");
         return true;
     }
     else if (player_finishes && player_finishes < time) {
@@ -326,8 +331,8 @@ void game_loz_start(void) {
 
     music_amp_unmute();
 
-    player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
-    player_gets_ending = random_bool_under_percent(GAME_FANFARE_PERCENT);
+    player_finds_secret = random_bool_under_percent(GAME_1UP_PERCENT);
+    player_gets_ending = random_bool_under_percent(GAME_ENDING_PERCENT);
     player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
     // Stop sparkling becuase we're about to play some music/lights!
@@ -364,8 +369,8 @@ void game_loz_start(void) {
     // Ignore the song header when calculating the song length
     length -= 6;
 
-    if (player_gets_1up)
-        player_gets_1up = random_value_within_int(length);
+    if (player_finds_secret)
+        player_finds_secret = random_value_within_int(length);
     // Now that the music has been identified, pick a random location in
     // the song to stop and play the die music.
     if (player_dies)
@@ -377,9 +382,9 @@ void game_loz_start(void) {
     ESP_LOGI(TAG, "Player level:  %d", level);
     ESP_LOGI(TAG, "Player lives:  %d", lives);
     ESP_LOGI(TAG, "Level length:  %d", length);
-    ESP_LOGI(TAG, "Player finds secret?  %s", player_gets_1up ? "Yes" : "No");
-    if (player_gets_1up)
-        ESP_LOGI(TAG, " ... at %d", player_gets_1up);
+    ESP_LOGI(TAG, "Player finds secret?  %s", player_finds_secret ? "Yes" : "No");
+    if (player_finds_secret)
+        ESP_LOGI(TAG, " ... at %d", player_finds_secret);
     ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
     if (player_dies)
         ESP_LOGI(TAG, " ... at %d", player_dies);
@@ -397,14 +402,15 @@ void game_loz_start(void) {
         stopped_music_time = music_playscore_at_time(level_stage->score, stopped_music_time);
 
         // The "1up" is actually the "found a secret" music
-        if (player_gets_1up && player_gets_1up <= stopped_music_time) {
+        if (player_finds_secret && player_finds_secret <= stopped_music_time) {
             lives++;
-            player_gets_1up = 0;
+            player_finds_secret = 0;
 
             const theme_t* secret_stage = themes_load_stage("LOZ", STAGE_block);
             secret_stage->pattern();
             music_playscore(secret_stage->score);
 
+            // The "1up" stage actually stores the "secret" stage under LOZ theme
             secret_stage = themes_load_stage("LOZ", STAGE_1up);
             secret_stage->pattern();
             music_playscore(secret_stage->score);
@@ -430,7 +436,7 @@ void game_loz_start(void) {
         music_playscore(death->score);
     }
     else if (level == 4) {
-        player_gets_1up = 0;
+        player_finds_secret = 0;
         player_finishes = 0;
         player_dies = 0;
 
@@ -453,7 +459,7 @@ void game_loz_start(void) {
         lives = GAME_START_LIVES;
     }
     else {
-        player_gets_1up = 0;
+        player_finds_secret = 0;
         player_finishes = 0;
         player_dies = 0;
 

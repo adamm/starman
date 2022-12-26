@@ -258,7 +258,7 @@ const unsigned char loz_lost_woods [] = {
 // command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 The_Legend_of_Zelda_A_Link_to_the_Past_-_Hyrule_Castle_cut 
 const unsigned char loz_castle [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
-7,53, 0x90,43, 0,127, 0x90,43, 0,133, 0x80, 0,2, 0x90,43, 1,23, 0x91,57, 0x92,62, 0x93,67, 0,127, 0x81, 
+0,53, 0x90,43, 0,127, 0x90,43, 0,133, 0x80, 0,2, 0x90,43, 1,23, 0x91,57, 0x92,62, 0x93,67, 0,127, 0x81, 
 0x82, 0x83, 0,1, 0x91,57, 0x92,62, 0x93,67, 0,133, 0x81, 0x82, 0x83, 0,1, 0x91,57, 0x92,62, 0x93,67, 0,85, 0x82, 
 0,16, 0x81, 0x83, 0,158, 0x91,55, 0x92,60, 0x93,65, 0,88, 0x82, 0,16, 0x81, 0x83, 0,158, 0x91,57, 0x92,62, 0x93,67, 
 2,9, 0x80, 0x81, 0x82, 0x83, 0,1, 0x90,58, 0x91,63, 0x92,68, 0x93,44, 1,131, 0x90,61, 0x91,66, 0x92,71, 0,125, 
@@ -449,18 +449,18 @@ const unsigned char loz_get_master_sword [] = {
 
 
 
-// Playtune bytestream for file "game-over.mid" created by MIDITONES V2.4 on Sun Dec 25 12:45:06 2022
-// command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 game-over 
+// Playtune bytestream for file "loz-death.mid" created by MIDITONES V2.4 on Mon Dec 26 10:39:25 2022
+// command line: /Users/adamm/git/miditones/miditones -d -pi -s1 -t4 loz-death 
 const unsigned char loz_death [] = {
 'P','t', 6, 0x00, 0x00,  4, // (Playtune file header)
-0,3, 0x90,75, 0,92, 0x80, 0,6, 0x90,74, 0,79, 0x80, 0,6, 0x90,73, 0,79, 0x80, 0,5, 0x90,72, 0,83, 
-0x80, 0,6, 0x90,74, 0,82, 0x80, 0,6, 0x90,73, 0,78, 0x80, 0,5, 0x90,72, 0,79, 0x80, 0,6, 0x90,71, 
-0,84, 0x80, 0,5, 0x90,73, 0,85, 0x80, 0,5, 0x90,72, 0,79, 0x80, 0,5, 0x90,71, 0,79, 0x80, 0,5, 
-0x90,70, 0,83, 0x80, 0,5, 0x90,72, 0,82, 0x80, 0,6, 0x90,71, 0,79, 0x80, 0,5, 0x90,70, 0,79, 0x80, 
-0,6, 0x90,69, 0,83, 0x80, 0,6, 0x90,71, 0,95, 0x80, 0,5, 0x90,70, 0,83, 0x80, 0,6, 0x90,69, 0,84, 
-0x80, 0,7, 0x90,68, 0,91, 0x80, 0,7, 0x90,66, 0,94, 0x80, 0,7, 0x90,65, 0,93, 0x80, 0,6, 0x90,64, 
-7,221, 0x80, 1,94, 0xF0};
-// This 170 byte score contains 23 notes and uses 1 tone generator
+// Game Over from Zelda
+// For the Nintendo Entertainment System
+0x90,75, 0,83, 0x90,74, 0,83, 0x90,73, 0,83, 0x90,72, 0,84, 0x90,74, 0,83, 0x90,73, 0,83, 0x90,72, 
+0,84, 0x90,71, 0,83, 0x90,73, 0,83, 0x90,72, 0,84, 0x90,71, 0,83, 0x90,70, 0,83, 0x90,72, 0,84, 
+0x90,71, 0,83, 0x90,70, 0,83, 0x90,69, 0,84, 0x90,71, 0,83, 0x90,70, 0,83, 0x90,69, 0,84, 0x90,68, 
+0,83, 0x90,66, 0,83, 0x90,65, 0,84, 0x90,64, 1,244, 0x91,79, 0,28, 0x91,83, 0,27, 0x91,86, 0,28, 
+0x91,89, 0,28, 0x81, 1,133, 0x80, 0xF0};
+// This 119 byte score contains 27 notes and uses 2 tone generators
 
 
 // Playtune bytestream for file "game-over-2-.mid" created by MIDITONES V2.4 on Sun Dec 25 12:42:34 2022
