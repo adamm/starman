@@ -27,6 +27,7 @@
 #include "gol.h"
 #include "patterns.h"
 #include "patterns_gol.h"
+#include "tetris.h"
 #include "text.h"
 
 static const char *TAG = "starman-patterns";
