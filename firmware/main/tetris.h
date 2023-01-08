@@ -124,21 +124,17 @@ const block_t blocks[] = {
 };
 
 // Store the position for all active blocks in the game
+// including a linked-list of past blocks
 typedef struct {
-    enum TYPE type;
+    block_t* block;
     enum ROT rot;
     coords_t pos;
+    void* next;
+    void* prev;
 } game_block_t;
 
-// Linked-list of active blocks for active game
-typedef struct {
-    game_block_t* prev;
-    game_block_t* this;
-    game_block_t* next;
-} game_blocks_t;
 
-// All blocks in the game
-game_blocks_t* game_blocks = NULL;
-
-// active block is the block controlled by the user
-game_block_t* active_block = NULL;
+void tetris_user_move_left(void);
+void tetris_user_move_right(void);
+void tetris_game_step(void);
+void tetris_init(void);

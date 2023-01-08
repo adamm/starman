@@ -17,6 +17,7 @@ idf_component_register(SRCS
                     "sparkle.c"
                     "storage.c"
                     "test.c"
+                    "tetris.c"
                     "text.c"
                     "themes.c"
                     "util.c"
