@@ -32,6 +32,8 @@ bool game_smb_step_sequence(uint32_t time);
 void game_smb_start(void);
 bool game_loz_step_sequence(uint32_t time);
 void game_loz_start(void);
+bool game_tet_step_sequence(uint32_t time);
+void game_tet_start(void);
 void game_start(void);
 
 #endif

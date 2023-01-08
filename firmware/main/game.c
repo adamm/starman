@@ -87,7 +87,6 @@ bool game_smb_step_sequence(uint32_t time) {
 }
 
 
-
 void game_smb_start(void) {
     // Ignore subsequent play_game() calls if game is already playing
     if (playing == false)
@@ -319,7 +318,6 @@ bool game_loz_step_sequence(uint32_t time) {
 }
 
 
-
 void game_loz_start(void) {
     // Ignore subsequent play_game() calls if game is already playing
     if (playing == false)
@@ -477,6 +475,143 @@ void game_loz_start(void) {
 
     if (lives == 0) {
         const theme_t* gameover = themes_load_stage("LOZ", STAGE_gameover);
+
+        gameover->pattern();
+        music_playscore(gameover->score);
+        patterns_gameover_stop();
+
+        level = 1;
+        lives = GAME_START_LIVES;
+    }
+
+    music_amp_mute();
+
+    ESP_LOGI(TAG, "Done!");
+    playing = false;
+
+    sparkle_start();
+}
+
+
+bool game_tet_step_sequence(uint32_t time) {
+    patterns_step_sequence();
+
+    // Allow the music to continue
+    return false;
+}
+
+
+void game_tet_start(void) {
+    // Ignore subsequent play_game() calls if game is already playing
+    if (playing == false)
+        playing = true;
+    else
+        return;
+
+    ESP_LOGI(TAG, "game_tet_start() started");
+
+    music_amp_unmute();
+
+    // Stop sparkling becuase we're about to play some music/lights!
+    sparkle_stop();
+
+    const theme_t* level_stage;
+
+    if (level == 1) {
+        level_stage = themes_load_stage("TET", STAGE_level_1);
+    }
+    else if (level == 2) {
+        level_stage = themes_load_stage("TET", STAGE_level_2);
+    }
+    else if (level == 3) {
+        level_stage = themes_load_stage("TET", STAGE_level_3);
+    }
+    else if (level == 4) {
+        level_stage = themes_load_stage("TET", STAGE_level_4);
+    }
+    else {
+        // We shouldn't get here.  Reset!
+        level = 1;
+        lives = GAME_START_LIVES;
+        playing = false;
+        game_tet_start();
+        return;
+    }
+
+    uint32_t length = music_get_score_length(level_stage->score);
+
+    // Ignore the song header when calculating the song length
+    length -= 6;
+
+    // Now that the music has been identified, pick a random location in
+    // the song to stop and play the die music.
+    if (player_dies)
+        player_dies = random_value_within_int(length);
+    else
+        player_finishes = random_value_within_int(length/2) + length/2;
+
+
+    ESP_LOGI(TAG, "Player level:  %d", level);
+    ESP_LOGI(TAG, "Player lives:  %d", lives);
+    ESP_LOGI(TAG, "Level length:  %d", length);
+    ESP_LOGI(TAG, "Player dies?  %s", player_dies ? "Yes" : "No");
+    if (player_dies)
+        ESP_LOGI(TAG, " ... at %d", player_dies);
+    ESP_LOGI(TAG, "Player finishes?  %s", player_finishes ? "Yes" : "No");
+    if (player_finishes)
+        ESP_LOGI(TAG, " ... at %d", player_finishes);
+
+    uint32_t stopped_music_time = 0;
+    music_settempo(100);
+
+    while (stopped_music_time < length) {
+        level_stage->pattern();
+        stopped_music_time = music_playscore_at_time(level_stage->score, stopped_music_time);
+
+        // If the user is destined to die, the level music will not resume
+        if (player_dies && player_dies <= stopped_music_time)
+            break;
+
+        // The player could finish the level before the music is done, and death is averted
+        if (player_finishes && player_finishes <= stopped_music_time) {
+            player_dies = 0;
+            break;
+        }
+    }
+
+    if (player_dies) {
+        player_dies = 0;
+
+        /* TODO: Find good "player dies" music
+        const theme_t* death = themes_load_stage("TET", STAGE_death);
+
+        death->pattern();
+        music_playscore(death->score);
+        */
+
+        lives--;
+    }
+    else {
+        player_finds_secret = 0;
+        player_finishes = 0;
+        player_dies = 0;
+
+        /* TODO: Find good "stage clear" music
+        const theme_t* success = themes_load_stage("TET", STAGE_success);
+        const theme_t* clear = themes_load_stage("TET", STAGE_clear);
+
+        success->pattern();
+        music_playscore(success->score);
+
+        clear->pattern();
+        music_playscore(clear->score);
+        */
+
+        level++;
+    }
+
+    if (lives == 0) {
+        const theme_t* gameover = themes_load_stage("TET", STAGE_gameover);
 
         gameover->pattern();
         music_playscore(gameover->score);
