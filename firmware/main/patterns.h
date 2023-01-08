@@ -541,5 +541,6 @@ void patterns_starman();
 void patterns_swoop();
 void patterns_thump();
 void patterns_waves();
+void* patterns_get_display(void);
 
 #endif

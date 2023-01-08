@@ -1,9 +1,11 @@
 #pragma once
 
+#include "display.h"
+
 // What is our coordinate domain?
 typedef struct {
-    int8_t x;
     int8_t y;
+    int8_t x;
 } coords_t;
 
 // What types of blocks are there?
@@ -31,7 +33,7 @@ typedef struct {
 } block_t;
 
 // All possible block types, colours, and sizes
-const block_t blocks[] = {
+static const block_t blocks[] = {
     {
         TYPE_square,
         0x40,
@@ -52,11 +54,6 @@ const block_t blocks[] = {
         TYPE_line,
         0x80,
         {
-            {           {-1, 0 },
-                        { 0, 0 },
-                        { 1, 0 },
-                        { 2, 0 } },
-
             { { 0,-1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } },
 
             {           {-1, 0 },
@@ -65,6 +62,12 @@ const block_t blocks[] = {
                         { 2, 0 } },
 
             { { 0,-1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } },
+
+            {           {-1, 0 },
+                        { 0, 0 },
+                        { 1, 0 },
+                        { 2, 0 } },
+
         }
     }, {
         TYPE_tee,
@@ -136,5 +139,7 @@ typedef struct {
 
 void tetris_user_move_left(void);
 void tetris_user_move_right(void);
-void tetris_game_step(void);
-void tetris_init(void);
+void tetris_user_rotate_left(void);
+void tetris_user_rotate_right(void);
+bool tetris_step_game(void);
+void tetris_init(display_t* display);

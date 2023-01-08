@@ -670,3 +670,8 @@ static void patterns_waves_step() {
         waves_height--;
     }
 }
+
+
+void* patterns_get_display(void) {
+    return &display;
+}

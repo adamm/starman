@@ -43,12 +43,20 @@ void display_update_leds(display_t* display) {
         for (int x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
             // Positions in the LED_LUT that are 0 have no physical LED; just ignore out the pattern data.
             if (LED_LUT[y][x] > 0) {
-                // The pattern range is 8-bits, but the LED PWM driver supports 16-bits of brightnesses.
-                // Until the pattern is expanded to 16-bits, just multiply the pattern value by 256.
+                // The background and overlay range is 8 bits, yet the LED PWM
+                // driver supports 16 bits of brightnesses. Until the background
+                // and overlay arrays are expanded to 16 bits, just multiply the
+                // received values by 256.
                 if (display->background[y][x] > 0) {
                     display_out[LED_LUT[y][x]-1] = display->background[y][x] * 256;
                 }
-                if (display->overlay[y][x] > 0) {
+                // A display overlay value of 0 is transparent, and allows the
+                // background to show however if the overlay is 1, treat it as 0
+                // and override the background
+                if (display->overlay[y][x] == 1) {
+                    display_out[LED_LUT[y][x]-1] = 0;
+                }
+                else if (display->overlay[y][x] > 1) {
                     display_out[LED_LUT[y][x]-1] = display->overlay[y][x] * 256;
                 }
             }

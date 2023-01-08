@@ -22,6 +22,7 @@
 #include "music.h"
 #include "random.h"
 #include "sparkle.h"
+#include "tetris.h"
 #define INCLUDE_THEME_MUSIC_AND_PATTERNS
 #include "themes.h"
 
@@ -496,8 +497,8 @@ void game_loz_start(void) {
 bool game_tet_step_sequence(uint32_t time) {
     patterns_step_sequence();
 
-    // Allow the music to continue
-    return false;
+    // If returns true, stop music.  The game is over
+    return tetris_step_game();
 }
 
 
@@ -563,6 +564,8 @@ void game_tet_start(void) {
 
     uint32_t stopped_music_time = 0;
     music_settempo(100);
+
+    tetris_init((display_t*)patterns_get_display());
 
     while (stopped_music_time < length) {
         level_stage->pattern();
