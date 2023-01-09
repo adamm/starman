@@ -137,10 +137,9 @@ const theme_t theme_loz[] = {
 };
 
 const theme_t theme_tet[] = {
-    { STAGE_level_1,  tet_intro,        patterns_swipe },
-    { STAGE_level_2,  tet_theme_a,      patterns_sweep },
-    { STAGE_level_3,  tet_theme_b,      patterns_swoosh },
-    { STAGE_level_4,  tet_theme_c,      patterns_castle },
+    { STAGE_level_1,  tet_theme_a,      patterns_swipe },
+    { STAGE_level_2,  tet_theme_b,      patterns_sweep },
+    { STAGE_level_3,  tet_theme_c,      patterns_swoosh },
     { STAGE_gameover, tet_game_over,    patterns_spiral },
 };
 
@@ -161,7 +160,7 @@ static const themes_t themes[] = {
     { "SMB3", theme_smb3, 15, game_smb_start, game_smb_step_sequence },
     { "SMW",  theme_smw,  15, game_smb_start, game_smb_step_sequence },
     { "LOZ",  theme_loz,  12, game_loz_start, game_loz_step_sequence },
-    { "TET",  theme_tet,   5, game_tet_start, game_tet_step_sequence },
+    { "TET",  theme_tet,   4, game_tet_start, game_tet_step_sequence },
 };
 
 #define TOTAL_THEMES_AVAILABLE 6
