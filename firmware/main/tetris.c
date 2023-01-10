@@ -69,7 +69,7 @@ static void place_block(void) {
 
 static game_block_t* new_block(void) {
     game_block_t* block = calloc(1, sizeof(game_block_t));
-    uint8_t pick_a_block = (uint8_t)random_value_within_int(6);
+    uint8_t pick_a_block = (uint8_t)random_value_within_int(TYPE_TOTAL_COUNT);
 
     if (active_block != NULL) {
         active_block->next = (game_block_t*)block;

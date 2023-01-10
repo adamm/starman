@@ -10,12 +10,16 @@ typedef struct {
 
 // What types of blocks are there?
 enum TYPE {
-    TYPE_square = 0,
-    TYPE_line,
-    TYPE_tee,
-    TYPE_seven,
-    TYPE_jay,
+    TYPE_O = 0,
+    TYPE_I,
+    TYPE_T,
+    TYPE_7,
+    TYPE_J,
+    TYPE_S,
+    TYPE_Z,
 };
+
+#define TYPE_TOTAL_COUNT 7
 
 // How can a block be positioned?
 enum ROT {
@@ -32,11 +36,11 @@ typedef struct {
     coords_t pos[4][4];
 } block_t;
 
-// All possible block types, colours, and sizes
+// All possible block types, greyscale, and orientations
 static const block_t blocks[] = {
     {
-        TYPE_square,
-        0x40,
+        TYPE_O,
+        0x1F,
         {
             { { 0, 0 }, { 0, 1 },
               { 1, 0 }, { 1, 1 } },
@@ -51,8 +55,8 @@ static const block_t blocks[] = {
               { 1, 0 }, { 1, 1 } },
         }
     }, {
-        TYPE_line,
-        0x80,
+        TYPE_I,
+        0x3F,
         {
             { { 0,-1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } },
 
@@ -70,8 +74,8 @@ static const block_t blocks[] = {
 
         }
     }, {
-        TYPE_tee,
-        0xA0,
+        TYPE_T,
+        0xDF,
         {
             { { 0,-1 }, { 0, 0 }, { 0, 1 },
                         { 1, 0 } },
@@ -88,8 +92,8 @@ static const block_t blocks[] = {
                         { 1, 0 } },
         }
     }, {
-        TYPE_seven,
-        0xC0,
+        TYPE_7,
+        0x6F,
         {
             { { 0,-1 }, { 0, 0 },
                         { 1, 0 },
@@ -106,8 +110,8 @@ static const block_t blocks[] = {
                         {-1, 0 } },
         }
     }, {
-        TYPE_jay,
-        0xF0,
+        TYPE_J,
+        0xBF,
         {
             {           {-2, 0 },
                         {-1, 0 },
@@ -123,7 +127,43 @@ static const block_t blocks[] = {
   { { 0,-2 }, { 0,-1 }, { 0, 0 },
                         { 1, 0 } },
         }
-    }
+    }, {
+        TYPE_S,
+        0x9F,
+        {
+            {           { 0, 0 }, { 0, 1 },
+              { 1,-1 }, { 1, 0 } },
+
+            { {-1,-1 },
+              { 0,-1 }, { 0, 0 },
+                        { 1, 0 } },
+
+            {           { 0, 0 }, { 0, 1 },
+              { 1,-1 }, { 1, 0 } },
+
+            { {-1,-1 },
+              { 0,-1 }, { 0, 0 },
+                        { 1, 0 } },
+        }
+    }, {
+        TYPE_Z,
+        0xFF,
+        {
+            { { 0,-1 }, { 0, 0 },
+                        { 1, 0 }, { 1, 1 } },
+
+            {           {-1, 0 },
+              { 0,-1 }, { 0, 0 },
+              { 1,-1 } },
+
+            { { 0,-1 }, { 0, 0 },
+                        { 1, 0 }, { 1, 1 } },
+
+            {           {-1, 0 },
+              { 0,-1 }, { 0, 0 },
+              { 1,-1 } },
+        }
+    },
 };
 
 // Store the position for all active blocks in the game
@@ -142,4 +182,6 @@ void tetris_user_move_right(void);
 void tetris_user_rotate_left(void);
 void tetris_user_rotate_right(void);
 bool tetris_step_game(void);
+void tetris_stop(void);
+void tetris_start(void);
 void tetris_init(display_t* display);
