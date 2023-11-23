@@ -65,7 +65,7 @@ static void play_task() {
 
 static void reset_task() {
     // Delay the reset to allow the HTTP response to complete
-    vTaskDelay(500 / portTICK_RATE_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
     esp_restart();
 }
 

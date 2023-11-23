@@ -31,7 +31,7 @@ void util_delay(uint32_t ms) {
 
 
 char* util_get_mac_addr(void) {
-    if (mac_str != NULL)
+    if (mac_str[0] != 0)
         return mac_str;
 
     uint8_t mac[6];

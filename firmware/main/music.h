@@ -17,6 +17,9 @@
 #ifndef MUSIC_H
 #define MUSIC_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #define CMD_PLAYNOTE   0x90  /* play a note: low nibble is generator #, note is next byte */
 #define CMD_STOPNOTE   0x80  /* stop a note: low nibble is generator # */
 #define CMD_INSTRUMENT 0xC0  /* change instrument; low nibble is generator #, instrument is next byte */

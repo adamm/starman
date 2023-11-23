@@ -41,7 +41,7 @@ static void gpio_play_task() {
     for(;;) {
         if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
             int state = gpio_get_level(io_num);
-            printf("GPIO[%d] intr, val: %d\n", io_num, state);
+            printf("GPIO[%ld] intr, val: %d\n", io_num, state);
             // The play button GPIO is active-low
             if (callback_func != NULL && state == 0)
                 callback_func();

@@ -43,7 +43,7 @@ uint16_t adc_get_ambient_light_level() {
 
     if (calibration_enabled) {
         voltage = esp_adc_cal_raw_to_voltage(adc_raw, &adc1_chars);
-        ESP_LOGD(TAG, "adc_volt = %d mV", voltage);
+        ESP_LOGD(TAG, "adc_volt = %lu mV", voltage);
     }
 
     // The lower the ADC raw value is, the brighter the reading.

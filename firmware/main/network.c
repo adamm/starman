@@ -16,11 +16,13 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 #include <esp_log.h>
 #include <esp_system.h>
+#include <esp_timer.h>
 #include <esp_event.h>
 #include <esp_netif.h>
 #include <lwip/err.h>
@@ -81,6 +83,9 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
         case HTTP_EVENT_ON_FINISH:
             ESP_LOGD(TAG, "HTTP_EVENT_ON_FINISH");
             break;
+        case HTTP_EVENT_REDIRECT:
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
+            break;
         case HTTP_EVENT_DISCONNECTED:
             ESP_LOGD(TAG, "HTTP_EVENT_DISCONNECTED");
             int mbedtls_err = 0;
@@ -112,7 +117,7 @@ char* network_get_https_uri(const char* url, size_t* bufLen, esp_err_t* err) {
     ESP_LOGI(TAG, "GET %s", url);
     *err = esp_http_client_perform(client);
     if (*err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
         *bufLen = output_len;
@@ -146,7 +151,7 @@ char* network_post_https_uri(const char* url, char* postData, size_t postLen, si
     ESP_LOGI(TAG, "%s", postData);
     *err = esp_http_client_perform(client);
     if (*err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
         *bufLen = output_len;
@@ -197,7 +202,7 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
     mbedtls_md5_context md5;
 
     mbedtls_md5_init(&md5);
-    mbedtls_md5_starts_ret(&md5);
+    mbedtls_md5_starts(&md5);
 
     while (total_read_len < content_length) {
         max_read_len = (content_length - total_read_len >= MAX_HTTP_RECV_BUFFER) ? MAX_HTTP_RECV_BUFFER : content_length - total_read_len;
@@ -212,28 +217,28 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
             then = now;
             now = esp_timer_get_time();
             speed = read_len * 1000 / (now - then);
-            ESP_LOGD(TAG, "read_len = %d, total_read_len = %d, content_length = %d, diff = %lld ms", read_len, total_read_len, content_length, (now - then));
+            ESP_LOGD(TAG, "read_len = %u, total_read_len = %d, content_length = %d, diff = %llu ms", read_len, total_read_len, content_length, (now - then));
             ESP_LOGI(TAG, "%d/%d @ %d kbps", total_read_len, content_length, speed);
         }
         else {
             putchar('.');
             fflush(stdout);
         }
-        mbedtls_md5_update_ret(&md5, (const unsigned char*)buffer, read_len);
+        mbedtls_md5_update(&md5, (const unsigned char*)buffer, read_len);
         callback(buffer, read_len);
     }
     putchar('\n');
     now = esp_timer_get_time();
     speed = total_read_len * 1000 / (now - start);
     ESP_LOGI(TAG, "%d bytes downloaded in %f seconds at %d kbps", total_read_len, (float)(now - start)/1000000L, speed);
-    ESP_LOGI(TAG, "HTTP Stream reader Status = %d, content_length = %d",
+    ESP_LOGI(TAG, "HTTP Stream reader Status = %d, content_length = %lld",
                     esp_http_client_get_status_code(client),
                     esp_http_client_get_content_length(client));
     esp_http_client_close(client);
     esp_http_client_cleanup(client);
     free(buffer);
 
-    mbedtls_md5_finish_ret(&md5, digest);
+    mbedtls_md5_finish(&md5, digest);
     char digest_str[MAX_MD5_LEN*2] = {0};
 
     for (int i = 0; i < MAX_MD5_LEN; i++) {
