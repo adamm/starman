@@ -45,6 +45,7 @@ typedef struct themes {
 #include "music/smb2.h"
 #include "music/smb3.h"
 #include "music/smw.h"
+#include "music/smbw.h"
 #include "music/loz.h"
 #include "patterns.h"
 
@@ -120,6 +121,24 @@ const theme_t theme_smw[] = {
     { STAGE_ending,   smw_ending,       patterns_diamonds },
 };
 
+const theme_t theme_smbw[] = {
+    { STAGE_level_1,  smbw_overworld,       patterns_swipe },
+    { STAGE_level_3,  smbw_piranha_plants,  patterns_waves },     // Get better pattern
+    { STAGE_level_2,  smbw_athletic,        patterns_swoosh },    // Get better pattern
+    { STAGE_level_4,  smbw_factory,         patterns_castle },
+    { STAGE_block,    smb_block,            patterns_question },  // Fallback to SMB
+    { STAGE_1up,      smb_1up,              patterns_checkered }, // Fallback to SMB
+    { STAGE_powerup,  smb_powerup,          patterns_flash },     // Fallback to SMB
+    { STAGE_starman,  smbw_wonder_flower,   patterns_starman },
+    { STAGE_warning,  NULL,                 NULL },               // There is no time warning
+    { STAGE_success,  smb_block,            patterns_sweep },     // Fallback to SMB
+    { STAGE_clear,    smbw_course_clear,    patterns_radar },
+    { STAGE_death,    smb_death,            patterns_spiral },    // Fallback to SMB
+    { STAGE_gameover, smbw_gameover,        patterns_gameover },
+    { STAGE_fanfare,  smbw_prologue,        patterns_checkered }, // Use prologue as epilogue
+    { STAGE_ending,   smbw_peaches,         patterns_diamonds },
+};
+
 const theme_t theme_loz[] = {
     { STAGE_level_1,  loz_overworld,    patterns_swipe },
     { STAGE_level_2,  loz_kariki,       patterns_sweep },
@@ -141,6 +160,7 @@ extern const theme_t theme_smb[];
 extern const theme_t theme_smb2[];
 extern const theme_t theme_smb3[];
 extern const theme_t theme_smw[];
+extern const theme_t theme_smbw[];
 extern const theme_t theme_loz[];
 
 #endif
@@ -150,10 +170,11 @@ static const themes_t themes[] = {
     { "SMB2", theme_smb2, 15, game_smb_start, game_smb_step_sequence },
     { "SMB3", theme_smb3, 15, game_smb_start, game_smb_step_sequence },
     { "SMW",  theme_smw,  15, game_smb_start, game_smb_step_sequence },
+    { "SMBW", theme_smbw, 15, game_smb_start, game_smb_step_sequence },
     { "LOZ",  theme_loz,  12, game_loz_start, game_loz_step_sequence },
 };
 
-#define TOTAL_THEMES_AVAILABLE 5
+#define TOTAL_THEMES_AVAILABLE 6
 
 const theme_t* themes_load_stage(const char* title, enum STAGE stage);
 

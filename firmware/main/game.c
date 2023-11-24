@@ -103,7 +103,8 @@ void game_smb_start(void) {
 
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
-    player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
+    if (active_theme[STAGE_warning].pattern != NULL)
+        player_gets_warning = random_bool_under_percent(GAME_WARNING_PERCENT);
     player_gets_ending = random_bool_under_percent(GAME_ENDING_PERCENT);
     player_dies = random_bool_under_percent(GAME_DIE_PERCENT);
 
