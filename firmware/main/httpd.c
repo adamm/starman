@@ -182,8 +182,8 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         httpd_resp_send(req, response, strlen(response));
     }
     else if (strcmp(req->uri, "/theme") == 0) {
-        char* json = calloc(140, sizeof(char));
-        char* themes_str = calloc(20, sizeof(char));
+        char* json = calloc(200, sizeof(char));
+        char* themes_str = calloc(80, sizeof(char));
 
         for (uint8_t i = 0; i < TOTAL_THEMES_AVAILABLE; i++) {
             strcat(themes_str, "\"");
