@@ -34,6 +34,10 @@ static void start_test_stage(void* arg) {
     else {
         ESP_LOGE(TAG, "Couldn't test stage: %s : %d", test_param->theme, test_param->stage);
     }
+
+    // The task never exits until a new test is run or device is reset
+    for(;;) {
+    }
 }
 
 

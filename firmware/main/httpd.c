@@ -172,11 +172,25 @@ esp_err_t httpd_get_handler(httpd_req_t *req) {
         // Delay the reset to allow the HTTP response to complete
         xTaskCreate(reset_task, "reset", 2048, NULL, 5, &http_task);
     }
-    else if (strcmp(req->uri, "/test") == 0) {
+    // To test music playback of a specific track, specify /test/$(theme)/$(stage_num)
+    // See the bottom of themes.h for the list of themes, and specify stage by number.
+    // For example, call "/test/SMW/8" to play the starman stage from the SMW theme.
+    else if (strncmp(req->uri, "/test/", 6) == 0) {
+        char uri[80] = {0};
+        const char slash[] = "/";
         const char* response = "OK";
 
-        test_play_stage("SMW", STAGE_level_1);
+        strcpy(uri, req->uri);
+        strtok(uri, slash);
+        char* theme = strtok(NULL, slash);
+        char* stage_str = strtok(NULL, slash);
+        int stage_num = atoi(stage_str);
 
+        ESP_LOGI(TAG, "test / %s / %d", theme, stage_num);
+        test_play_stage(theme, stage_num);
+
+        // FIXME: Return an error here if the theme or stage_num is invalid.
+        // This info won't be known until start_test_stage()'s stage pointer is null or not.
         httpd_resp_set_status(req, "200 OK");
         httpd_resp_set_type(req, "test/plain");
         httpd_resp_send(req, response, strlen(response));
