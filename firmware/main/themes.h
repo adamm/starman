@@ -133,9 +133,9 @@ const theme_t theme_smbw[] = {
     { STAGE_warning,  NULL,                 NULL },               // There is no time warning
     { STAGE_success,  smb_block,            patterns_sweep },     // Fallback to SMB
     { STAGE_clear,    smbw_course_clear,    patterns_radar },
-    { STAGE_death,    smb_death,            patterns_spiral },    // Fallback to SMB
+    { STAGE_death,    smw_death,            patterns_spiral },    // Fallback to SMW
     { STAGE_gameover, smbw_gameover,        patterns_gameover },
-    { STAGE_fanfare,  smbw_prologue,        patterns_checkered }, // Use prologue as epilogue
+    { STAGE_fanfare,  smbw_course_clear,    patterns_radar },     // Cannot find good end-of-game fanfare music yet
     { STAGE_ending,   smbw_peaches,         patterns_diamonds },
 };
 
