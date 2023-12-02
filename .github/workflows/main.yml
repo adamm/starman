@@ -32,4 +32,5 @@ jobs:
         with:
           esp_idf_version: release-v4.4
           target: esp32s3
+          path: firmware
 

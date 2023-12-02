@@ -49,7 +49,7 @@ following commands in the root of the cloned repository.
 
 If you're using an IDE with the [Eclipse plugin](https://github.com/espressif/idf-eclipse-plugin/blob/master/README.md)
 or [VSCode extension](https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/install.md),
-follow those instructions.  If you using the command-line follow these steps:
+follow those instructions.  If you using the command-line follow these steps frim the firmware/ directory:
 
 1. `idf.py set-target esp32s3` to prepare the build environment.  (You only need to do this once.)
 
