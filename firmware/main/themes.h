@@ -123,8 +123,8 @@ const theme_t theme_smw[] = {
 
 const theme_t theme_smbw[] = {
     { STAGE_level_1,  smbw_overworld,       patterns_swipe },
+    { STAGE_level_2,  smbw_pipe_rock,       patterns_swoosh },
     { STAGE_level_3,  smbw_piranha_plants,  patterns_waves },     // Get better pattern
-    { STAGE_level_2,  smbw_athletic,        patterns_swoosh },    // Get better pattern
     { STAGE_level_4,  smbw_factory,         patterns_castle },
     { STAGE_block,    smb_block,            patterns_question },  // Fallback to SMB
     { STAGE_1up,      smb_1up,              patterns_checkered }, // Fallback to SMB
