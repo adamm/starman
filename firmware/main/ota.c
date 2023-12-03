@@ -217,6 +217,7 @@ uint8_t ota_upgrade(void) {
     uint32_t image_download_size = 0;
     float image_download_percent = 0;
     uint8_t image_download_percent_rounded = 0;
+    uint8_t last_image_download_percent_rounded = 0;
     char progress_text[10] = {0};
     display_t* display = NULL;
 
@@ -233,9 +234,12 @@ uint8_t ota_upgrade(void) {
         image_download_percent = (float)image_download_size / (float)image_total_size * 100.0;
         image_download_percent_rounded = floor(image_download_percent);
 
-        music_amp_unmute();
-        music_play_note(C5, 0.2);
-        music_amp_mute();
+        if (last_image_download_percent_rounded != image_download_percent_rounded) {
+            music_amp_unmute();
+            music_play_note(C5, 0.1);
+            music_amp_mute();
+            last_image_download_percent_rounded = image_download_percent_rounded;
+        }
 
         // ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
 
@@ -260,7 +264,7 @@ uint8_t ota_upgrade(void) {
 
             storage_set_str(STORAGE_DEVICE_TRACK_KEY, firmware_track);
             ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
-            vTaskDelay(4000 / portTICK_PERIOD_MS);
+            vTaskDelay(2000 / portTICK_PERIOD_MS);
             esp_restart();
             return 1;
         } else {
