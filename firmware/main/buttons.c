@@ -19,11 +19,20 @@
 #include <freertos/queue.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
+#include <string.h>
 
 #include "buttons.h"
 #include "config.h"
+#include "display.h"
+#include "music.h"
+#include "sparkle.h"
+#include "text.h"
+#include "themes.h"
 
 static const char *TAG = "starman-buttons";
+
+static display_t* display = NULL;
+static TaskHandle_t text_task;
 static void (*callback_func)(void) = NULL;
 static xQueueHandle gpio_evt_queue = NULL;
 
@@ -35,16 +44,124 @@ static void IRAM_ATTR gpio_isr_handler(void* arg) {
 }
 
 
-static void gpio_play_task() {
+static void scroll_theme_text() {
+    while(1) {
+        text_scroll(display);
+        display_update_leds(display);
+        vTaskDelay(100 / portTICK_RATE_MS);
+    }
+}
+
+
+static void gpio_button_task() {
     uint32_t io_num;
+    static bool prev_state = 0;
+    static bool theme_select_mode = 0;
+    static uint64_t button_pressed_time = 0;
+    static uint64_t button_released_time = 0;
 
     for(;;) {
         if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
-            int state = gpio_get_level(io_num);
-            printf("GPIO[%d] intr, val: %d\n", io_num, state);
-            // The play button GPIO is active-low
-            if (callback_func != NULL && state == 0)
-                callback_func();
+            // The button GPIO is active-low
+            bool now_state = !gpio_get_level(io_num);
+            bool button_released = !now_state;
+
+            if (now_state != prev_state) {
+                if (now_state == 1) {
+                    button_released = 0;
+                    button_pressed_time = esp_timer_get_time();
+                    button_released_time = 0;
+                }
+                else {
+                    button_released = 1;
+                    button_released_time = esp_timer_get_time();
+                }
+            }
+            prev_state = now_state;
+            printf("GPIO[%d] intr, val: %d\n", io_num, now_state);
+
+            // In normal mode, and user makes a short button press, play the game.
+            // In normal mode, and user makes a long button press, go into theme select mode.
+            // In theme-select mode, and user makes a short button press, rotate through the theme options.
+            // In theme-select mode, and user makes a long button press, save the theme setting and return to normal mode.
+
+            if (button_released && button_pressed_time > 0) {
+                ESP_LOGI(TAG, "button release - pressed times: %lld - %lld = %lld",
+                    button_released_time, button_pressed_time, button_released_time - button_pressed_time);
+                if (button_released_time - button_pressed_time > 1000000) {
+                    theme_select_mode = !theme_select_mode;
+                    // If entering theme-select mode, do two beeps: low-high notes
+                    // If leaving theme-select mode, do two beeps: high-low notes
+                    if (theme_select_mode) {
+                        char theme_text[15] = {0};
+
+                        ESP_LOGI(TAG, "Entering theme-select mode");
+                        music_amp_unmute();
+                        music_play_note(C5, 0.2);
+                        music_play_note(C6, 0.2);
+                        music_amp_mute();
+
+                        // Clear the display and show the currently selected theme
+                        sparkle_stop();
+                        display = calloc(1, sizeof(display_t));
+                        memset(display, 0, sizeof(display_t));
+
+                        sprintf(theme_text, " %s ", themes[config_theme].title);
+                        text_write_string(display, theme_text);
+                        display_update_leds(display);
+
+                        // Set a timer that calles text_scroll(display) to rotate through the name
+                        xTaskCreate(scroll_theme_text, "theme", 8192, NULL, 5, &text_task);
+                    }
+                    else {
+                        ESP_LOGI(TAG, "Leaving theme-select mode");
+                        music_amp_unmute();
+                        music_play_note(C6, 0.2);
+                        music_play_note(C5, 0.2);
+                        music_amp_mute();
+
+                        // Stop scrolling and reset the display to the sparkle routine
+                        vTaskDelete(text_task);
+                        // Give the scroller a chance to complete its final update
+                        vTaskDelay(150 / portTICK_RATE_MS);
+                        free(display);
+                        display = NULL;
+                        sparkle_start();
+                    }
+                    // TODO: start a timer to auto-exit theme-select mode after a five seconds of inactivty.
+                }
+                else {
+                    if (theme_select_mode) {
+                        char theme_text[10] = {0};
+
+                        ESP_LOGI(TAG, "Selecting next theme");
+
+                        // make a single beep: medium note
+                        music_amp_unmute();
+                        music_play_note(G5, 0.1);
+                        music_amp_mute();
+
+                        // select the next theme, save it, and scroll its name on the display
+                        config_theme++;
+                        if (config_theme >= TOTAL_THEMES_AVAILABLE)
+                            config_theme = 0;
+                        config_set_theme(config_theme);
+
+                        sprintf(theme_text, " %s ", themes[config_theme].title);
+                        text_write_string(display, theme_text);
+                        display_update_leds(display);
+                        // Text should continue to scroll from the established scroll_theme_text() task
+                    }
+                    else {
+                        // Execute normal button press functinoality. 
+                        // ie, play the game!
+                        ESP_LOGI(TAG, "Calling main program");
+                        if (callback_func != NULL)
+                            callback_func();
+                    }
+                }
+                button_pressed_time = 0;
+            }
         }
     }
 }
@@ -66,7 +183,7 @@ void buttons_init(void) {
     gpio_config(&io_conf);
 
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-    xTaskCreate(gpio_play_task, "gpio_play_task", 8196, NULL, 10, NULL);
+    xTaskCreate(gpio_button_task, "gpio_button_task", 8196, NULL, 10, NULL);
 
     gpio_install_isr_service(ESP_INTR_FLAG_LOWMED);
     gpio_isr_handler_add(PLAY_GAME_GPIO, gpio_isr_handler, (void*) PLAY_GAME_GPIO);
