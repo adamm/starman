@@ -320,6 +320,15 @@ void music_amp_mute(void) {
 }
 
 
+void music_play_note(music_notes_t note, float time) {
+    uint8_t i = (uint8_t)note;
+    ESP_LOGI(TAG, "Musnotec note %d: %s %dhz", i, notes[i], freqs[i]);
+    ledc_set_freq(ledc_channel[0].speed_mode, ledc_timer[0].timer_num, freqs[i]);
+    ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, freqs[i]);
+    ledc_update_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel);
+    vTaskDelay(1000 / portTICK_PERIOD_MS * time);
+}
+
 
 void music_init(void) {
     gpio_config_t io_conf = {};
