@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "display.h"
+#include "music.h"
 #include "sparkle.h"
 #include "storage.h"
 #include "text.h"
@@ -232,6 +233,10 @@ uint8_t ota_upgrade(void) {
         image_download_percent = (float)image_download_size / (float)image_total_size * 100.0;
         image_download_percent_rounded = floor(image_download_percent);
 
+        music_amp_unmute();
+        music_play_note(C5, 0.2);
+        music_amp_mute();
+
         // ESP_LOGI(TAG, "OTA download: %d of %d bytes which is %f%% or %d%%", image_download_size, image_total_size, image_download_percent, image_download_percent_rounded);
 
         sprintf(progress_text, "%d%%", image_download_percent_rounded);
@@ -247,6 +252,12 @@ uint8_t ota_upgrade(void) {
     } else {
         ota_finish_err = esp_https_ota_finish(https_ota_handle);
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
+            music_amp_unmute();
+            music_play_note(C5, 0.2);
+            music_play_note(G5, 0.2);
+            music_play_note(C6, 0.2);
+            music_amp_mute();
+
             storage_set_str(STORAGE_DEVICE_TRACK_KEY, firmware_track);
             ESP_LOGI(TAG, "ESP_HTTPS_OTA upgrade successful. Rebooting ...");
             vTaskDelay(4000 / portTICK_PERIOD_MS);
