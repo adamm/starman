@@ -48,12 +48,8 @@ void text_draw_char(display_t* display, uint8_t x, uint8_t y, char chr) {
     uint8_t ord = (uint8_t) chr;
     uint8_t row = 0, col = 0;
 
-    // Ensure all chars are upper-case
-    if (ord > 96)
-        ord -= 32;
-
-    // The font only contains ASCII characters between 32..96
-    if (ord < 32 || ord > 96)
+    // The font only contains ASCII characters between 32..126
+    if (ord < 32 || ord > 126)
         return;
     ord -= 32;
 
