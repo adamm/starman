@@ -186,7 +186,18 @@ void buttons_init(void) {
     xTaskCreate(gpio_button_task, "gpio_button_task", 8196, NULL, 10, NULL);
 
     gpio_install_isr_service(ESP_INTR_FLAG_LOWMED);
-    gpio_isr_handler_add(PLAY_GAME_GPIO, gpio_isr_handler, (void*) PLAY_GAME_GPIO);
 
     ESP_LOGI(TAG, "Init success");
+}
+
+
+void buttons_start() {
+    gpio_isr_handler_add(PLAY_GAME_GPIO, gpio_isr_handler, (void*) PLAY_GAME_GPIO);
+    ESP_LOGI(TAG, "Starting button handler");
+}
+
+
+void buttons_stop() {
+    gpio_isr_handler_remove(PLAY_GAME_GPIO);
+    ESP_LOGI(TAG, "Stopped button handler");
 }
