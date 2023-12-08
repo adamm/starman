@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**",
                 "~/esp/esp-idf/components/**"
             ],
-            "defines": [],
+            "defines": ["__XTENSA__=1"],
             "macFrameworkPath": [],
             "compilerPath": "/opt/homebrew/bin/arm-none-eabi-gcc",
             "cStandard": "gnu17",
