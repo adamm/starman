@@ -18,6 +18,7 @@
 #include <freertos/task.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
+#include <driver/timer.h>
 #include <esp_log.h>
 #include <string.h>
 
@@ -29,18 +30,30 @@
 #include "text.h"
 #include "themes.h"
 
+#define TIMER_SECONDS  2
+#define TIMER_DIVIDER  16
+#define TIMER_SCALE    (TIMER_BASE_CLK / TIMER_DIVIDER)
+#define BUTTON_TIMEOUT (TIMER_SECONDS * TIMER_SCALE)
+
 static const char *TAG = "starman-buttons";
 
 static display_t* display = NULL;
 static TaskHandle_t text_task;
 static void (*callback_func)(void) = NULL;
 static xQueueHandle gpio_evt_queue = NULL;
-
+static xQueueHandle timer_evt_queue = NULL;
 
 static void IRAM_ATTR gpio_isr_handler(void* arg) {
     uint32_t gpio_num = (uint32_t) arg;
 
     xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
+}
+
+
+static void IRAM_ATTR timer_isr_handler(void* arg) {
+    uint64_t counter = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, TIMER_0);
+
+    xQueueSendFromISR(timer_evt_queue, &counter, NULL);
 }
 
 
@@ -71,10 +84,13 @@ static void gpio_button_task() {
                     button_released = 0;
                     button_pressed_time = esp_timer_get_time();
                     button_released_time = 0;
+                    timer_start(TIMER_GROUP_0, TIMER_0);
                 }
                 else {
                     button_released = 1;
                     button_released_time = esp_timer_get_time();
+                    timer_pause(TIMER_GROUP_0, TIMER_0);
+                    timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
                 }
             }
             prev_state = now_state;
@@ -173,6 +189,22 @@ void buttons_play_callback(void (*callback)(void)) {
 
 
 void buttons_init(void) {
+    timer_config_t timer_conf = {};
+
+    timer_conf.divider = TIMER_DIVIDER;
+    timer_conf.counter_dir = TIMER_COUNT_UP;
+    timer_conf.counter_en = TIMER_PAUSE;
+    timer_conf.alarm_en = TIMER_ALARM_EN;
+    timer_conf.auto_reload = false;
+
+    timer_init(TIMER_GROUP_0, TIMER_0, &timer_conf);
+    timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
+    timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, BUTTON_TIMEOUT);
+    timer_enable_intr(TIMER_GROUP_0, TIMER_0);
+
+    timer_isr_callback_add(TIMER_GROUP_0, TIMER_0, timer_evt_queue, NULL, 0);
+    // Timer is actually started when the button is pressed; stopped when its released or alarm triggered
+
     gpio_config_t io_conf = {};
 
     io_conf.intr_type = GPIO_INTR_ANYEDGE;
