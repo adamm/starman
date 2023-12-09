@@ -26,6 +26,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "buttons.h"
 #include "config.h"
 #include "display.h"
 #include "music.h"
@@ -221,6 +222,7 @@ uint8_t ota_upgrade(void) {
     char progress_text[10] = {0};
     display_t* display = NULL;
 
+    buttons_stop();
     sparkle_stop();
     display = calloc(1, sizeof(display_t));
     memset(display, 0, sizeof(display_t));
@@ -252,7 +254,6 @@ uint8_t ota_upgrade(void) {
     if (esp_https_ota_is_complete_data_received(https_ota_handle) != true) {
         // the OTA image was not completely received and user can customise the response to this situation.
         ESP_LOGE(TAG, "Complete data was not received.");
-        sparkle_start();
     } else {
         ota_finish_err = esp_https_ota_finish(https_ota_handle);
         if ((err == ESP_OK) && (ota_finish_err == ESP_OK)) {
@@ -272,11 +273,11 @@ uint8_t ota_upgrade(void) {
                 ESP_LOGE(TAG, "Image validation failed, image is corrupted");
             }
             ESP_LOGE(TAG, "ESP_HTTPS_OTA upgrade failed 0x%x", ota_finish_err);
-            sparkle_start();
-            return 0;
         }
     }
-    return 1;
+    buttons_start();
+    sparkle_start();
+    return 0;
 
 ota_end:
     esp_https_ota_abort(https_ota_handle);

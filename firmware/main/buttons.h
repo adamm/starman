@@ -19,5 +19,7 @@
 
 void buttons_play_callback(void (*callback)(void));
 void buttons_init(void);
+void buttons_start();
+void buttons_stop();
 
 #endif

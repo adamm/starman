@@ -322,7 +322,7 @@ void music_amp_mute(void) {
 
 void music_play_note(music_notes_t note, float time) {
     uint8_t i = (uint8_t)note;
-    ESP_LOGI(TAG, "Musnotec note %d: %s %dhz", i, notes[i], freqs[i]);
+    ESP_LOGI(TAG, "Play note #%d: %s (%dhz) for %0.2f seconds", i, notes[i], freqs[i], time);
     ledc_set_freq(ledc_channel[0].speed_mode, ledc_timer[0].timer_num, freqs[i]);
     ledc_set_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel, freqs[i]);
     ledc_update_duty(ledc_channel[0].speed_mode, ledc_channel[0].channel);

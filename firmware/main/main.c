@@ -100,6 +100,7 @@ void app_main(void) {
 
     // Execute the start game function when the play button is pressed or /play is accessed
     buttons_play_callback(game_start);
+    buttons_start();
     httpd_play_callback(game_start);
 
     // Sparkle runs continiously in another thread while we wait for the user
