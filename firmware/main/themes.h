@@ -123,15 +123,15 @@ const theme_t theme_smw[] = {
 
 const theme_t theme_smbw[] = {
     { STAGE_level_1,  smbw_overworld,       patterns_swipe },
-    { STAGE_level_2,  smbw_pipe_rock,       patterns_swoosh },
-    { STAGE_level_3,  smbw_piranha_plants,  patterns_waves },     // Get better pattern
-    { STAGE_level_4,  smbw_factory,         patterns_castle },
+    { STAGE_level_2,  smbw_piranha_plants,  patterns_swoosh },
+    { STAGE_level_3,  smbw_athletic,        patterns_sweep },
+    { STAGE_level_4,  smbw_pumpkin_party,   patterns_castle },
     { STAGE_block,    smb_block,            patterns_question },  // Fallback to SMB
     { STAGE_1up,      smb_1up,              patterns_checkered }, // Fallback to SMB
     { STAGE_powerup,  smb_powerup,          patterns_flash },     // Fallback to SMB
     { STAGE_starman,  smbw_wonder_flower,   patterns_starman },
     { STAGE_warning,  NULL,                 NULL },               // There is no time warning
-    { STAGE_success,  smb_block,            patterns_sweep },     // Fallback to SMB
+    { STAGE_success,  smb_flagpole,         patterns_sweep },     // Fallback to SMB
     { STAGE_clear,    smbw_course_clear,    patterns_radar },
     { STAGE_death,    smw_death,            patterns_spiral },    // Fallback to SMW
     { STAGE_gameover, smbw_gameover,        patterns_gameover },
