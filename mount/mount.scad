@@ -15,7 +15,7 @@
 */
 
 body_w = 28;
-body_l = 18;
+body_l = 22;
 body_h = 100;
 body_x = -(body_w / 2);
 body_y = -(body_l / 2);
@@ -26,7 +26,7 @@ body_socket_delta = 11;
 body_treebranch_delta = 10;
 
 socket_w = 3.5;
-socket_l = 22;
+socket_l = body_l + 5;
 socket_h = 32;
 
 socket_left_x = -8.25 - socket_w;
@@ -49,14 +49,20 @@ tree_cone_z = -0.01;
 tree_cone_r = 7;
 tree_cone_h = 60;
 
-notch_size = 5;
+ldo_notch_w = 6;
+ldo_notch_h = 9;
+ldo_notch_l = 6;
+ldo_notch_x1 = body_w/2 - ldo_notch_w + 0.1;
+ldo_notch_x2 = -body_w/2 - 0.1;
+ldo_notch_y = body_l/2 - ldo_notch_w + 0.1;
+ldo_notch_z = body_h - ldo_notch_h + 0.1;
 
-notch_x = body_w/2 - notch_size;
-notch_y = body_l/2 - notch_size;
-notch_z = body_h - notch_size;
-notch_w = notch_size + 0.1;
-notch_l = notch_size + 0.1;
-notch_h = notch_size + 0.1;
+j10_notch_w = 12;
+j10_notch_h = 13;
+j10_notch_l = 3;
+j10_notch_x = -j10_notch_w/2;
+j10_notch_y = -body_l/2 - 0.1;
+j10_notch_z = socket_left_z;
 
 $fn = 100;
 
@@ -77,8 +83,14 @@ module mount_3d() {
         translate([socket_right_x, socket_right_y, socket_right_z])
             cube([socket_w, socket_l, socket_h]);
 
-        translate([notch_x, notch_y, notch_z])
-            cube([notch_w, notch_l, notch_h]);
+        translate([ldo_notch_x1, ldo_notch_y, ldo_notch_z])
+            cube([ldo_notch_w, ldo_notch_l, ldo_notch_h]);
+
+        translate([ldo_notch_x2, ldo_notch_y, ldo_notch_z])
+            cube([ldo_notch_w, ldo_notch_l, ldo_notch_h]);
+
+        translate([j10_notch_x, j10_notch_y, j10_notch_z])
+            cube([j10_notch_w, j10_notch_l, j10_notch_h]);
 
         translate([tree_cylinder_x, tree_cylinder_y, tree_cylinder_z-2])
             cylinder(r=tree_cylinder_r, h=tree_cylinder_h);
