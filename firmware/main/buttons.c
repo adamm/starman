@@ -54,6 +54,7 @@ static void IRAM_ATTR gpio_isr_handler(void* arg) {
 static bool IRAM_ATTR timer_isr_handler(void* arg) {
     uint64_t counter = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, TIMER_0);
 
+    // ets_printf("Timer Alert!\n");
     xQueueSendFromISR(timer_evt_queue, &counter, NULL);
 
     return pdTRUE;
@@ -84,6 +85,7 @@ static void gpio_button_task() {
             // The button GPIO is active-low
             bool now_state = !gpio_get_level(io_num);
             bool button_released = !now_state;
+            bool button_changed = (now_state != prev_state);
 
             if (now_state != prev_state) {
                 if (now_state == 1) {
@@ -104,7 +106,10 @@ static void gpio_button_task() {
             // In theme-select mode, and user makes a short button press, rotate through the theme options.
             // In theme-select mode, and user makes a long button press, save the theme setting and return to normal mode.
 
-            if (button_released && !timer_overrides_button) {
+            // Verify the button was just changed, becuase sometimes the GPIO
+            // fires multiple high/button-release events in a row, despite not
+            // actually changing state.
+            if (button_released && button_changed && !timer_overrides_button) {
                 if (theme_select_mode) {
                     char theme_text[10] = {0};
 
@@ -144,12 +149,16 @@ static void gpio_button_task() {
             }
         }
         else if(activated_evt_queue == timer_evt_queue) {
-            // Two second timer has fired.  Switch states!
+            // The button-hold timer has fired.  Switch states!
             theme_select_mode = !theme_select_mode;
 
             // Ignore next button press.  This ensures that when the button is
             // released after timer fires, a short-press isn't also recorded.
             timer_overrides_button = true;
+            // Also stop the timer to ensure continuing to hold down the button
+            // past the alert doesn't cycle theme-select mode in and out
+            timer_pause(TIMER_GROUP_0, TIMER_0);
+            timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
 
             // If entering theme-select mode, do two beeps: low-high notes
             // If leaving theme-select mode, do two beeps: high-low notes
