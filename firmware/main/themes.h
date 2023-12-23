@@ -124,14 +124,15 @@ const theme_t theme_smw[] = {
 
 const theme_t theme_sm64[] = {
     { STAGE_level_1,  sm64_overworld,   patterns_swipe },
-    { STAGE_level_2,  sm64_peach_castle, patterns_swoosh },
-    { STAGE_level_3,  sm64_underwater,  patterns_waves },
+    { STAGE_level_2,  sm64_peach_castle, patterns_sweep },
+    { STAGE_level_3,  sm64_slide,       patterns_swoosh },
     { STAGE_level_4,  sm64_bowser,      patterns_castle },
     { STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
     { STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
     { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
-    { STAGE_starman,  sm64_wing_cap,    patterns_starman },
-    { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+ // { STAGE_starman,  sm64_wing_cap,    patterns_starman },   // FIXME: wingcap is too long and tones are bad
+    { STAGE_warning,  NULL,             NULL },               // There is no time warning in SM64
     { STAGE_success,  smb_block,        patterns_sweep },     // Fallback to SMB
     { STAGE_clear,    sm64_course_clear, patterns_radar },
     { STAGE_death,    smb_death,        patterns_spiral },    // Fallback to SMB
