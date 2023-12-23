@@ -42,6 +42,17 @@ static uint32_t player_dies         = 0;
 static uint32_t player_finishes     = 0;
 
 
+static void reset_player_fate() {
+    player_gets_star    = 0;
+    player_finds_secret = 0;
+    player_gets_1up     = 0;
+    player_gets_warning = 0;
+    player_gets_ending  = 0;
+    player_dies         = 0;
+    player_finishes     = 0;
+}
+
+
 uint8_t game_get_level() {
     return level;
 }
@@ -101,6 +112,7 @@ void game_smb_start(void) {
 
     music_amp_unmute();
 
+    reset_player_fate();
     player_gets_star = random_bool_under_percent(GAME_STAR_PERCENT);
     player_gets_1up = random_bool_under_percent(GAME_1UP_PERCENT);
     if (active_theme[STAGE_warning].pattern != NULL)
@@ -146,6 +158,10 @@ void game_smb_start(void) {
         return;
     }
 
+    // Some theme songs are too long.
+    if (length > 1500)
+        length = 1500;
+
     if (player_invincible)
         player_dies = 0;
 
@@ -165,7 +181,6 @@ void game_smb_start(void) {
         player_dies = random_value_within_int(length);
     else
         player_finishes = random_value_within_int(length/2) + length/2;
-
 
     ESP_LOGI(TAG, "Player level:  %d", level);
     ESP_LOGI(TAG, "Player lives:  %d", lives);
@@ -196,17 +211,21 @@ void game_smb_start(void) {
     while (stopped_music_time < length) {
         level_pattern();
         stopped_music_time = music_playscore_at_time(level_music, stopped_music_time);
+        ESP_LOGI(TAG, "Pausing score at time: %d", stopped_music_time);
 
         if (player_gets_star && player_gets_star <= stopped_music_time) {
             uint8_t prev_tempo = music_gettempo();
             player_gets_star = 0;
 
+            ESP_LOGI(TAG, "Playing STAGE_block");
             active_theme[STAGE_block].pattern();
             music_playscore(active_theme[STAGE_block].score);
 
+            ESP_LOGI(TAG, "Playing STAGE_powerup");
             active_theme[STAGE_powerup].pattern();
             music_playscore(active_theme[STAGE_powerup].score);
 
+            ESP_LOGI(TAG, "Playing STAGE_starman");
             active_theme[STAGE_starman].pattern();
             music_playscore(active_theme[STAGE_starman].score);
 
@@ -218,9 +237,11 @@ void game_smb_start(void) {
             uint8_t prev_tempo = music_gettempo();
             player_gets_1up = 0;
 
+            ESP_LOGI(TAG, "Playing STAGE_block");
             active_theme[STAGE_block].pattern();
             music_playscore(active_theme[STAGE_block].score);
 
+            ESP_LOGI(TAG, "Playing STAGE_1up");
             active_theme[STAGE_1up].pattern();
             music_playscore(active_theme[STAGE_1up].score);
 
@@ -230,6 +251,7 @@ void game_smb_start(void) {
         if (player_gets_warning && player_gets_warning <= stopped_music_time) {
             player_gets_warning = 0;
 
+            ESP_LOGI(TAG, "Playing STAGE_warning");
             active_theme[STAGE_warning].pattern();
             music_playscore(active_theme[STAGE_warning].score);
             music_settempo(150);
@@ -252,18 +274,19 @@ void game_smb_start(void) {
         lives--;
         player_dies = 0;
 
+        ESP_LOGI(TAG, "Playing STAGE_death");
         active_theme[STAGE_death].pattern();
         music_playscore(active_theme[STAGE_death].score);
     }
     else if (level == 4) {
+        ESP_LOGI(TAG, "Playing STAGE_fanfare");
         active_theme[STAGE_fanfare].pattern();
         music_playscore(active_theme[STAGE_fanfare].score);
 
         if (player_gets_ending) {
-            player_gets_ending = 0;
-            player_finishes = 0;
-            player_dies = 0;
+            reset_player_fate();
 
+            ESP_LOGI(TAG, "Playing STAGE_ending");
             active_theme[STAGE_ending].pattern();
             music_playscore(active_theme[STAGE_ending].score);
         }
@@ -271,9 +294,12 @@ void game_smb_start(void) {
         lives = GAME_START_LIVES;
     }
     else {
+        reset_player_fate();
+        ESP_LOGI(TAG, "Playing STAGE_success");
         active_theme[STAGE_success].pattern();
         music_playscore(active_theme[STAGE_success].score);
 
+        ESP_LOGI(TAG, "Playing STAGE_clear");
         active_theme[STAGE_clear].pattern();
         music_playscore(active_theme[STAGE_clear].score);
 
@@ -281,6 +307,8 @@ void game_smb_start(void) {
     }
 
     if (lives == 0) {
+        reset_player_fate();
+        ESP_LOGI(TAG, "Playing STAGE_gameover");
         active_theme[STAGE_gameover].pattern();
         music_playscore(active_theme[STAGE_gameover].score);
         patterns_gameover_stop();
