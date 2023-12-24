@@ -75,7 +75,10 @@ static void patterns_waves_step();
 static void invert_background() {
     for (uint8_t y = 0; y < DISPLAY_LIGHTS_HEIGHT; y++) {
         for (uint8_t x = 0; x < DISPLAY_LIGHTS_WIDTH; x++) {
-            display.background[y][x] = 255 - display.background[y][x];
+            // In order to avoid overly flickering the screen during invert,
+            // subtract 51 (which is 1/4 of 255 max value) from each pixel. The
+            // end result is inverting the screen but not as quickly
+            display.background[y][x] = 51 - display.background[y][x];
         }
     }
 }
