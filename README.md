@@ -1,7 +1,7 @@
 # Starman Christmas Tree Topper
 
-Disclaimer: This work is a *work-in-progress*.  This project is still under
-active development and is estimated to be completed _December 1st, 2022_.
+Disclaimer: This work is a *work-in-progress*.  While this project is still
+under active development, version 2.1 was released _December 1st, 2022_.
 What you see here is code that is largely incomplete, buggy, crashes,
 and could catch fire. The PCB board is largely inefficient, expensive,
 broken, and could catch fire.
@@ -14,6 +14,15 @@ Version 2 is a complete redesign for 2022, including a custom PCB, 144
 LEDs, 235 components, ESP32-S3 MCU, esp-idf framework, and WiFi/Bluetooth
 support.  Audio is driven by 4 PWM channels, featuring a volume control and
 a class-D amplifier.
+
+Version 2.1 includes over-the-air firmware updates. I plan on releasing
+new themes and songs every Holiday season. 
+
+As of December 2023, there are **7 themes** and **81 arranged songs**.
+
+> [!NOTE]
+> I'll be demoing the Starman project, as well demoing its build process at [Calgary Maker Faire, May 4 & 5 2024](https://calgary.makerfaire.com/).
+> Come talk to me if you are interested in purchasing a pre-built Starman for Christmas 2024!
 
 You can see v2 in action here: https://www.youtube.com/watch?v=h6fquYPDars
 
@@ -87,6 +96,8 @@ Starman will forget about its current wifi configuration, theme, and configurati
 - [X] Brightness control
 - [X] Selectable themes
 - [ ] Document the REST API
+- [ ] Upgrade the speaker from 800mW to 1.5W for more power
+- [ ] Debug the RC filter to reduce distortion
 
 ## Known Issues
 
