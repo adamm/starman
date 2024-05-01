@@ -77,7 +77,7 @@ const theme_t theme_smb2[] = {
     { STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
     { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB
     { STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
-    { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
+    { STAGE_warning,  NULL,             NULL },               // There is no time warning in SMB2
     { STAGE_success,  smb_flagpole,     patterns_sweep },     // Fallback to SMB
     { STAGE_clear,    smb2_clear,       patterns_radar },
     { STAGE_death,    smb2_death,       patterns_spiral },
@@ -94,7 +94,7 @@ const theme_t theme_smb3[] = {
     { STAGE_block,    smb_block,        patterns_question },  // Fallback to SMB
     { STAGE_1up,      smb_1up,          patterns_checkered }, // Fallback to SMB
     { STAGE_powerup,  smb_powerup,      patterns_flash },     // Fallback to SMB       
-    { STAGE_starman,  smb_starman,      patterns_starman },   // Fallback to SMB
+    { STAGE_starman,  smb3_warp_zone,   patterns_starman },
     { STAGE_warning,  smb_warning,      patterns_siren },     // Fallback to SMB
     { STAGE_success,  smb_block,        patterns_sweep },     // No real "success" sound, so instead just bump the block
     { STAGE_clear,    smb3_course_clear,patterns_radar },
