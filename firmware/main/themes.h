@@ -161,7 +161,7 @@ const theme_t theme_smbw[] = {
 
 const theme_t theme_loz[] = {
     { STAGE_level_1,  loz_overworld,    patterns_swipe },
-    { STAGE_level_2,  loz_kariki,       patterns_sweep },
+    { STAGE_level_2,  loz_kokiri,       patterns_sweep },
     { STAGE_level_3,  loz_lost_woods,   patterns_swoosh },
     { STAGE_level_4,  loz_castle,       patterns_castle },
     { STAGE_block,    smb_block,        patterns_sweep },
