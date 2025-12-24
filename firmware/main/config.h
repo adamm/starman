@@ -73,6 +73,9 @@
 #define LIGHTS_MOSI_GPIO     35
 #define LIGHTS_SCLK_GPIO     36
 
+#define EXT_LED1_GPIO        16
+#define EXT_LED2_GPIO        15
+
 #else
 
 #error Only ESP32S2 and ESP32S3 configuration supported

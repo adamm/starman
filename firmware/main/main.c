@@ -25,6 +25,7 @@
 #include "buttons.h"
 #include "config.h"
 #include "display.h"
+#include "ext.h"
 #include "game.h"
 #include "httpd.h"
 #include "music.h"
@@ -93,6 +94,7 @@ void app_main(void) {
     storage_init();
     config_init();
     adc_init();
+    ext_init();
     buttons_init();
     display_init();
     music_init();

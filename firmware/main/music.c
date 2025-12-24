@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "ext.h"
 
 #include "music.h"
 
@@ -214,6 +215,7 @@ static void music_stepscore(void) {
     while (1) {
         cmd = *score_cursor++;
         ESP_LOGD(TAG, "cmd: %x", cmd);
+        ext_led_flip();
         if (++pos % 200 == 0)
             ESP_LOGI(TAG, "Playing score at byte: %d", pos);
 
@@ -300,6 +302,7 @@ static void music_stopscore(void) {
         ledc_set_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel, 0);
         ledc_update_duty(ledc_channel[i].speed_mode, ledc_channel[i].channel);
     }
+    ext_led_off();
 
     ESP_LOGI(TAG, "done");
 

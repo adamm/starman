@@ -5,6 +5,7 @@ idf_component_register(SRCS
                     "config.c"
                     "display.c"
                     "draw.c"
+                    "ext.c"
                     "game.c"
                     "gol.c"
                     "httpd.c"
