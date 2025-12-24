@@ -21,6 +21,7 @@
 #include <freertos/event_groups.h>
 #include <esp_log.h>
 #include <esp_system.h>
+#include <esp_timer.h>
 #include <esp_event.h>
 #include <esp_netif.h>
 #include <lwip/err.h>
@@ -55,6 +56,9 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
             break;
         case HTTP_EVENT_ON_CONNECTED:
             ESP_LOGD(TAG, "HTTP_EVENT_ON_CONNECTED");
+            break;
+        case HTTP_EVENT_REDIRECT:
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
             break;
         case HTTP_EVENT_HEADER_SENT:
             ESP_LOGD(TAG, "HTTP_EVENT_HEADER_SENT");
@@ -196,7 +200,7 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
     mbedtls_md5_context md5;
 
     mbedtls_md5_init(&md5);
-    mbedtls_md5_starts_ret(&md5);
+    mbedtls_md5_starts(&md5);
 
     while (total_read_len < content_length) {
         max_read_len = (content_length - total_read_len >= MAX_HTTP_RECV_BUFFER) ? MAX_HTTP_RECV_BUFFER : content_length - total_read_len;
@@ -217,7 +221,7 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
             putchar('.');
             fflush(stdout);
         }
-        mbedtls_md5_update_ret(&md5, (const unsigned char*)buffer, read_len);
+        mbedtls_md5_update(&md5, (const unsigned char*)buffer, read_len);
         callback(buffer, read_len);
     }
     putchar('\n');
@@ -231,7 +235,7 @@ esp_err_t network_stream_https_uri(const char* url, void (*callback)(char*, size
     esp_http_client_cleanup(client);
     free(buffer);
 
-    mbedtls_md5_finish_ret(&md5, digest);
+    mbedtls_md5_finish(&md5, digest);
     char digest_str[MAX_MD5_LEN*2] = {0};
 
     for (int i = 0; i < MAX_MD5_LEN; i++) {

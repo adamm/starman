@@ -18,7 +18,7 @@
 #include <freertos/task.h>
 #include <freertos/queue.h>
 #include <driver/gpio.h>
-#include <driver/timer.h>
+#include <driver/gptimer.h>
 #include <esp_log.h>
 #include <string.h>
 
@@ -31,9 +31,9 @@
 #include "themes.h"
 
 #define TIMER_SECONDS  1
-#define TIMER_DIVIDER  16
-#define TIMER_SCALE    (TIMER_BASE_CLK / TIMER_DIVIDER)
+#define TIMER_SCALE    1000000
 #define BUTTON_TIMEOUT (TIMER_SECONDS * TIMER_SCALE)
+ // Since the resolution is 1us, 1000000 represents 1s
 
 static const char *TAG = "starman-buttons";
 
@@ -44,6 +44,9 @@ static QueueSetHandle_t evt_queue_set = NULL;
 static xQueueHandle gpio_evt_queue = NULL;
 static xQueueHandle timer_evt_queue = NULL;
 
+gptimer_handle_t gptimer = NULL;
+gptimer_config_t timer_config = {};
+
 static void IRAM_ATTR gpio_isr_handler(void* arg) {
     uint32_t gpio_num = (uint32_t) arg;
 
@@ -51,8 +54,10 @@ static void IRAM_ATTR gpio_isr_handler(void* arg) {
 }
 
 
-static bool IRAM_ATTR timer_isr_handler(void* arg) {
-    uint64_t counter = timer_group_get_counter_value_in_isr(TIMER_GROUP_0, TIMER_0);
+static bool timer_alarm_callback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx) {
+    uint64_t counter = 0;
+
+    gptimer_get_raw_count(timer, &counter);
 
     // ets_printf("Timer Alert!\n");
     xQueueSendFromISR(timer_evt_queue, &counter, NULL);
@@ -90,16 +95,17 @@ static void gpio_button_task() {
             if (now_state != prev_state) {
                 if (now_state == 1) {
                     button_released = 0;
-                    timer_start(TIMER_GROUP_0, TIMER_0);
+                    gptimer_start(gptimer);
                 }
                 else {
                     button_released = 1;
-                    timer_pause(TIMER_GROUP_0, TIMER_0);
-                    timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
+                    gptimer_stop(gptimer);
+                    gptimer_set_raw_count(gptimer, 0);
+
                 }
             }
             prev_state = now_state;
-            printf("GPIO[%d] intr, val: %d\n", io_num, now_state);
+            printf("GPIO[%ld] intr, val: %d\n", io_num, now_state);
 
             // In normal mode, and user makes a short button press, play the game.
             // In normal mode, and user makes a long button press, go into theme select mode.
@@ -132,7 +138,7 @@ static void gpio_button_task() {
                     // Text should continue to scroll from the established scroll_theme_text() task
                 }
                 else {
-                    // Execute normal button press functinoality. 
+                    // Execute normal button press functionality.
                     // ie, play the game!
                     ESP_LOGI(TAG, "Calling main program");
                     if (callback_func != NULL) {
@@ -157,8 +163,8 @@ static void gpio_button_task() {
             timer_overrides_button = true;
             // Also stop the timer to ensure continuing to hold down the button
             // past the alert doesn't cycle theme-select mode in and out
-            timer_pause(TIMER_GROUP_0, TIMER_0);
-            timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
+            gptimer_stop(gptimer);
+            gptimer_set_raw_count(gptimer, 0);
 
             // If entering theme-select mode, do two beeps: low-high notes
             // If leaving theme-select mode, do two beeps: high-low notes
@@ -211,26 +217,34 @@ void buttons_play_callback(void (*callback)(void)) {
 
 
 void buttons_init(void) {
-    timer_config_t timer_conf = {};
-
     timer_evt_queue = xQueueCreate(10, sizeof(uint32_t));
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
     evt_queue_set = xQueueCreateSet(20);
     xQueueAddToSet(timer_evt_queue, evt_queue_set);
     xQueueAddToSet(gpio_evt_queue, evt_queue_set);
 
-    timer_conf.divider = TIMER_DIVIDER;
-    timer_conf.counter_dir = TIMER_COUNT_UP;
-    timer_conf.counter_en = TIMER_PAUSE;
-    timer_conf.alarm_en = TIMER_ALARM_EN;
-    timer_conf.auto_reload = true;
+    timer_config.clk_src = GPTIMER_CLK_SRC_DEFAULT;
+    timer_config.direction = GPTIMER_COUNT_UP;
+    timer_config.resolution_hz = 1 * 1000 * 1000;
 
-    timer_init(TIMER_GROUP_0, TIMER_0, &timer_conf);
-    timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0);
-    timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, BUTTON_TIMEOUT);
-    timer_enable_intr(TIMER_GROUP_0, TIMER_0);
+    gptimer_new_timer(&timer_config, &gptimer);
 
-    timer_isr_callback_add(TIMER_GROUP_0, TIMER_0, timer_isr_handler, NULL, 0);
+    gptimer_alarm_config_t alarm_config = {
+        .reload_count = 0,      // When the alarm event occurs, the timer will automatically reload to 0
+        .alarm_count = BUTTON_TIMEOUT,
+        .flags.auto_reload_on_alarm = true, // Enable auto-reload function
+    };
+
+    gptimer_set_alarm_action(gptimer, &alarm_config);
+
+    gptimer_set_raw_count(gptimer, 0);
+
+    gptimer_event_callbacks_t cbs = {
+        .on_alarm = timer_alarm_callback, // Call the user callback function when the alarm event occurs
+    };
+    gptimer_register_event_callbacks(gptimer, &cbs, NULL);
+    gptimer_enable(gptimer);
+
     // Timer is actually started when the button is pressed; stopped when its released or alarm triggered
 
     gpio_config_t io_conf = {};

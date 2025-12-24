@@ -2,6 +2,7 @@ firmware/.vscode/settings.json
 firmware/.vscode/c_cpp_properties.json
 .DS_Store
 firmware/build/
+firmware/managed_components/
 firmware/sdkconfig
 firmware/sdkconfig.old
 bom.html
